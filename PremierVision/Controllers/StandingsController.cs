@@ -11,7 +11,7 @@ public class StandingsController(IStandingsService standingsService) : Controlle
         var rows = await standingsService.CalculateAsync(cancellationToken);
         return View(new StandingsPageViewModel
         {
-            Rows = rows
+            Rows = rows 
         });
     }
 }
