@@ -48,15 +48,24 @@
 
 <main>
     <div class="wrap" style="padding-top:28px;padding-bottom:56px">
-        @if (Model.FeaturedMatch is not null)
+@if (Model.FeaturedMatch is not null)
         {
+            var featuredHomeInitials = Model.FeaturedMatch.HomeTeamName.Substring(0, Math.Min(3, Model.FeaturedMatch.HomeTeamName.Length)).ToUpperInvariant();
+            var featuredAwayInitials = Model.FeaturedMatch.AwayTeamName.Substring(0, Math.Min(3, Model.FeaturedMatch.AwayTeamName.Length)).ToUpperInvariant();
             <div class="feat-wrap">
                 <div class="feat-lbl">One Cikan Mac</div>
                 <a asp-controller="Matches" asp-action="Detail" asp-route-id="@Model.FeaturedMatch.Id" class="feat-card">
                     <div class="row align-items-center g-2">
                         <div class="col-5">
                             <div class="ft-team">
-                                <div class="ft-logo">@Model.FeaturedMatch.HomeTeamName.Substring(0, Math.Min(3, Model.FeaturedMatch.HomeTeamName.Length)).ToUpperInvariant()</div>
+                                @if (!string.IsNullOrWhiteSpace(Model.FeaturedMatch.HomeTeamLogoUrl))
+                                {
+                                    <img src="@Model.FeaturedMatch.HomeTeamLogoUrl" alt="@Model.FeaturedMatch.HomeTeamName logo" class="ft-logo" style="object-fit:contain;background:#fff;padding:6px" />
+                                }
+                                else
+                                {
+                                    <div class="ft-logo">@featuredHomeInitials</div>
+                                }
                                 <div class="ft-name">@Model.FeaturedMatch.HomeTeamName</div>
                                 <div class="ft-type">Ev Sahibi</div>
                             </div>
@@ -99,7 +108,14 @@
                         </div>
                         <div class="col-5">
                             <div class="ft-team">
-                                <div class="ft-logo">@Model.FeaturedMatch.AwayTeamName.Substring(0, Math.Min(3, Model.FeaturedMatch.AwayTeamName.Length)).ToUpperInvariant()</div>
+                                @if (!string.IsNullOrWhiteSpace(Model.FeaturedMatch.AwayTeamLogoUrl))
+                                {
+                                    <img src="@Model.FeaturedMatch.AwayTeamLogoUrl" alt="@Model.FeaturedMatch.AwayTeamName logo" class="ft-logo" style="object-fit:contain;background:#fff;padding:6px" />
+                                }
+                                else
+                                {
+                                    <div class="ft-logo">@featuredAwayInitials</div>
+                                }
                                 <div class="ft-name">@Model.FeaturedMatch.AwayTeamName</div>
                                 <div class="ft-type">Deplasman</div>
                             </div>
@@ -121,6 +137,8 @@
         }
         @foreach (var item in liveMatches)
         {
+            var homeInitials = item.HomeTeamName.Substring(0, Math.Min(3, item.HomeTeamName.Length)).ToUpperInvariant();
+            var awayInitials = item.AwayTeamName.Substring(0, Math.Min(3, item.AwayTeamName.Length)).ToUpperInvariant();
             <div class="mc-wrap match-card" data-section="live">
                 <a asp-controller="Matches" asp-action="Detail" asp-route-id="@item.Id" class="mc live">
                     <div class="mc-time">
@@ -130,12 +148,26 @@
                     <div class="dvv"></div>
                     <div class="mc-teams">
                         <div class="mc-tr">
-                            <div class="tl-sm">@item.HomeTeamName.Substring(0, Math.Min(3, item.HomeTeamName.Length)).ToUpperInvariant()</div>
+                            @if (!string.IsNullOrWhiteSpace(item.HomeTeamLogoUrl))
+                            {
+                                <img src="@item.HomeTeamLogoUrl" alt="@item.HomeTeamName logo" class="tl-sm" style="object-fit:contain;background:#fff;padding:3px" />
+                            }
+                            else
+                            {
+                                <div class="tl-sm">@homeInitials</div>
+                            }
                             <span class="tn">@item.HomeTeamName</span>
                             <span class="ts">@(item.HomeFullTimeScore ?? 0)</span>
                         </div>
                         <div class="mc-tr">
-                            <div class="tl-sm">@item.AwayTeamName.Substring(0, Math.Min(3, item.AwayTeamName.Length)).ToUpperInvariant()</div>
+                            @if (!string.IsNullOrWhiteSpace(item.AwayTeamLogoUrl))
+                            {
+                                <img src="@item.AwayTeamLogoUrl" alt="@item.AwayTeamName logo" class="tl-sm" style="object-fit:contain;background:#fff;padding:3px" />
+                            }
+                            else
+                            {
+                                <div class="tl-sm">@awayInitials</div>
+                            }
                             <span class="tn">@item.AwayTeamName</span>
                             <span class="ts">@(item.AwayFullTimeScore ?? 0)</span>
                         </div>
@@ -152,6 +184,8 @@
         }
         @foreach (var item in finishedMatches)
         {
+            var homeInitials = item.HomeTeamName.Substring(0, Math.Min(3, item.HomeTeamName.Length)).ToUpperInvariant();
+            var awayInitials = item.AwayTeamName.Substring(0, Math.Min(3, item.AwayTeamName.Length)).ToUpperInvariant();
             <div class="mc-wrap match-card" data-section="finished">
                 <a asp-controller="Matches" asp-action="Detail" asp-route-id="@item.Id" class="mc">
                     <div class="mc-time">
@@ -161,12 +195,26 @@
                     <div class="dvv"></div>
                     <div class="mc-teams">
                         <div class="mc-tr">
-                            <div class="tl-sm">@item.HomeTeamName.Substring(0, Math.Min(3, item.HomeTeamName.Length)).ToUpperInvariant()</div>
+                            @if (!string.IsNullOrWhiteSpace(item.HomeTeamLogoUrl))
+                            {
+                                <img src="@item.HomeTeamLogoUrl" alt="@item.HomeTeamName logo" class="tl-sm" style="object-fit:contain;background:#fff;padding:3px" />
+                            }
+                            else
+                            {
+                                <div class="tl-sm">@homeInitials</div>
+                            }
                             <span class="tn">@item.HomeTeamName</span>
                             <span class="ts">@item.HomeFullTimeScore</span>
                         </div>
                         <div class="mc-tr">
-                            <div class="tl-sm">@item.AwayTeamName.Substring(0, Math.Min(3, item.AwayTeamName.Length)).ToUpperInvariant()</div>
+                            @if (!string.IsNullOrWhiteSpace(item.AwayTeamLogoUrl))
+                            {
+                                <img src="@item.AwayTeamLogoUrl" alt="@item.AwayTeamName logo" class="tl-sm" style="object-fit:contain;background:#fff;padding:3px" />
+                            }
+                            else
+                            {
+                                <div class="tl-sm">@awayInitials</div>
+                            }
                             <span class="tn">@item.AwayTeamName</span>
                             <span class="ts">@item.AwayFullTimeScore</span>
                         </div>
@@ -183,6 +231,8 @@
         }
         @foreach (var item in upcomingMatches)
         {
+            var homeInitials = item.HomeTeamName.Substring(0, Math.Min(3, item.HomeTeamName.Length)).ToUpperInvariant();
+            var awayInitials = item.AwayTeamName.Substring(0, Math.Min(3, item.AwayTeamName.Length)).ToUpperInvariant();
             <div class="mc-wrap match-card" data-section="upcoming">
                 <a asp-controller="Matches" asp-action="Detail" asp-route-id="@item.Id" class="mc">
                     <div class="mc-time">
@@ -192,12 +242,26 @@
                     <div class="dvv"></div>
                     <div class="mc-teams">
                         <div class="mc-tr">
-                            <div class="tl-sm">@item.HomeTeamName.Substring(0, Math.Min(3, item.HomeTeamName.Length)).ToUpperInvariant()</div>
+                            @if (!string.IsNullOrWhiteSpace(item.HomeTeamLogoUrl))
+                            {
+                                <img src="@item.HomeTeamLogoUrl" alt="@item.HomeTeamName logo" class="tl-sm" style="object-fit:contain;background:#fff;padding:3px" />
+                            }
+                            else
+                            {
+                                <div class="tl-sm">@homeInitials</div>
+                            }
                             <span class="tn">@item.HomeTeamName</span>
                             <span class="ts dim">-</span>
                         </div>
                         <div class="mc-tr">
-                            <div class="tl-sm">@item.AwayTeamName.Substring(0, Math.Min(3, item.AwayTeamName.Length)).ToUpperInvariant()</div>
+                            @if (!string.IsNullOrWhiteSpace(item.AwayTeamLogoUrl))
+                            {
+                                <img src="@item.AwayTeamLogoUrl" alt="@item.AwayTeamName logo" class="tl-sm" style="object-fit:contain;background:#fff;padding:3px" />
+                            }
+                            else
+                            {
+                                <div class="tl-sm">@awayInitials</div>
+                            }
                             <span class="tn">@item.AwayTeamName</span>
                             <span class="ts dim">-</span>
                         </div>

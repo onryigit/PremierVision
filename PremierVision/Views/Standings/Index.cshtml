@@ -92,7 +92,19 @@
                                     <strong>@item.Position</strong>
                                 </div>
                             </td>
-                            <td class="fw-semibold">@item.TeamName</td>
+                            <td class="fw-semibold">
+                                <div class="d-flex align-items-center gap-2">
+                                    @if (!string.IsNullOrWhiteSpace(item.TeamLogoUrl))
+                                    {
+                                        <img src="@item.TeamLogoUrl" alt="@item.TeamName logo" style="width:24px;height:24px;object-fit:contain;background:#fff;border-radius:50%;padding:2px" />
+                                    }
+                                    else
+                                    {
+                                        <span class="tl-sm" style="width:24px;height:24px;font-size:10px">@item.TeamName[..Math.Min(3, item.TeamName.Length)].ToUpperInvariant()</span>
+                                    }
+                                    <span>@item.TeamName</span>
+                                </div>
+                            </td>
                             <td>@item.Played</td>
                             <td style="color:var(--green)">@item.Wins</td>
                             <td style="color:var(--t2)">@item.Draws</td>

@@ -23,31 +23,36 @@ public class ApiFootballSyncService(
             $"teams?league={_options.PremierLeagueId}&season={_options.Season}",
             cancellationToken);
 
+        var existingTeams = await context.Teams.ToListAsync(cancellationToken);
         var count = 0;
         foreach (var item in document.RootElement.GetProperty("response").EnumerateArray())
         {
             var teamJson = item.GetProperty("team");
             var venueJson = item.GetProperty("venue");
             var apiTeamId = teamJson.GetProperty("id").GetInt32();
+            var teamName = teamJson.GetProperty("name").GetString() ?? string.Empty;
+            var teamCode = teamJson.TryGetProperty("code", out var codeProp)
+                ? codeProp.GetString()
+                : null;
 
-            var entity = await context.Teams.FirstOrDefaultAsync(
-                x => x.ApiFootballTeamId == apiTeamId,
-                cancellationToken);
+            var entity = existingTeams.FirstOrDefault(x => x.ApiFootballTeamId == apiTeamId)
+                ?? existingTeams.FirstOrDefault(x =>
+                    x.ApiFootballTeamId == null &&
+                    (x.Name == teamName ||
+                     (!string.IsNullOrWhiteSpace(teamCode) && x.Code == teamCode) ||
+                     (!string.IsNullOrWhiteSpace(teamCode) && x.ShortName == teamCode)));
 
             if (entity is null)
             {
                 entity = new Team();
                 context.Teams.Add(entity);
+                existingTeams.Add(entity);
             }
 
             entity.ApiFootballTeamId = apiTeamId;
-            entity.Name = teamJson.GetProperty("name").GetString() ?? string.Empty;
-            entity.ShortName = teamJson.TryGetProperty("code", out var codeProp)
-                ? codeProp.GetString() ?? entity.Name
-                : entity.Name;
-            entity.Code = teamJson.TryGetProperty("code", out var codeValue)
-                ? codeValue.GetString() ?? entity.ShortName
-                : entity.ShortName;
+            entity.Name = teamName;
+            entity.ShortName = teamCode ?? entity.Name;
+            entity.Code = teamCode ?? entity.ShortName;
             entity.LogoUrl = teamJson.TryGetProperty("logo", out var logoProp)
                 ? logoProp.GetString()
                 : null;
@@ -68,6 +73,11 @@ public class ApiFootballSyncService(
     public async Task<int> SyncFixturesAsync(CancellationToken cancellationToken = default)
     {
         EnsureApiKey();
+
+        if (!await context.Teams.AnyAsync(x => x.ApiFootballTeamId.HasValue, cancellationToken))
+        {
+            await SyncTeamsAsync(cancellationToken);
+        }
 
         using var document = await GetAsync(
             $"fixtures?league={_options.PremierLeagueId}&season={_options.Season}",
@@ -95,8 +105,16 @@ public class ApiFootballSyncService(
                 continue;
             }
 
+            var kickoffUtc = fixtureJson.GetProperty("date").GetDateTime();
             var entity = await context.Fixtures.FirstOrDefaultAsync(
                 x => x.ApiFootballFixtureId == apiFixtureId,
+                cancellationToken);
+
+            entity ??= await context.Fixtures.FirstOrDefaultAsync(
+                x => x.ApiFootballFixtureId == null &&
+                     x.HomeTeamId == homeTeam.Id &&
+                     x.AwayTeamId == awayTeam.Id &&
+                     x.KickoffUtc == kickoffUtc,
                 cancellationToken);
 
             if (entity is null)
@@ -111,7 +129,7 @@ public class ApiFootballSyncService(
             entity.MatchWeek = ParseMatchWeek(leagueJson.TryGetProperty("round", out var roundProp)
                 ? roundProp.GetString()
                 : null);
-            entity.KickoffUtc = fixtureJson.GetProperty("date").GetDateTime();
+            entity.KickoffUtc = kickoffUtc;
             entity.VenueName = fixtureJson.GetProperty("venue").TryGetProperty("name", out var venueName)
                 ? venueName.GetString() ?? string.Empty
                 : string.Empty;

@@ -5,6 +5,7 @@ public class StandingRowViewModel
     public int Position { get; init; }
     public int TeamId { get; init; }
     public string TeamName { get; init; } = string.Empty;
+    public string? TeamLogoUrl { get; init; }
     public int Played { get; init; }
     public int Wins { get; init; }
     public int Draws { get; init; }

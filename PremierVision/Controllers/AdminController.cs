@@ -12,7 +12,17 @@ public class AdminController(AppDbContext context, IApiFootballSyncService apiFo
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        return View(await BuildViewModelAsync(cancellationToken));
+        try
+        {
+            return View(await BuildViewModelAsync(cancellationToken));
+        }
+        catch (Exception exception)
+        {
+            return View(new AdminPanelViewModel
+            {
+                ErrorMessage = $"Admin paneli yuklenirken veritabani baglantisi kurulamadi: {exception.Message}"
+            });
+        }
     }
 
     [HttpPost]
@@ -26,7 +36,7 @@ public class AdminController(AppDbContext context, IApiFootballSyncService apiFo
 
         if (!ModelState.IsValid)
         {
-            return View("Index", await BuildViewModelAsync(cancellationToken, fixture: input));
+            return View("Index", await BuildViewModelAsyncSafe(cancellationToken, fixture: input));
         }
 
         context.Fixtures.Add(new Fixture
@@ -55,7 +65,7 @@ public class AdminController(AppDbContext context, IApiFootballSyncService apiFo
     {
         if (!ModelState.IsValid)
         {
-            return View("Index", await BuildViewModelAsync(cancellationToken, @event: input));
+            return View("Index", await BuildViewModelAsyncSafe(cancellationToken, @event: input));
         }
 
         context.MatchEvents.Add(new MatchEvent
@@ -79,7 +89,7 @@ public class AdminController(AppDbContext context, IApiFootballSyncService apiFo
     {
         if (!ModelState.IsValid)
         {
-            return View("Index", await BuildViewModelAsync(cancellationToken, statistic: input));
+            return View("Index", await BuildViewModelAsyncSafe(cancellationToken, statistic: input));
         }
 
         context.MatchStatistics.Add(new MatchStatistic
@@ -165,5 +175,27 @@ public class AdminController(AppDbContext context, IApiFootballSyncService apiFo
             Teams = teams,
             Fixtures = fixtures
         };
+    }
+
+    private async Task<AdminPanelViewModel> BuildViewModelAsyncSafe(
+        CancellationToken cancellationToken,
+        CreateFixtureInputModel? fixture = null,
+        CreateMatchEventInputModel? @event = null,
+        CreateMatchStatisticInputModel? statistic = null)
+    {
+        try
+        {
+            return await BuildViewModelAsync(cancellationToken, fixture, @event, statistic);
+        }
+        catch (Exception exception)
+        {
+            return new AdminPanelViewModel
+            {
+                ErrorMessage = $"Veritabani baglantisi kurulamadi: {exception.Message}",
+                Fixture = fixture ?? new CreateFixtureInputModel(),
+                Event = @event ?? new CreateMatchEventInputModel(),
+                Statistic = statistic ?? new CreateMatchStatisticInputModel()
+            };
+        }
     }
 }

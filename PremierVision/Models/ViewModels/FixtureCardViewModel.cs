@@ -5,7 +5,9 @@ public class FixtureCardViewModel
     public int Id { get; init; }
     public int MatchWeek { get; init; }
     public string HomeTeamName { get; init; } = string.Empty;
+    public string? HomeTeamLogoUrl { get; init; }
     public string AwayTeamName { get; init; } = string.Empty;
+    public string? AwayTeamLogoUrl { get; init; }
     public DateTime KickoffUtc { get; init; }
     public string VenueName { get; init; } = string.Empty;
     public FixtureStatus Status { get; init; }

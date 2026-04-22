@@ -6,6 +6,10 @@
 
 <section class="hero">
     <div class="wrap">
+        @{
+            var homeInitials = Model.Fixture.HomeTeamName[..Math.Min(3, Model.Fixture.HomeTeamName.Length)].ToUpperInvariant();
+            var awayInitials = Model.Fixture.AwayTeamName[..Math.Min(3, Model.Fixture.AwayTeamName.Length)].ToUpperInvariant();
+        }
         <div class="hero-badges">
             <span class="hbadge hb-gold"><i class="bi bi-trophy-fill me-1"></i>Premier League</span>
             <span class="hbadge hb-gray"><i class="bi bi-calendar3 me-1"></i>Hafta @Model.Fixture.MatchWeek</span>
@@ -27,7 +31,14 @@
 
         <div class="hero-grid">
             <div class="h-team">
-                <div class="h-logo">@Model.Fixture.HomeTeamName[..Math.Min(3, Model.Fixture.HomeTeamName.Length)].ToUpperInvariant()</div>
+                @if (!string.IsNullOrWhiteSpace(Model.Fixture.HomeTeamLogoUrl))
+                {
+                    <img src="@Model.Fixture.HomeTeamLogoUrl" alt="@Model.Fixture.HomeTeamName logo" class="h-logo" style="object-fit:contain;background:#fff;padding:10px" />
+                }
+                else
+                {
+                    <div class="h-logo">@homeInitials</div>
+                }
                 <div class="h-name">@Model.Fixture.HomeTeamName</div>
                 <div class="h-type">Ev Sahibi</div>
             </div>
@@ -45,7 +56,14 @@
                 </div>
             </div>
             <div class="h-team">
-                <div class="h-logo">@Model.Fixture.AwayTeamName[..Math.Min(3, Model.Fixture.AwayTeamName.Length)].ToUpperInvariant()</div>
+                @if (!string.IsNullOrWhiteSpace(Model.Fixture.AwayTeamLogoUrl))
+                {
+                    <img src="@Model.Fixture.AwayTeamLogoUrl" alt="@Model.Fixture.AwayTeamName logo" class="h-logo" style="object-fit:contain;background:#fff;padding:10px" />
+                }
+                else
+                {
+                    <div class="h-logo">@awayInitials</div>
+                }
                 <div class="h-name">@Model.Fixture.AwayTeamName</div>
                 <div class="h-type">Deplasman</div>
             </div>

@@ -63,6 +63,7 @@ public class StandingsService(AppDbContext context) : IStandingsService
             {
                 TeamId = team.Id,
                 TeamName = team.Name,
+                TeamLogoUrl = team.LogoUrl,
                 Played = playedMatches.Count,
                 Wins = wins,
                 Draws = draws,
@@ -86,6 +87,7 @@ public class StandingsService(AppDbContext context) : IStandingsService
                 Position = index + 1,
                 TeamId = row.TeamId,
                 TeamName = row.TeamName,
+                TeamLogoUrl = row.TeamLogoUrl,
                 Played = row.Played,
                 Wins = row.Wins,
                 Draws = row.Draws,

@@ -19,7 +19,15 @@ namespace PremierVision.Controllers
                 .OrderBy(x => x)
                 .ToListAsync(cancellationToken);
 
-            var selectedWeek = week ?? availableWeeks.LastOrDefault();
+            var currentWeek = await context.Fixtures
+                .AsNoTracking()
+                .Where(x => x.Status == FixtureStatus.Live || x.Status == FixtureStatus.Completed)
+                .OrderByDescending(x => x.KickoffUtc)
+                .Select(x => x.MatchWeek)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var selectedWeek = week
+                ?? (currentWeek != 0 ? currentWeek : availableWeeks.LastOrDefault());
 
             var weeklyFixtures = await context.Fixtures
                 .AsNoTracking()
@@ -32,7 +40,9 @@ namespace PremierVision.Controllers
                     Id = x.Id,
                     MatchWeek = x.MatchWeek,
                     HomeTeamName = x.HomeTeam.Name,
+                    HomeTeamLogoUrl = x.HomeTeam.LogoUrl,
                     AwayTeamName = x.AwayTeam.Name,
+                    AwayTeamLogoUrl = x.AwayTeam.LogoUrl,
                     KickoffUtc = x.KickoffUtc,
                     VenueName = x.VenueName,
                     Status = x.Status,
@@ -55,7 +65,9 @@ namespace PremierVision.Controllers
                     Id = x.Id,
                     MatchWeek = x.MatchWeek,
                     HomeTeamName = x.HomeTeam.Name,
+                    HomeTeamLogoUrl = x.HomeTeam.LogoUrl,
                     AwayTeamName = x.AwayTeam.Name,
+                    AwayTeamLogoUrl = x.AwayTeam.LogoUrl,
                     KickoffUtc = x.KickoffUtc,
                     VenueName = x.VenueName,
                     Status = x.Status,
@@ -78,7 +90,9 @@ namespace PremierVision.Controllers
                     Id = x.Id,
                     MatchWeek = x.MatchWeek,
                     HomeTeamName = x.HomeTeam.Name,
+                    HomeTeamLogoUrl = x.HomeTeam.LogoUrl,
                     AwayTeamName = x.AwayTeam.Name,
+                    AwayTeamLogoUrl = x.AwayTeam.LogoUrl,
                     KickoffUtc = x.KickoffUtc,
                     VenueName = x.VenueName,
                     Status = x.Status,

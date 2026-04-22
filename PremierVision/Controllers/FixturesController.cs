@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PremierVision.Data;
+using PremierVision.Models;
 using PremierVision.Models.ViewModels;
 
 namespace PremierVision.Controllers;
@@ -16,7 +17,15 @@ public class FixturesController(AppDbContext context) : Controller
             .OrderBy(x => x)
             .ToListAsync(cancellationToken);
 
-        var selectedWeek = week ?? availableWeeks.LastOrDefault();
+        var upcomingWeek = await context.Fixtures
+            .AsNoTracking()
+            .Where(x => x.Status != FixtureStatus.Completed)
+            .OrderBy(x => x.KickoffUtc)
+            .Select(x => x.MatchWeek)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var selectedWeek = week
+            ?? (upcomingWeek != 0 ? upcomingWeek : availableWeeks.LastOrDefault());
 
         var fixtures = await context.Fixtures
             .AsNoTracking()
@@ -29,7 +38,9 @@ public class FixturesController(AppDbContext context) : Controller
                 Id = x.Id,
                 MatchWeek = x.MatchWeek,
                 HomeTeamName = x.HomeTeam.Name,
+                HomeTeamLogoUrl = x.HomeTeam.LogoUrl,
                 AwayTeamName = x.AwayTeam.Name,
+                AwayTeamLogoUrl = x.AwayTeam.LogoUrl,
                 KickoffUtc = x.KickoffUtc,
                 VenueName = x.VenueName,
                 Status = x.Status,
