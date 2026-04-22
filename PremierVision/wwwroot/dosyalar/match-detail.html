@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Arsenal 2–2 Liverpool — GoalZone Maç Detayı</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080d18;--bg2:#0c1220;--card:#111827;--card2:#16202f;--elevated:#1c2d42;
+  --green:#00e676;--blue:#2979ff;--live:#ff1744;--gold:#ffd600;--yellow:#ffc107;--red:#f44336;
+  --t1:#eef2ff;--t2:#7b96c4;--t3:#3d5478;--border:#1a2640;
+  --r1:8px;--r2:12px;--r3:16px;--shadow:0 4px 24px rgba(0,0,0,.5);
+  --tr:all .22s cubic-bezier(.4,0,.2,1);--fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--t1);min-height:100vh;
+  background-image:radial-gradient(ellipse at 15% 0%,rgba(41,121,255,.07) 0%,transparent 55%),
+  radial-gradient(ellipse at 85% 0%,rgba(0,230,118,.04) 0%,transparent 50%)}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--elevated);border-radius:3px}
+a{text-decoration:none;color:inherit}img{display:block}
+
+/* ── NAVBAR ── */
+.nb{background:rgba(8,13,24,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:1000;box-shadow:0 2px 24px rgba(0,0,0,.5)}
+.nb-inner{max-width:1120px;margin:0 auto;padding:0 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;padding:14px 0}
+.brand-ico{width:34px;height:34px;background:linear-gradient(135deg,var(--green),var(--blue));
+  border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.brand-txt{font-family:var(--fd);font-size:21px;font-weight:800;letter-spacing:1px}
+.brand-txt span{color:var(--green)}
+.nav-links{display:flex}
+.nl{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--t2);padding:22px 15px;position:relative;transition:var(--tr)}
+.nl::after{content:'';position:absolute;bottom:0;left:15px;right:15px;height:2px;
+  background:var(--green);transform:scaleX(0);transition:var(--tr)}
+.nl:hover,.nl.active{color:var(--t1)}.nl:hover::after,.nl.active::after{transform:scaleX(1)}
+.nb-icons{display:flex;align-items:center;gap:5px}
+.ico-btn{width:36px;height:36px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r1);color:var(--t2);display:flex;align-items:center;
+  justify-content:center;font-size:14px;transition:var(--tr)}
+.ico-btn:hover{background:var(--elevated);color:var(--t1);border-color:var(--blue)}
+.tog{background:var(--card);border:1px solid var(--border);border-radius:var(--r1);
+  padding:7px 9px;color:var(--t1);cursor:pointer;line-height:1}
+.mob-menu{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.mob-menu.open{max-height:320px}
+.mob-menu .nl{padding:14px 0;border-bottom:1px solid var(--border);display:block}
+
+/* ── WRAP ── */
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(180deg,#0b1830 0%,var(--bg) 100%);
+  border-bottom:1px solid var(--border);padding:36px 0 28px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 20% 50%,rgba(0,230,118,.05) 0%,transparent 60%),
+  radial-gradient(ellipse at 80% 50%,rgba(41,121,255,.05) 0%,transparent 60%);pointer-events:none}
+.hero-badges{display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:26px;flex-wrap:wrap}
+.hbadge{font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;padding:4px 12px;border-radius:20px}
+.hb-gold{background:rgba(255,214,0,.09);border:1px solid rgba(255,214,0,.2);color:var(--gold)}
+.hb-gray{background:rgba(143,163,200,.08);color:var(--t3)}
+.hb-green{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.18);color:var(--green)}
+.hero-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center}
+.h-team{display:flex;flex-direction:column;align-items:center;gap:12px}
+.h-logo{width:86px;height:86px;border-radius:50%;background:var(--card);
+  border:2px solid var(--border);display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-size:24px;font-weight:900;overflow:hidden}
+.h-logo img{width:100%;height:100%;object-fit:contain;padding:8px}
+.h-name{font-family:var(--fd);font-size:clamp(18px,3vw,26px);font-weight:900;
+  letter-spacing:.3px;text-align:center}
+.h-type{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.h-score-c{display:flex;flex-direction:column;align-items:center;gap:10px}
+.h-sc{font-family:var(--fd);font-size:clamp(54px,10vw,88px);font-weight:900;
+  letter-spacing:-4px;line-height:1;
+  background:linear-gradient(180deg,#fff 0%,#8fa3c8 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.h-ht{font-family:var(--fd);font-size:12px;color:var(--t2);background:var(--card);
+  padding:4px 14px;border-radius:11px;border:1px solid var(--border)}
+.h-ft{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--t3)}
+.info-strip{display:flex;align-items:center;justify-content:center;gap:22px;
+  margin-top:22px;padding-top:18px;border-top:1px solid var(--border);flex-wrap:wrap}
+.istrip{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2)}
+.istrip i{color:var(--t3);font-size:13px}
+
+/* ── CONTENT ── */
+.content{padding:28px 0 56px}
+.dc{background:var(--card);border:1px solid var(--border);border-radius:var(--r3);
+  padding:22px;margin-bottom:18px}
+.dc-title{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--t3);margin-bottom:18px;
+  display:flex;align-items:center;gap:10px}
+.dc-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── TIMELINE ── */
+.tl-wrap{position:relative}
+.tl-line{position:absolute;left:50%;top:0;bottom:0;width:1px;
+  background:var(--border);transform:translateX(-50%)}
+.tl-ev{display:grid;grid-template-columns:1fr 58px 1fr;gap:10px;
+  align-items:center;margin-bottom:10px;
+  animation:fadeUp .4s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.tl-ev:nth-child(1){animation-delay:.05s}.tl-ev:nth-child(2){animation-delay:.1s}
+.tl-ev:nth-child(3){animation-delay:.15s}.tl-ev:nth-child(4){animation-delay:.2s}
+.tl-ev:nth-child(5){animation-delay:.25s}.tl-ev:nth-child(6){animation-delay:.3s}
+.tl-ev:nth-child(7){animation-delay:.35s}.tl-ev:nth-child(8){animation-delay:.4s}
+.tl-ev:nth-child(9){animation-delay:.45s}.tl-ev:nth-child(10){animation-delay:.5s}
+.tl-ev:nth-child(11){animation-delay:.55s}
+.tl-home{display:flex;justify-content:flex-end}
+.tl-away{display:flex;justify-content:flex-start}
+.tl-min-c{display:flex;align-items:center;justify-content:center}
+.min-b{background:var(--elevated);border:1px solid var(--border);border-radius:11px;
+  padding:3px 8px;font-family:var(--fd);font-size:11px;font-weight:700;
+  color:var(--t2);white-space:nowrap;position:relative;z-index:1}
+.chip{display:flex;align-items:center;gap:7px;background:var(--elevated);
+  border:1px solid var(--border);border-radius:var(--r1);padding:8px 11px;max-width:210px}
+.chip.home{flex-direction:row-reverse;text-align:right}
+.chip.goal-ev{border-color:rgba(0,230,118,.25);background:rgba(0,230,118,.06)}
+.chip.yel-ev{border-color:rgba(255,193,7,.25);background:rgba(255,193,7,.06)}
+.chip.red-ev{border-color:rgba(244,67,54,.25);background:rgba(244,67,54,.06)}
+.chip.sub-ev{border-color:rgba(41,121,255,.2);background:rgba(41,121,255,.05)}
+.ev-ico{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;
+  justify-content:center;font-size:13px;flex-shrink:0}
+.ei-goal{background:rgba(0,230,118,.15);color:var(--green)}
+.ei-yel{background:rgba(255,193,7,.15);color:var(--yellow)}
+.ei-red{background:rgba(244,67,54,.15);color:var(--red)}
+.ei-sub{background:rgba(41,121,255,.12);color:var(--blue)}
+.ev-pl{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--t1)}
+.ev-dt{font-size:10px;color:var(--t3)}
+
+/* ── GOALS / CARDS ── */
+.split2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.box2{padding:14px;background:var(--bg2);border-radius:var(--r2);border:1px solid var(--border)}
+.box2-title{font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.gl{display:flex;align-items:center;gap:9px;padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.04)}
+.gl:last-child{border-bottom:none}
+.gl-ico{width:20px;height:20px;background:rgba(0,230,118,.12);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:10px;
+  color:var(--green);flex-shrink:0}
+.gl-pl{font-family:var(--fd);font-size:14px;font-weight:700;flex:1}
+.gl-min{font-family:var(--fd);font-size:11px;font-weight:700;color:var(--t3);
+  background:var(--elevated);padding:2px 7px;border-radius:7px}
+.ycard{width:12px;height:16px;background:var(--yellow);border-radius:2px;
+  flex-shrink:0;box-shadow:0 2px 5px rgba(255,193,7,.3)}
+.rcard{width:12px;height:16px;background:var(--red);border-radius:2px;
+  flex-shrink:0;box-shadow:0 2px 5px rgba(244,67,54,.3)}
+
+/* ── SUBSTITUTIONS ── */
+.sub-r{display:flex;align-items:center;gap:11px;padding:9px 0;
+  border-bottom:1px solid rgba(255,255,255,.04)}
+.sub-r:last-child{border-bottom:none}
+.sub-min{font-family:var(--fd);font-size:12px;font-weight:700;color:var(--t3);
+  background:var(--elevated);padding:3px 9px;border-radius:9px;
+  width:46px;text-align:center;flex-shrink:0}
+.sub-in{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--green)}
+.sub-out{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--live)}
+.sub-arr{color:var(--t3);font-size:15px}
+.sub-lbl{font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:var(--t3);margin:14px 0 6px;
+  padding-top:10px;border-top:1px solid var(--border)}
+.sub-lbl:first-child{margin-top:0;padding-top:0;border-top:none}
+
+/* ── STATS ── */
+.stat-r{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;
+  align-items:center;margin-bottom:12px}
+.sv-h{font-family:var(--fd);font-size:17px;font-weight:800;text-align:right}
+.sv-a{font-family:var(--fd);font-size:17px;font-weight:800;text-align:left}
+.sl{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  color:var(--t3);text-align:center;white-space:nowrap}
+.bar-r{display:grid;grid-template-columns:1fr 20px 1fr;gap:7px;
+  align-items:center;margin-bottom:12px}
+.bh{height:3px;background:var(--elevated);border-radius:2px;
+  overflow:hidden;display:flex;justify-content:flex-end}
+.bh .f{height:100%;background:linear-gradient(90deg,var(--blue),#6aabff);
+  border-radius:2px;transition:width 1.1s ease}
+.ba{height:3px;background:var(--elevated);border-radius:2px;overflow:hidden}
+.ba .f{height:100%;background:linear-gradient(90deg,#ff6b6b,var(--live));
+  border-radius:2px;transition:width 1.1s ease}
+
+/* ── MATCH INFO BOX ── */
+.mi-row{display:flex;justify-content:space-between;align-items:center;
+  padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.mi-row:last-child{border-bottom:none}
+.mi-key{color:var(--t3)}.mi-val{font-family:var(--fd);font-size:14px;font-weight:700;text-align:right}
+
+/* ── SCORE PILLS ── */
+.sc-pills{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.sc-pill{background:var(--bg2);border-radius:var(--r2);padding:11px;
+  text-align:center;border:1px solid var(--border)}
+.sp-lbl{font-family:var(--fd);font-size:10px;color:var(--t3);
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.sp-val{font-family:var(--fd);font-size:22px;font-weight:900}
+
+/* ── BACK BTN ── */
+.back-btn{display:inline-flex;align-items:center;gap:7px;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--r2);color:var(--t2);
+  padding:10px 18px;font-family:var(--fd);font-size:12px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;transition:var(--tr);margin-bottom:22px}
+.back-btn:hover{background:var(--elevated);border-color:var(--blue);color:var(--t1)}
+
+/* ── FOOTER ── */
+.ft{background:var(--bg2);border-top:1px solid var(--border);padding:44px 0 22px;margin-top:36px}
+.ft-brand{font-family:var(--fd);font-size:20px;font-weight:800;margin-bottom:8px}
+.ft-brand span{color:var(--green)}
+.ft-desc{font-size:12px;color:var(--t3);line-height:1.7;max-width:240px}
+.ft-h{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--t2);margin-bottom:14px}
+.ft-ul{list-style:none;padding:0}.ft-ul li{margin-bottom:7px}
+.ft-ul a{color:var(--t3);font-size:12px;transition:var(--tr)}.ft-ul a:hover{color:var(--t1)}
+.si-row{display:flex;gap:7px;margin-top:14px}
+.si{width:34px;height:34px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r1);display:flex;align-items:center;justify-content:center;
+  color:var(--t3);transition:var(--tr);font-size:13px}
+.si:hover{background:var(--elevated);color:var(--green);border-color:var(--green)}
+.ft-bot{border-top:1px solid var(--border);padding-top:18px;margin-top:32px;
+  font-size:11px;color:var(--t3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .hero-grid{gap:10px}
+  .h-logo{width:60px;height:60px}
+  .h-name{font-size:14px}
+  .h-sc{font-size:52px;letter-spacing:-2px}
+  .tl-ev{grid-template-columns:1fr 46px 1fr;gap:5px}
+  .chip{padding:6px 8px;max-width:140px}
+  .ev-pl{font-size:12px}.ev-dt{display:none}
+  .ev-ico{width:22px;height:22px;font-size:11px}
+  .split2{grid-template-columns:1fr}
+  .info-strip{gap:12px}.istrip{font-size:11px}
+  .sc-pills{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:480px){
+  .h-sc{font-size:42px}
+  .h-logo{width:50px;height:50px}
+  .h-name{font-size:12px}
+  .info-strip{gap:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="nb">
+  <div class="nb-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-ico">⚽</div>
+      <span class="brand-txt">Goal<span>Zone</span></span>
+    </a>
+    <div class="nav-links d-none d-lg-flex">
+      <a href="index.html" class="nl">Ana Sayfa</a>
+      <a href="#" class="nl active">Canlı Skorlar</a>
+      <a href="#" class="nl">Fikstür</a>
+      <a href="#" class="nl">Puan Durumu</a>
+      <a href="#" class="nl">Ligler</a>
+    </div>
+    <div class="nb-icons">
+      <a href="#" class="ico-btn d-none d-sm-flex"><i class="bi bi-search"></i></a>
+      <a href="#" class="ico-btn d-none d-sm-flex"><i class="bi bi-bell"></i></a>
+      <a href="#" class="ico-btn"><i class="bi bi-person"></i></a>
+      <button class="tog d-lg-none" id="tog"><i class="bi bi-list"></i></button>
+    </div>
+  </div>
+  <div class="mob-menu" id="mobMenu">
+    <div class="wrap">
+      <a href="index.html" class="nl d-block">Ana Sayfa</a>
+      <a href="#" class="nl d-block active">Canlı Skorlar</a>
+      <a href="#" class="nl d-block">Fikstür</a>
+      <a href="#" class="nl d-block">Puan Durumu</a>
+      <a href="#" class="nl d-block">Ligler</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-badges">
+      <span class="hbadge hb-gold"><i class="bi bi-trophy-fill me-1"></i>Premier League · Hafta 33</span>
+      <span class="hbadge hb-gray"><i class="bi bi-check2-circle me-1"></i>Maç Sona Erdi</span>
+      <span class="hbadge hb-green"><i class="bi bi-people-fill me-1"></i>60,260 Seyirci</span>
+    </div>
+    <div class="hero-grid">
+      <div class="h-team">
+        <div class="h-logo" style="border-color:rgba(239,1,7,.5);box-shadow:0 0 28px rgba(239,1,7,.1)">
+          <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" alt="ARS" onerror="this.parentNode.textContent='ARS'"/>
+        </div>
+        <div class="h-name">Arsenal</div>
+        <div class="h-type">Ev Sahibi</div>
+      </div>
+      <div class="h-score-c">
+        <div class="h-sc">2–2</div>
+        <div class="h-ht"><i class="bi bi-hourglass-split me-1"></i>İY: 1–1</div>
+        <div class="h-ft">Maç Bitti</div>
+      </div>
+      <div class="h-team">
+        <div class="h-logo" style="border-color:rgba(200,16,46,.5);box-shadow:0 0 28px rgba(200,16,46,.1)">
+          <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" alt="LIV" onerror="this.parentNode.textContent='LIV'"/>
+        </div>
+        <div class="h-name">Liverpool</div>
+        <div class="h-type">Deplasman</div>
+      </div>
+    </div>
+    <div class="info-strip">
+      <div class="istrip"><i class="bi bi-geo-alt-fill"></i><span>Emirates Stadium, Londra</span></div>
+      <div class="istrip"><i class="bi bi-calendar3"></i><span>12 Nisan 2025</span></div>
+      <div class="istrip"><i class="bi bi-clock"></i><span>16:30</span></div>
+      <div class="istrip"><i class="bi bi-person-badge"></i><span>Michael Oliver</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<div class="content">
+<div class="wrap">
+  <a href="index.html" class="back-btn"><i class="bi bi-arrow-left"></i> Maç Listesine Dön</a>
+
+  <div class="row g-4">
+
+    <!-- LEFT: Timeline, Goals, Cards, Subs -->
+    <div class="col-lg-7">
+
+      <!-- TIMELINE -->
+      <div class="dc">
+        <div class="dc-title"><i class="bi bi-activity me-2" style="color:var(--green)"></i>Maç Olayları</div>
+        <div class="tl-wrap">
+          <div class="tl-line"></div>
+
+          <!-- 12' Saka Goal -->
+          <div class="tl-ev">
+            <div class="tl-home">
+              <div class="chip home goal-ev">
+                <div class="ev-ico ei-goal"><i class="bi bi-circle-fill" style="font-size:9px"></i></div>
+                <div><div class="ev-pl">Bukayo Saka</div><div class="ev-dt">Sol Köşe</div></div>
+              </div>
+            </div>
+            <div class="tl-min-c"><div class="min-b">12'</div></div>
+            <div class="tl-away"></div>
+          </div>
+
+          <!-- 27' Yellow Rice -->
+          <div class="tl-ev">
+            <div class="tl-home">
+              <div class="chip home yel-ev">
+                <div class="ev-ico ei-yel"><i class="bi bi-square-fill" style="font-size:10px"></i></div>
+                <div><div class="ev-pl">Declan Rice</div><div class="ev-dt">Foul</div></div>
+              </div>
+            </div>
+            <div class="tl-min-c"><div class="min-b">27'</div></div>
+            <div class="tl-away"></div>
+          </div>
+
+          <!-- 39' Salah Goal -->
+          <div class="tl-ev">
+            <div class="tl-home"></div>
+            <div class="tl-min-c"><div class="min-b">39'</div></div>
+            <div class="tl-away">
+              <div class="chip away goal-ev">
+                <div class="ev-ico ei-goal"><i class="bi bi-circle-fill" style="font-size:9px"></i></div>
+                <div><div class="ev-pl">M. Salah</div><div class="ev-dt">Düz Şut</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HT -->
+          <div class="tl-ev">
+            <div class="tl-home"></div>
+            <div class="tl-min-c">
+              <div class="min-b" style="background:rgba(255,193,7,.09);border-color:rgba(255,193,7,.22);color:var(--yellow)">İY</div>
+            </div>
+            <div class="tl-away"></div>
+          </div>
+
+          <!-- 52' Sub Arsenal -->
+          <div class="tl-ev">
+            <div class="tl-home">
+              <div class="chip home sub-ev">
+                <div class="ev-ico ei-sub"><i class="bi bi-arrow-left-right"></i></div>
+                <div><div class="ev-pl">Trossard ↑</div><div class="ev-dt">Martinelli ↓</div></div>
+              </div>
+            </div>
+            <div class="tl-min-c"><div class="min-b">52'</div></div>
+            <div class="tl-away"></div>
+          </div>
+
+          <!-- 61' Havertz Goal -->
+          <div class="tl-ev">
+            <div class="tl-home">
+              <div class="chip home goal-ev">
+                <div class="ev-ico ei-goal"><i class="bi bi-circle-fill" style="font-size:9px"></i></div>
+                <div><div class="ev-pl">Kai Havertz</div><div class="ev-dt">Kafa Golü</div></div>
+              </div>
+            </div>
+            <div class="tl-min-c"><div class="min-b">61'</div></div>
+            <div class="tl-away"></div>
+          </div>
+
+          <!-- 68' Yellow Van Dijk -->
+          <div class="tl-ev">
+            <div class="tl-home"></div>
+            <div class="tl-min-c"><div class="min-b">68'</div></div>
+            <div class="tl-away">
+              <div class="chip away yel-ev">
+                <div class="ev-ico ei-yel"><i class="bi bi-square-fill" style="font-size:10px"></i></div>
+                <div><div class="ev-pl">Van Dijk</div><div class="ev-dt">Müdahale</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 72' Sub Liverpool -->
+          <div class="tl-ev">
+            <div class="tl-home"></div>
+            <div class="tl-min-c"><div class="min-b">72'</div></div>
+            <div class="tl-away">
+              <div class="chip away sub-ev">
+                <div class="ev-ico ei-sub"><i class="bi bi-arrow-left-right"></i></div>
+                <div><div class="ev-pl">D. Núñez ↑</div><div class="ev-dt">L. Díaz ↓</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 78' Red Calafiori -->
+          <div class="tl-ev">
+            <div class="tl-home">
+              <div class="chip home red-ev">
+                <div class="ev-ico ei-red"><i class="bi bi-square-fill" style="font-size:10px"></i></div>
+                <div><div class="ev-pl">Calafiori</div><div class="ev-dt">2. Sarı / Kırmızı</div></div>
+              </div>
+            </div>
+            <div class="tl-min-c"><div class="min-b">78'</div></div>
+            <div class="tl-away"></div>
+          </div>
+
+          <!-- 84' Nunez Goal -->
+          <div class="tl-ev">
+            <div class="tl-home"></div>
+            <div class="tl-min-c"><div class="min-b">84'</div></div>
+            <div class="tl-away">
+              <div class="chip away goal-ev">
+                <div class="ev-ico ei-goal"><i class="bi bi-circle-fill" style="font-size:9px"></i></div>
+                <div><div class="ev-pl">D. Núñez</div><div class="ev-dt">Penaltı</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FT -->
+          <div class="tl-ev">
+            <div class="tl-home"></div>
+            <div class="tl-min-c">
+              <div class="min-b" style="background:rgba(143,163,200,.08);border-color:rgba(143,163,200,.18);color:var(--t2)">MS</div>
+            </div>
+            <div class="tl-away"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- GOALS -->
+      <div class="dc">
+        <div class="dc-title"><i class="bi bi-circle-fill me-2" style="color:var(--green);font-size:9px"></i>Goller</div>
+        <div class="split2">
+          <div class="box2">
+            <div class="box2-title">⚽ Arsenal</div>
+            <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">Bukayo Saka</div><div class="gl-min">12'</div></div>
+            <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">Kai Havertz</div><div class="gl-min">61'</div></div>
+          </div>
+          <div class="box2">
+            <div class="box2-title">⚽ Liverpool</div>
+            <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">M. Salah</div><div class="gl-min">39'</div></div>
+            <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">D. Núñez</div><div class="gl-min">84'</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARDS -->
+      <div class="dc">
+        <div class="dc-title"><i class="bi bi-square-fill me-2" style="color:var(--yellow);font-size:10px"></i>Kartlar</div>
+        <div class="split2">
+          <div class="box2">
+            <div class="box2-title">Arsenal</div>
+            <div class="gl"><div class="ycard"></div><div class="gl-pl">Declan Rice</div><div class="gl-min">27'</div></div>
+            <div class="gl"><div class="ycard"></div><div class="gl-pl">Calafiori</div><div class="gl-min">74'</div></div>
+            <div class="gl"><div class="rcard"></div><div class="gl-pl">Calafiori</div><div class="gl-min">78'</div></div>
+          </div>
+          <div class="box2">
+            <div class="box2-title">Liverpool</div>
+            <div class="gl"><div class="ycard"></div><div class="gl-pl">Van Dijk</div><div class="gl-min">68'</div></div>
+            <div class="gl"><div class="ycard"></div><div class="gl-pl">Curtis Jones</div><div class="gl-min">88'</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBSTITUTIONS -->
+      <div class="dc">
+        <div class="dc-title"><i class="bi bi-arrow-left-right me-2" style="color:var(--blue)"></i>Oyuncu Değişiklikleri</div>
+        <div class="sub-lbl">Arsenal</div>
+        <div class="sub-r">
+          <div class="sub-min">52'</div>
+          <div class="sub-in">↑ Trossard</div><div class="sub-arr">⇄</div><div class="sub-out">↓ Martinelli</div>
+        </div>
+        <div class="sub-r">
+          <div class="sub-min">65'</div>
+          <div class="sub-in">↑ Odegaard</div><div class="sub-arr">⇄</div><div class="sub-out">↓ Jorginho</div>
+        </div>
+        <div class="sub-r">
+          <div class="sub-min">79'</div>
+          <div class="sub-in">↑ Kiwior</div><div class="sub-arr">⇄</div><div class="sub-out">↓ Calafiori (K.K.)</div>
+        </div>
+        <div class="sub-lbl">Liverpool</div>
+        <div class="sub-r">
+          <div class="sub-min">72'</div>
+          <div class="sub-in">↑ D. Núñez</div><div class="sub-arr">⇄</div><div class="sub-out">↓ L. Díaz</div>
+        </div>
+        <div class="sub-r">
+          <div class="sub-min">80'</div>
+          <div class="sub-in">↑ H. Elliott</div><div class="sub-arr">⇄</div><div class="sub-out">↓ Gakpo</div>
+        </div>
+        <div class="sub-r">
+          <div class="sub-min">85'</div>
+          <div class="sub-in">↑ Robertson</div><div class="sub-arr">⇄</div><div class="sub-out">↓ C. Jones</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Summary, Stats, Match Info -->
+    <div class="col-lg-5">
+
+      <!-- SCORE SUMMARY -->
+      <div class="dc">
+        <div class="dc-title"><i class="bi bi-bar-chart-fill me-2" style="color:var(--blue)"></i>Maç Özeti</div>
+        <div class="sc-pills">
+          <div class="sc-pill"><div class="sp-lbl">İlk Yarı</div><div class="sp-val">1–1</div></div>
+          <div class="sc-pill"><div class="sp-lbl">İkinci Yarı</div><div class="sp-val">1–1</div></div>
+          <div class="sc-pill"><div class="sp-lbl">Sonuç</div><div class="sp-val" style="color:var(--green)">2–2</div></div>
+        </div>
+      </div>
+
+      <!-- STATISTICS -->
+      <div class="dc">
+        <div class="dc-title"><i class="bi bi-graph-up me-2" style="color:var(--green)"></i>İstatistikler</div>
+
+        <div class="stat-r"><div class="sv-h">55%</div><div class="sl">Topa Sahip Olma</div><div class="sv-a">45%</div></div>
+        <div class="bar-r"><div class="bh"><div class="f" style="width:55%"></div></div><div></div><div class="ba"><div class="f" style="width:45%"></div></div></div>
+
+        <div class="stat-r"><div class="sv-h">14</div><div class="sl">Şut</div><div class="sv-a">10</div></div>
+        <div class="bar-r"><div class="bh"><div class="f" style="width:58%"></div></div><div></div><div class="ba"><div class="f" style="width:42%"></div></div></div>
+
+        <div class="stat-r"><div class="sv-h">6</div><div class="sl">İsabetli Şut</div><div class="sv-a">5</div></div>
+        <div class="bar-r"><div class="bh"><div class="f" style="width:55%"></div></div><div></div><div class="ba"><div class="f" style="width:45%"></div></div></div>
+
+        <div class="stat-r"><div class="sv-h">478</div><div class="sl">Pas</div><div class="sv-a">392</div></div>
+        <div class="bar-r"><div class="bh"><div class="f" style="width:55%"></div></div><div></div><div class="ba"><div class="f" style="width:45%"></div></div></div>
+
+        <div class="stat-r"><div class="sv-h">87%</div><div class="sl">Pas İsabeti</div><div class="sv-a">83%</div></div>
+        <div class="bar-r"><div class="bh"><div class="f" style="width:51%"></div></div><div></div><div class="ba"><div class="f" style="width:49%"></div></div></div>
+
+        <div class="stat-r"><div class="sv-h">6</div><div class="sl">Korner</div><div class="sv-a">4</div></div>
+        <div class="bar-r"><div class="bh"><div class="f" style="width:60%"></div></div><div></div><div class="ba"><div class="f" style="width:40%"></div></div></div>
+
+        <div class="stat-r"><div class="sv-h">11</div><div class="sl">Faul</div><div class="sv-a">14</div></div>
+        <div class="bar-r"><div class="bh"><div class="f" style="width:44%"></div></div><div></div><div class="ba"><div class="f" style="width:56%"></div></div></div>
+
+        <div class="stat-r"><div class="sv-h">2</div><div class="sl">Ofsayt</div><div class="sv-a">3</div></div>
+        <div class="bar-r" style="margin-bottom:14px"><div class="bh"><div class="f" style="width:40%"></div></div><div></div><div class="ba"><div class="f" style="width:60%"></div></div></div>
+
+        <div class="stat-r" style="margin-bottom:0">
+          <div class="sv-h" style="color:var(--yellow)">2</div>
+          <div class="sl">Sarı Kart</div>
+          <div class="sv-a" style="color:var(--yellow)">2</div>
+        </div>
+        <div class="stat-r" style="margin-bottom:0;margin-top:8px">
+          <div class="sv-h" style="color:var(--red)">1</div>
+          <div class="sl">Kırmızı Kart</div>
+          <div class="sv-a" style="color:var(--t3)">0</div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-top:18px;
+          padding-top:14px;border-top:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:7px">
+            <div style="width:9px;height:9px;border-radius:50%;background:var(--blue)"></div>
+            <span style="font-family:var(--fd);font-size:12px;font-weight:700;color:var(--t2)">Arsenal</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="font-family:var(--fd);font-size:12px;font-weight:700;color:var(--t2)">Liverpool</span>
+            <div style="width:9px;height:9px;border-radius:50%;background:var(--live)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MATCH INFO -->
+      <div class="dc">
+        <div class="dc-title"><i class="bi bi-info-circle me-2" style="color:var(--t3)"></i>Maç Bilgileri</div>
+        <div class="mi-row"><span class="mi-key">Lig</span><span class="mi-val" style="color:var(--gold)">Premier League</span></div>
+        <div class="mi-row"><span class="mi-key">Sezon</span><span class="mi-val">2024 / 2025</span></div>
+        <div class="mi-row"><span class="mi-key">Hafta</span><span class="mi-val">Hafta 33</span></div>
+        <div class="mi-row"><span class="mi-key">Stadyum</span><span class="mi-val">Emirates Stadium</span></div>
+        <div class="mi-row"><span class="mi-key">Şehir</span><span class="mi-val">Londra, İngiltere</span></div>
+        <div class="mi-row"><span class="mi-key">Seyirci</span><span class="mi-val">60,260</span></div>
+        <div class="mi-row"><span class="mi-key">Hakem</span><span class="mi-val">Michael Oliver</span></div>
+        <div class="mi-row"><span class="mi-key">Tarih</span><span class="mi-val">12 Nisan 2025</span></div>
+        <div class="mi-row"><span class="mi-key">Saat</span><span class="mi-val">16:30</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="mt-2">
+    <a href="index.html" class="back-btn"><i class="bi bi-arrow-left"></i> Tüm Maçlara Dön</a>
+  </div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer class="ft">
+  <div class="wrap">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="ft-brand">Goal<span>Zone</span></div>
+        <p class="ft-desc">Premier futbol liglerinin canlı skorları, maç analizleri ve istatistikleri için tek adres.</p>
+        <div class="si-row">
+          <a href="#" class="si"><i class="bi bi-twitter-x"></i></a>
+          <a href="#" class="si"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="si"><i class="bi bi-youtube"></i></a>
+          <a href="#" class="si"><i class="bi bi-telegram"></i></a>
+        </div>
+      </div>
+      <div class="col-6 col-lg-2">
+        <div class="ft-h">Ligler</div>
+        <ul class="ft-ul">
+          <li><a href="#">Premier League</a></li>
+          <li><a href="#">La Liga</a></li>
+          <li><a href="#">Bundesliga</a></li>
+          <li><a href="#">Serie A</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <div class="ft-h">Hızlı Erişim</div>
+        <ul class="ft-ul">
+          <li><a href="#">Canlı Skorlar</a></li>
+          <li><a href="#">Fikstür</a></li>
+          <li><a href="#">Puan Durumu</a></li>
+          <li><a href="#">Gol Krallığı</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <div class="ft-h">Takımlar</div>
+        <ul class="ft-ul">
+          <li><a href="#">Arsenal</a></li>
+          <li><a href="#">Liverpool</a></li>
+          <li><a href="#">Man City</a></li>
+          <li><a href="#">Chelsea</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <div class="ft-h">Destek</div>
+        <ul class="ft-ul">
+          <li><a href="#">Hakkımızda</a></li>
+          <li><a href="#">İletişim</a></li>
+          <li><a href="#">Gizlilik</a></li>
+          <li><a href="#">Kullanım Şartları</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ft-bot">
+      <span>© 2025 GoalZone. Tüm hakları saklıdır.</span>
+      <span>Premier League verileri demo amaçlıdır.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Mobile nav
+const tog = document.getElementById('tog');
+const mob = document.getElementById('mobMenu');
+tog.addEventListener('click', () => {
+  mob.classList.toggle('open');
+  tog.innerHTML = mob.classList.contains('open')
+    ? '<i class="bi bi-x-lg"></i>' : '<i class="bi bi-list"></i>';
+});
+
+// Navbar shadow
+window.addEventListener('scroll', () => {
+  document.querySelector('.nb').style.boxShadow =
+    window.scrollY > 8 ? '0 4px 32px rgba(0,0,0,.7)' : '0 2px 24px rgba(0,0,0,.5)';
+});
+
+// Stat bar animation on scroll
+function animateBars() {
+  const bars = document.querySelectorAll('.bh .f, .ba .f');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.width = e.target.dataset.w;
+        obs.unobserve(e.target);
+      }
+    });
+  }, {threshold: 0.3});
+  bars.forEach(b => {
+    b.dataset.w = b.style.width;
+    b.style.width = '0';
+    obs.observe(b);
+  });
+}
+animateBars();
+</script>
+</body>
+</html>

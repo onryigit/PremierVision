@@ -1,0 +1,50 @@
+@model StandingsPageViewModel
+
+@{
+    ViewData["Title"] = "Puan Durumu";
+}
+
+<section class="card shadow-sm">
+    <div class="card-body">
+        <h1 class="h3 mb-1">Puan Durumu</h1>
+        <p class="text-muted mb-4">Bu tablo case'teki gereksinime uygun olarak mac sonuclarindan dinamik hesaplanir.</p>
+
+        <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Takim</th>
+                        <th>O</th>
+                        <th>G</th>
+                        <th>B</th>
+                        <th>M</th>
+                        <th>AG</th>
+                        <th>YG</th>
+                        <th>AV</th>
+                        <th>P</th>
+                        <th>Form</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Rows)
+                    {
+                        <tr>
+                            <td>@item.Position</td>
+                            <td class="fw-semibold">@item.TeamName</td>
+                            <td>@item.Played</td>
+                            <td>@item.Wins</td>
+                            <td>@item.Draws</td>
+                            <td>@item.Losses</td>
+                            <td>@item.GoalsFor</td>
+                            <td>@item.GoalsAgainst</td>
+                            <td>@item.GoalDifference</td>
+                            <td class="fw-bold">@item.Points</td>
+                            <td>@item.Form</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

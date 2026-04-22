@@ -1,0 +1,86 @@
+@model MatchDetailViewModel
+
+@{
+    ViewData["Title"] = "Mac Detayi";
+}
+
+<section class="row g-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <a asp-controller="Fixtures" asp-action="Index" class="btn btn-sm btn-outline-dark mb-3">Fiksture Don</a>
+                <h1 class="h3 mb-1">@Model.Fixture.HomeTeamName - @Model.Fixture.AwayTeamName</h1>
+                <p class="text-muted mb-2">Hafta @Model.Fixture.MatchWeek | @Model.Fixture.VenueName</p>
+                <div class="display-6 fw-bold">
+                    @(Model.Fixture.HomeFullTimeScore.HasValue && Model.Fixture.AwayFullTimeScore.HasValue
+                        ? $"{Model.Fixture.HomeFullTimeScore} - {Model.Fixture.AwayFullTimeScore}"
+                        : "Planlandi")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h4 mb-3">Mac Olaylari</h2>
+                @if (Model.Events.Count == 0)
+                {
+                    <p class="text-muted mb-0">Bu maca ait olay girisi yok.</p>
+                }
+                else
+                {
+                    <div class="list-group">
+                        @foreach (var item in Model.Events)
+                        {
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-semibold">@item.Minute'</span>
+                                    <span>@item.EventType</span>
+                                </div>
+                                <div>@item.PlayerName</div>
+                                <div class="small text-muted">@item.TeamName @if (!string.IsNullOrWhiteSpace(item.Description)) { <span>- @item.Description</span> }</div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h4 mb-3">Mac Istatistikleri</h2>
+                @if (Model.Statistics.Count == 0)
+                {
+                    <p class="text-muted mb-0">Bu maca ait istatistik girisi yok.</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Takim</th>
+                                    <th>Istatistik</th>
+                                    <th>Deger</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Statistics)
+                                {
+                                    <tr>
+                                        <td>@item.TeamName</td>
+                                        <td>@item.Name</td>
+                                        <td>@item.Value</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>

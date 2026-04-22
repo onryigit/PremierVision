@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Puan Durumu — GoalZone Premier League</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080d18;--bg2:#0c1220;--card:#111827;--card2:#16202f;--elevated:#1c2d42;
+  --green:#00e676;--blue:#2979ff;--live:#ff1744;--gold:#ffd600;--yellow:#ffc107;--red:#f44336;
+  --t1:#eef2ff;--t2:#7b96c4;--t3:#3d5478;--border:#1a2640;
+  --r1:8px;--r2:12px;--r3:16px;
+  --tr:all .22s cubic-bezier(.4,0,.2,1);
+  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--t1);min-height:100vh;
+  background-image:radial-gradient(ellipse at 15% 0%,rgba(41,121,255,.07) 0%,transparent 55%),
+  radial-gradient(ellipse at 85% 0%,rgba(0,230,118,.04) 0%,transparent 50%)}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--elevated);border-radius:3px}
+a{text-decoration:none;color:inherit}img{display:block}
+
+/* ── NAVBAR ── */
+.nb{background:rgba(8,13,24,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:1000;box-shadow:0 2px 24px rgba(0,0,0,.5)}
+.nb-inner{max-width:1120px;margin:0 auto;padding:0 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;padding:14px 0}
+.brand-ico{width:34px;height:34px;background:linear-gradient(135deg,var(--green),var(--blue));
+  border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.brand-txt{font-family:var(--fd);font-size:21px;font-weight:800;letter-spacing:1px}
+.brand-txt span{color:var(--green)}
+.nav-links{display:flex}
+.nl{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--t2);padding:22px 15px;position:relative;transition:var(--tr)}
+.nl::after{content:'';position:absolute;bottom:0;left:15px;right:15px;height:2px;
+  background:var(--green);transform:scaleX(0);transition:var(--tr)}
+.nl:hover,.nl.active{color:var(--t1)}.nl:hover::after,.nl.active::after{transform:scaleX(1)}
+.nb-icons{display:flex;align-items:center;gap:5px}
+.ico-btn{width:36px;height:36px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r1);color:var(--t2);display:flex;align-items:center;
+  justify-content:center;font-size:14px;transition:var(--tr)}
+.ico-btn:hover{background:var(--elevated);color:var(--t1);border-color:var(--blue)}
+.tog{background:var(--card);border:1px solid var(--border);border-radius:var(--r1);
+  padding:7px 9px;color:var(--t1);cursor:pointer;line-height:1}
+.mob-menu{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.mob-menu.open{max-height:320px}
+.mob-menu .nl{padding:14px 0;border-bottom:1px solid var(--border);display:block}
+
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+/* ── PAGE HEADER ── */
+.pg-head{background:linear-gradient(135deg,var(--bg2),var(--card));
+  border-bottom:1px solid var(--border);padding:32px 0 24px;position:relative;overflow:hidden}
+.pg-head::before{content:'';position:absolute;top:-40%;right:-5%;width:380px;height:380px;
+  background:radial-gradient(circle,rgba(0,230,118,.05) 0%,transparent 70%);pointer-events:none}
+.pg-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,214,0,.09);
+  border:1px solid rgba(255,214,0,.22);border-radius:20px;padding:4px 12px;
+  font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--gold);
+  text-transform:uppercase;margin-bottom:10px}
+.pg-title{font-family:var(--fd);font-size:clamp(26px,5vw,42px);font-weight:900;letter-spacing:.5px;line-height:1}
+.pg-sub{font-size:13px;color:var(--t2);margin-top:6px}
+
+/* ── LEGEND BADGES ── */
+.legend{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2);
+  background:var(--card);border:1px solid var(--border);padding:5px 10px;border-radius:7px}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* ── TABLE CONTAINER ── */
+.tbl-wrap{padding:28px 0 56px}
+
+/* ── ZONE LABELS ── */
+.zone-lbl{font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--t3);padding:12px 0 6px;
+  border-top:1px solid var(--border);margin-top:4px}
+
+/* ── STANDINGS TABLE ── */
+.std-table{width:100%;border-collapse:separate;border-spacing:0 4px}
+.std-table thead th{font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--t3);padding:6px 10px;text-align:center;border:none}
+.std-table thead th.team-col{text-align:left;padding-left:14px}
+.std-row{background:var(--card);transition:var(--tr);cursor:pointer}
+.std-row:hover{background:var(--card2);transform:translateX(3px)}
+.std-row td{padding:11px 10px;text-align:center;border:none;vertical-align:middle}
+.std-row td:first-child{border-radius:var(--r1) 0 0 var(--r1);padding-left:0}
+.std-row td:last-child{border-radius:0 var(--r1) var(--r1) 0}
+
+/* position marker strip */
+.pos-strip{width:4px;height:42px;border-radius:2px 0 0 2px;flex-shrink:0}
+.pos-cell{display:flex;align-items:center;gap:0;padding:0}
+.pos-num{font-family:var(--fd);font-size:16px;font-weight:800;color:var(--t2);
+  width:38px;text-align:center}
+.pos-num.top1{color:var(--gold)}
+.pos-num.top4{color:var(--green)}
+.pos-num.euro{color:var(--blue)}
+.pos-num.rel{color:var(--live)}
+
+/* team cell */
+.team-cell{display:flex;align-items:center;gap:10px;text-align:left;min-width:160px}
+.t-logo{width:28px;height:28px;border-radius:50%;background:var(--elevated);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-size:9px;font-weight:800;color:var(--t2);
+  overflow:hidden;flex-shrink:0}
+.t-logo img{width:100%;height:100%;object-fit:contain;padding:3px}
+.t-name{font-family:var(--fd);font-size:15px;font-weight:700}
+.t-name .t-short{display:none;font-size:14px}
+
+/* stat cells */
+.std-row .s-mp{font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t2)}
+.std-row .s-w{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--green)}
+.std-row .s-d{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--t2)}
+.std-row .s-l{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--live)}
+.std-row .s-gf{font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t1)}
+.std-row .s-ga{font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t1)}
+.std-row .s-gd{font-family:var(--fd);font-size:14px;font-weight:700}
+.s-gd.pos{color:var(--green)}.s-gd.neg{color:var(--live)}.s-gd.zero{color:var(--t3)}
+.s-pts{font-family:var(--fd);font-size:18px;font-weight:900;color:var(--t1)}
+.pts-top{color:var(--gold) !important}
+
+/* form pills */
+.form-row{display:flex;gap:3px;justify-content:center}
+.fp{width:18px;height:18px;border-radius:4px;font-family:var(--fd);font-size:10px;
+  font-weight:800;display:flex;align-items:center;justify-content:center;line-height:1}
+.fp-w{background:rgba(0,230,118,.18);color:var(--green)}
+.fp-d{background:rgba(123,150,196,.12);color:var(--t2)}
+.fp-l{background:rgba(255,23,68,.14);color:var(--live)}
+
+/* position color bar on left of row */
+.cl-champ{background:rgba(255,214,0,.7)}
+.cl-ucl{background:var(--green)}
+.cl-uel{background:var(--blue)}
+.cl-uecl{background:#00bcd4}
+.cl-rel{background:var(--live)}
+.cl-none{background:transparent}
+
+/* ── TOP STATS CARDS ── */
+.top-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.ts-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);
+  padding:18px;display:flex;flex-direction:column;gap:4px}
+.ts-label{font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--t3)}
+.ts-val{font-family:var(--fd);font-size:28px;font-weight:900;line-height:1}
+.ts-team{font-size:12px;color:var(--t2);margin-top:2px}
+
+/* ── FOOTER ── */
+.ft{background:var(--bg2);border-top:1px solid var(--border);padding:44px 0 22px;margin-top:0}
+.ft-brand{font-family:var(--fd);font-size:20px;font-weight:800;margin-bottom:8px}
+.ft-brand span{color:var(--green)}
+.ft-desc{font-size:12px;color:var(--t3);line-height:1.7;max-width:240px}
+.ft-h{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--t2);margin-bottom:14px}
+.ft-ul{list-style:none;padding:0}.ft-ul li{margin-bottom:7px}
+.ft-ul a{color:var(--t3);font-size:12px;transition:var(--tr)}.ft-ul a:hover{color:var(--t1)}
+.si-row{display:flex;gap:7px;margin-top:14px}
+.si{width:34px;height:34px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r1);display:flex;align-items:center;justify-content:center;
+  color:var(--t3);transition:var(--tr);font-size:13px}
+.si:hover{background:var(--elevated);color:var(--green);border-color:var(--green)}
+.ft-bot{border-top:1px solid var(--border);padding-top:18px;margin-top:32px;
+  font-size:11px;color:var(--t3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .hide-md{display:none!important}
+  .t-name span.t-full{display:none}
+  .t-name .t-short{display:inline}
+  .top-stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:600px){
+  .hide-sm{display:none!important}
+  .top-stats{grid-template-columns:repeat(2,1fr);gap:8px}
+  .ts-val{font-size:22px}
+  .std-row .s-pts{font-size:15px}
+  .pos-num{width:28px;font-size:14px}
+  .team-cell{min-width:120px;gap:7px}
+  .t-logo{width:22px;height:22px}
+  .t-name .t-short{font-size:12px}
+  .fp{width:15px;height:15px;font-size:9px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="nb">
+  <div class="nb-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-ico">⚽</div>
+      <span class="brand-txt">Goal<span>Zone</span></span>
+    </a>
+    <div class="nav-links d-none d-lg-flex">
+      <a href="index.html" class="nl">Ana Sayfa</a>
+      <a href="#" class="nl">Canlı Skorlar</a>
+      <a href="fixtures.html" class="nl">Fikstür</a>
+      <a href="standings.html" class="nl active">Puan Durumu</a>
+      <a href="#" class="nl">Ligler</a>
+    </div>
+    <div class="nb-icons">
+      <a href="#" class="ico-btn d-none d-sm-flex"><i class="bi bi-search"></i></a>
+      <a href="#" class="ico-btn d-none d-sm-flex"><i class="bi bi-bell"></i></a>
+      <a href="#" class="ico-btn"><i class="bi bi-person"></i></a>
+      <button class="tog d-lg-none" id="tog"><i class="bi bi-list"></i></button>
+    </div>
+  </div>
+  <div class="mob-menu" id="mobMenu">
+    <div class="wrap">
+      <a href="index.html" class="nl d-block">Ana Sayfa</a>
+      <a href="#" class="nl d-block">Canlı Skorlar</a>
+      <a href="fixtures.html" class="nl d-block">Fikstür</a>
+      <a href="standings.html" class="nl d-block active">Puan Durumu</a>
+      <a href="#" class="nl d-block">Ligler</a>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<section class="pg-head">
+  <div class="wrap">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <div class="pg-badge"><i class="bi bi-trophy-fill"></i> Premier League</div>
+        <h1 class="pg-title">Puan <span style="color:var(--green)">Durumu</span></h1>
+        <p class="pg-sub">2024 / 2025 Sezonu &nbsp;·&nbsp; 33. Hafta Sonrası</p>
+      </div>
+      <div class="col-lg-4 mt-3 mt-lg-0">
+        <div class="legend">
+          <div class="leg-item"><div class="leg-dot" style="background:rgba(255,214,0,.8)"></div>Şampiyon</div>
+          <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Şampiyonlar Ligi</div>
+          <div class="leg-item"><div class="leg-dot" style="background:var(--blue)"></div>UEFA Ligi</div>
+          <div class="leg-item"><div class="leg-dot" style="background:var(--live)"></div>Küme Düşme</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main>
+<div class="wrap">
+<div class="tbl-wrap">
+
+  <!-- TOP STAT CARDS -->
+  <div class="top-stats">
+    <div class="ts-card">
+      <div class="ts-label">Lider Takım</div>
+      <div class="ts-val" style="color:var(--gold)">LIV</div>
+      <div class="ts-team">Liverpool · 79 puan</div>
+    </div>
+    <div class="ts-card">
+      <div class="ts-label">En Çok Gol</div>
+      <div class="ts-val" style="color:var(--green)">82</div>
+      <div class="ts-team">Manchester City</div>
+    </div>
+    <div class="ts-card">
+      <div class="ts-label">En Az Yenilen</div>
+      <div class="ts-val" style="color:var(--blue)">26</div>
+      <div class="ts-team">Arsenal</div>
+    </div>
+    <div class="ts-card">
+      <div class="ts-label">Haftanın Maçı</div>
+      <div class="ts-val" style="color:var(--t1);font-size:16px;margin-top:2px">ARS 2–2 LIV</div>
+      <div class="ts-team">Emirates Stadium</div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div style="overflow-x:auto;border-radius:var(--r3);border:1px solid var(--border)">
+  <table class="std-table" style="min-width:620px">
+    <thead>
+      <tr>
+        <th style="width:4px;padding:0"></th>
+        <th style="width:44px">#</th>
+        <th class="team-col">Takım</th>
+        <th>O</th>
+        <th>G</th>
+        <th>B</th>
+        <th>M</th>
+        <th class="hide-sm">AG</th>
+        <th class="hide-sm">YG</th>
+        <th>AV</th>
+        <th>Son 5</th>
+        <th>P</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  </div>
+
+</div>
+</div>
+</main>
+
+<!-- FOOTER -->
+<footer class="ft">
+  <div class="wrap">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="ft-brand">Goal<span>Zone</span></div>
+        <p class="ft-desc">Premier futbol liglerinin canlı skorları, maç analizleri ve istatistikleri için tek adres.</p>
+        <div class="si-row">
+          <a href="#" class="si"><i class="bi bi-twitter-x"></i></a>
+          <a href="#" class="si"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="si"><i class="bi bi-youtube"></i></a>
+          <a href="#" class="si"><i class="bi bi-telegram"></i></a>
+        </div>
+      </div>
+      <div class="col-6 col-lg-2">
+        <div class="ft-h">Ligler</div>
+        <ul class="ft-ul">
+          <li><a href="#">Premier League</a></li>
+          <li><a href="#">La Liga</a></li>
+          <li><a href="#">Bundesliga</a></li>
+          <li><a href="#">Serie A</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <div class="ft-h">Hızlı Erişim</div>
+        <ul class="ft-ul">
+          <li><a href="index.html">Haftalık Skorlar</a></li>
+          <li><a href="fixtures.html">Fikstür</a></li>
+          <li><a href="standings.html">Puan Durumu</a></li>
+          <li><a href="#">Gol Krallığı</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <div class="ft-h">Takımlar</div>
+        <ul class="ft-ul">
+          <li><a href="#">Arsenal</a></li>
+          <li><a href="#">Liverpool</a></li>
+          <li><a href="#">Man City</a></li>
+          <li><a href="#">Chelsea</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <div class="ft-h">Destek</div>
+        <ul class="ft-ul">
+          <li><a href="#">Hakkımızda</a></li>
+          <li><a href="#">İletişim</a></li>
+          <li><a href="#">Gizlilik</a></li>
+          <li><a href="#">Kullanım Şartları</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ft-bot">
+      <span>© 2025 GoalZone. Tüm hakları saklıdır.</span>
+      <span>Premier League verileri demo amaçlıdır.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ── DATA ──
+const teams = [
+  { pos:1,  name:'Liverpool',       short:'LIV', logo:'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg',         mp:33, w:24, d:7,  l:2,  gf:74, ga:30, pts:79, form:['W','W','D','W','W'], zone:'champ' },
+  { pos:2,  name:'Arsenal',         short:'ARS', logo:'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg',           mp:33, w:22, d:6,  l:5,  gf:68, ga:26, pts:72, form:['D','W','W','L','W'], zone:'ucl' },
+  { pos:3,  name:'Manchester City', short:'MCI', logo:'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg', mp:33, w:20, d:7,  l:6,  gf:82, ga:44, pts:67, form:['W','W','W','D','W'], zone:'ucl' },
+  { pos:4,  name:'Chelsea',         short:'CHE', logo:'https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg',           mp:33, w:18, d:8,  l:7,  gf:60, ga:42, pts:62, form:['L','W','D','W','W'], zone:'ucl' },
+  { pos:5,  name:'Newcastle',       short:'NEW', logo:'https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg', mp:33, w:17, d:9,  l:7,  gf:58, ga:38, pts:60, form:['D','D','W','W','D'], zone:'uel' },
+  { pos:6,  name:'Aston Villa',     short:'AVL', logo:'https://upload.wikimedia.org/wikipedia/en/f/f9/Aston_Villa_FC_crest_%282016%29.svg', mp:33, w:17, d:7, l:9, gf:62, ga:48, pts:58, form:['W','L','W','W','W'], zone:'uel' },
+  { pos:7,  name:'Tottenham',       short:'TOT', logo:'https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg',    mp:33, w:15, d:8,  l:10, gf:56, ga:50, pts:53, form:['D','D','L','W','D'], zone:'none' },
+  { pos:8,  name:'Manchester Utd',  short:'MNU', logo:'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg', mp:33, w:13, d:9, l:11, gf:40, ga:46, pts:48, form:['L','D','L','D','L'], zone:'none' },
+  { pos:9,  name:'West Ham',        short:'WHU', logo:'https://upload.wikimedia.org/wikipedia/en/c/c2/West_Ham_United_FC_logo.svg', mp:33, w:12, d:10, l:11, gf:48, ga:52, pts:46, form:['L','W','D','W','L'], zone:'none' },
+  { pos:10, name:'Brighton',        short:'BHA', logo:'https://upload.wikimedia.org/wikipedia/en/f/fd/Brighton_%26_Hove_Albion_FC_logo.svg', mp:33, w:12, d:9, l:12, gf:50, ga:54, pts:45, form:['W','D','W','L','D'], zone:'none' },
+  { pos:11, name:'Brentford',       short:'BRE', logo:'https://upload.wikimedia.org/wikipedia/en/2/2a/Brentford_FC_crest.svg',   mp:33, w:11, d:10, l:12, gf:46, ga:52, pts:43, form:['W','D','L','D','L'], zone:'none' },
+  { pos:12, name:'Fulham',          short:'FUL', logo:'https://upload.wikimedia.org/wikipedia/en/e/eb/Fulham_FC_%28shield%29.svg', mp:33, w:11, d:9, l:13, gf:44, ga:55, pts:42, form:['D','L','W','D','W'], zone:'none' },
+  { pos:13, name:'Wolves',          short:'WOL', logo:'https://upload.wikimedia.org/wikipedia/en/f/fc/Wolverhampton_Wanderers.svg', mp:33, w:11, d:8, l:14, gf:46, ga:58, pts:41, form:['W','W','L','L','D'], zone:'none' },
+  { pos:14, name:'Everton',         short:'EVE', logo:'https://upload.wikimedia.org/wikipedia/en/7/7c/Everton_FC_logo.svg',       mp:33, w:10, d:10, l:13, gf:38, ga:52, pts:40, form:['W','D','D','L','W'], zone:'none' },
+  { pos:15, name:'Crystal Palace',  short:'CRY', logo:'https://upload.wikimedia.org/wikipedia/en/a/a2/Crystal_Palace_FC_logo_%282022%29.svg', mp:33, w:9, d:9, l:15, gf:34, ga:50, pts:36, form:['L','D','L','W','D'], zone:'none' },
+  { pos:16, name:'Nottm Forest',    short:'NFO', logo:'https://upload.wikimedia.org/wikipedia/en/e/e5/Nottingham_Forest_FC_logo.svg', mp:33, w:9, d:7, l:17, gf:38, ga:58, pts:34, form:['D','L','W','L','D'], zone:'none' },
+  { pos:17, name:'Bournemouth',     short:'BOU', logo:'https://upload.wikimedia.org/wikipedia/en/e/e5/AFC_Bournemouth_%282013%29.svg', mp:33, w:8, d:9, l:16, gf:42, ga:62, pts:33, form:['D','L','D','W','D'], zone:'none' },
+  { pos:18, name:'Leicester City',  short:'LEI', logo:'https://upload.wikimedia.org/wikipedia/en/2/2d/Leicester_City_crest.svg',  mp:33, w:7, d:8,  l:18, gf:36, ga:68, pts:29, form:['W','L','L','D','L'], zone:'rel' },
+  { pos:19, name:'Ipswich Town',    short:'IPS', logo:'https://upload.wikimedia.org/wikipedia/en/4/43/Ipswich_Town.svg',          mp:33, w:5, d:10, l:18, gf:28, ga:64, pts:25, form:['D','D','L','L','L'], zone:'rel' },
+  { pos:20, name:'Southampton',     short:'SOU', logo:'https://upload.wikimedia.org/wikipedia/en/c/c9/FC_Southampton.svg',        mp:33, w:3, d:7,  l:23, gf:24, ga:74, pts:16, form:['L','L','D','L','L'], zone:'rel' },
+];
+
+const zoneColors = {
+  champ:'cl-champ', ucl:'cl-ucl', uel:'cl-uel', uecl:'cl-uecl', rel:'cl-rel', none:'cl-none'
+};
+
+const formMap = { W:'fp-w', D:'fp-d', L:'fp-l' };
+const posColors = { champ:'top1', ucl:'top4', uel:'euro', rel:'rel', none:'' };
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  let html = '';
+
+  teams.forEach((t, i) => {
+    const gd = t.gf - t.ga;
+    const gdStr = gd > 0 ? '+' + gd : gd;
+    const gdClass = gd > 0 ? 'pos' : gd < 0 ? 'neg' : 'zero';
+    const posClass = posColors[t.zone] || '';
+    const zClass = zoneColors[t.zone] || 'cl-none';
+    const isPtsTop = t.zone === 'champ';
+
+    // zone separator labels
+    let sectionLabel = '';
+    if (i === 0) sectionLabel = `<tr><td colspan="12"><div class="zone-lbl">🏆 &nbsp;Şampiyonlar Ligi Grupları (1–4)</div></td></tr>`;
+    if (i === 4) sectionLabel = `<tr><td colspan="12"><div class="zone-lbl">🔵 &nbsp;UEFA Avrupa Ligi (5–6)</div></td></tr>`;
+    if (i === 6) sectionLabel = `<tr><td colspan="12"><div class="zone-lbl">— &nbsp;Avrupa Dışı (7–17)</div></td></tr>`;
+    if (i === 17) sectionLabel = `<tr><td colspan="12"><div class="zone-lbl">🔴 &nbsp;Küme Düşme Hattı (18–20)</div></td></tr>`;
+
+    const formPills = t.form.map(f =>
+      `<div class="fp ${formMap[f]}">${f}</div>`
+    ).join('');
+
+    html += sectionLabel;
+    html += `
+    <tr class="std-row" title="${t.name}">
+      <td style="padding:0;width:4px">
+        <div class="pos-strip ${zClass}" style="height:44px;border-radius:var(--r1) 0 0 var(--r1)"></div>
+      </td>
+      <td><span class="pos-num ${posClass}">${t.pos}</span></td>
+      <td>
+        <div class="team-cell">
+          <div class="t-logo">
+            <img src="${t.logo}" alt="${t.short}" onerror="this.parentNode.textContent='${t.short}'"/>
+          </div>
+          <div class="t-name">
+            <span class="t-full">${t.name}</span>
+            <span class="t-short">${t.short}</span>
+          </div>
+        </div>
+      </td>
+      <td class="s-mp">${t.mp}</td>
+      <td class="s-w">${t.w}</td>
+      <td class="s-d">${t.d}</td>
+      <td class="s-l">${t.l}</td>
+      <td class="s-gf hide-sm">${t.gf}</td>
+      <td class="s-ga hide-sm">${t.ga}</td>
+      <td class="s-gd ${gdClass}">${gdStr}</td>
+      <td><div class="form-row">${formPills}</div></td>
+      <td class="s-pts ${isPtsTop ? 'pts-top' : ''}">${t.pts}</td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = html;
+}
+
+// Mobile nav
+const tog = document.getElementById('tog');
+const mob = document.getElementById('mobMenu');
+tog.addEventListener('click', () => {
+  mob.classList.toggle('open');
+  tog.innerHTML = mob.classList.contains('open')
+    ? '<i class="bi bi-x-lg"></i>' : '<i class="bi bi-list"></i>';
+});
+
+// Navbar shadow
+window.addEventListener('scroll', () => {
+  document.querySelector('.nb').style.boxShadow =
+    window.scrollY > 8 ? '0 4px 32px rgba(0,0,0,.7)' : '0 2px 24px rgba(0,0,0,.5)';
+});
+
+// Row animate in
+function animateRows() {
+  const rows = document.querySelectorAll('.std-row');
+  rows.forEach((r, i) => {
+    r.style.opacity = '0';
+    r.style.transform = 'translateY(10px)';
+    setTimeout(() => {
+      r.style.transition = 'opacity .3s ease, transform .3s ease';
+      r.style.opacity = '1';
+      r.style.transform = 'translateY(0)';
+    }, 30 + i * 28);
+  });
+}
+
+renderTable();
+animateRows();
+</script>
+</body>
+</html>
