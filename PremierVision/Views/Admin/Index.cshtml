@@ -8,8 +8,8 @@
 <section class="pg-head">
     <div class="wrap">
         <div class="pg-badge"><i class="bi bi-shield-lock-fill"></i> Admin Panel</div>
-        <h1 class="pg-title">Sadece <span style="color:var(--green)">Ekleme</span> Islemleri</h1>
-        <p class="pg-sub">Case kapsamina uygun olarak mac, mac olayi ve mac istatistigi ekleme ekranlari</p>
+        <h1 class="pg-title">Sadece <span style="color:var(--green)">Ekleme</span> İşlemleri</h1>
+        <p class="pg-sub">Case kapsamına uygun olarak maç, maç olayı ve maç istatistiği ekleme ekranları</p>
     </div>
 </section>
 
@@ -29,17 +29,17 @@
             <div class="card-body d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <div>
                     <h2 class="h4 mb-1">API-Football Senkronizasyonu</h2>
-                    <p class="mb-0" style="color:var(--t2)">API key tanimlandiginda takımlar ve fiksturler dogrudan veritabanina alinabilir.</p>
+                    <p class="mb-0" style="color:var(--t2)">API key tanımlandığında takımlar ve fikstürler doğrudan veritabanına alınabilir.</p>
                 </div>
                 <div class="d-flex gap-2">
                     <form asp-action="SyncTeams" method="post">
-                        <button class="btn btn-outline-light">Takimlari Cek</button>
+                        <button class="btn btn-outline-light">Takımları Çek</button>
                     </form>
                     <form asp-action="SyncFixtures" method="post">
-                        <button class="btn btn-primary">Fiksturu Cek</button>
+                        <button class="btn btn-primary">Fikstürü Çek</button>
                     </form>
                     <form asp-action="SyncMatchDetails" method="post">
-                        <button class="btn btn-outline-info">Detaylari Cek</button>
+                        <button class="btn btn-outline-info">Detayları Çek</button>
                     </form>
                 </div>
             </div>
@@ -49,7 +49,7 @@
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm h-100" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
                     <div class="card-body">
-                        <h2 class="h4 mb-3">Mac Ekle</h2>
+                        <h2 class="h4 mb-3">Maç Ekle</h2>
                         <form asp-action="AddFixture" method="post" class="d-grid gap-3">
                             <div>
                                 <label asp-for="Fixture.MatchWeek" class="form-label"></label>
@@ -79,11 +79,11 @@
                             </div>
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <label asp-for="Fixture.HomeHalfTimeScore" class="form-label">IY Ev</label>
+                                    <label asp-for="Fixture.HomeHalfTimeScore" class="form-label">İY Ev</label>
                                     <input asp-for="Fixture.HomeHalfTimeScore" class="form-control" />
                                 </div>
                                 <div class="col-6">
-                                    <label asp-for="Fixture.AwayHalfTimeScore" class="form-label">IY Dep</label>
+                                    <label asp-for="Fixture.AwayHalfTimeScore" class="form-label">İY Dep</label>
                                     <input asp-for="Fixture.AwayHalfTimeScore" class="form-control" />
                                 </div>
                                 <div class="col-6">
@@ -95,7 +95,7 @@
                                     <input asp-for="Fixture.AwayFullTimeScore" class="form-control" />
                                 </div>
                             </div>
-                            <button class="btn btn-success">Mac Ekle</button>
+                            <button class="btn btn-success">Maç Ekle</button>
                         </form>
                     </div>
                 </div>
@@ -104,16 +104,16 @@
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm h-100" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
                     <div class="card-body">
-                        <h2 class="h4 mb-3">Mac Olayi Ekle</h2>
+                        <h2 class="h4 mb-3">Maç Olayı Ekle</h2>
                         <form asp-action="AddEvent" method="post" class="d-grid gap-3">
                             <div>
-                                <label asp-for="Event.FixtureId" class="form-label">Mac</label>
+                                <label asp-for="Event.FixtureId" class="form-label">Maç</label>
                                 <select asp-for="Event.FixtureId" class="form-select" asp-items="@(new SelectList(Model.Fixtures, "Value", "Label"))"></select>
                             </div>
                             <div>
-                                <label asp-for="Event.TeamId" class="form-label">Takim</label>
+                                <label asp-for="Event.TeamId" class="form-label">Takım</label>
                                 <select asp-for="Event.TeamId" class="form-select" asp-items="@(new SelectList(Model.Teams, "Value", "Label"))">
-                                    <option value="">Seciniz</option>
+                                    <option value="">Seçiniz</option>
                                 </select>
                             </div>
                             <div class="row g-2">
@@ -127,14 +127,14 @@
                                 </div>
                             </div>
                             <div>
-                                <label asp-for="Event.PlayerName" class="form-label">Oyuncu Ismi</label>
+                                <label asp-for="Event.PlayerName" class="form-label">Oyuncu İsmi</label>
                                 <input asp-for="Event.PlayerName" class="form-control" />
                             </div>
                             <div>
-                                <label asp-for="Event.Description" class="form-label">Aciklama</label>
+                                <label asp-for="Event.Description" class="form-label">Açıklama</label>
                                 <input asp-for="Event.Description" class="form-control" />
                             </div>
-                            <button class="btn btn-warning">Mac Olayi Ekle</button>
+                            <button class="btn btn-warning">Maç Olayı Ekle</button>
                         </form>
                     </div>
                 </div>
@@ -143,25 +143,25 @@
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm h-100" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
                     <div class="card-body">
-                        <h2 class="h4 mb-3">Mac Istatistigi Ekle</h2>
+                        <h2 class="h4 mb-3">Maç İstatistiği Ekle</h2>
                         <form asp-action="AddStatistic" method="post" class="d-grid gap-3">
                             <div>
-                                <label asp-for="Statistic.FixtureId" class="form-label">Mac</label>
+                                <label asp-for="Statistic.FixtureId" class="form-label">Maç</label>
                                 <select asp-for="Statistic.FixtureId" class="form-select" asp-items="@(new SelectList(Model.Fixtures, "Value", "Label"))"></select>
                             </div>
                             <div>
-                                <label asp-for="Statistic.TeamId" class="form-label">Takim</label>
+                                <label asp-for="Statistic.TeamId" class="form-label">Takım</label>
                                 <select asp-for="Statistic.TeamId" class="form-select" asp-items="@(new SelectList(Model.Teams, "Value", "Label"))"></select>
                             </div>
                             <div>
-                                <label asp-for="Statistic.Name" class="form-label">Istatistik Adi</label>
+                                <label asp-for="Statistic.Name" class="form-label">İstatistik Adı</label>
                                 <input asp-for="Statistic.Name" class="form-control" />
                             </div>
                             <div>
-                                <label asp-for="Statistic.Value" class="form-label">Deger</label>
+                                <label asp-for="Statistic.Value" class="form-label">Değer</label>
                                 <input asp-for="Statistic.Value" class="form-control" />
                             </div>
-                            <button class="btn btn-info text-white">Istatistik Ekle</button>
+                            <button class="btn btn-info text-white">İstatistik Ekle</button>
                         </form>
                     </div>
                 </div>

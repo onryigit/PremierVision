@@ -1,7 +1,7 @@
 @model FixtureListViewModel
 
 @{
-    ViewData["Title"] = "Fikstur";
+    ViewData["Title"] = "Fikstür";
 
     var totalMatches = Model.Fixtures.Count;
     var firstMatch = Model.Fixtures.OrderBy(x => x.KickoffUtc).FirstOrDefault();
@@ -151,6 +151,8 @@
             color: var(--blue);
             line-height: 1;
         }
+
+        .countdown-strip { display: none !important; }
 
         .content { padding: 28px 0 56px; }
 
@@ -374,14 +376,14 @@
             flex-direction: column;
             align-items: flex-end;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
             min-width: 0;
             border-left: 1px solid var(--border);
             padding-left: 18px;
         }
 
         .fx-stadium {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--t3);
             text-align: right;
             max-width: 100%;
@@ -390,28 +392,8 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            font-weight: 600;
         }
-
-        .notify-btn, .notify-btn:focus {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: rgba(41,121,255,.08);
-            border: 1px solid rgba(41,121,255,.2);
-            color: var(--blue);
-            border-radius: var(--r1);
-            padding: 5px 10px;
-            font-family: var(--fd);
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: .8px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: var(--tr);
-        }
-
-        .notify-btn:hover { background: rgba(41,121,255,.18); }
-        .notify-btn.active { background: rgba(0,230,118,.1); border-color: rgba(0,230,118,.3); color: var(--green); }
 
         .top-match-tag {
             font-size: 9px;
@@ -442,7 +424,6 @@
             .fx-logo { width: 22px; height: 22px; }
             .week-summary { gap: 8px; }
             .ws-num { font-size: 20px; }
-            .notify-btn span { display: none; }
             .fx-right { padding-left: 8px; }
         }
     </style>
@@ -453,16 +434,16 @@
         <div class="row align-items-end">
             <div class="col-lg-7">
                 <div class="pg-badge"><i class="bi bi-trophy-fill"></i> Premier League</div>
-                <h1 class="pg-title">Hafta <span style="color:var(--blue)">@Model.CurrentWeek</span> Fiksturu</h1>
+                <h1 class="pg-title">Hafta <span style="color:var(--blue)">@Model.CurrentWeek</span> Fikstürü</h1>
                 <p class="pg-sub">
                     @if (totalMatches > 0)
                     {
                         <span>@weekStart.ToString("dd MMMM yyyy") - @weekEnd.ToString("dd MMMM yyyy")</span>
-                        <span>&nbsp;·&nbsp; @totalMatches Mac</span>
+                        <span>&nbsp;·&nbsp; @totalMatches Maç</span>
                     }
                     else
                     {
-                        <span>Secilen haftaya ait mac bulunamadi</span>
+                        <span>Seçilen haftaya ait maç bulunamadı</span>
                     }
                 </p>
                 <div class="week-nav">
@@ -481,8 +462,8 @@
                 @if (firstMatch is not null)
                 {
                     <div class="countdown-strip" data-kickoff="@firstMatch.KickoffUtc.ToString("O")">
-                        <span class="cd-label">Ilk Macta Kalan</span>
-                        <div class="cd-box"><div class="cd-num" data-part="days">00</div><div class="cd-unit">Gun</div></div>
+                        <span class="cd-label">İlk Maça Kalan</span>
+                        <div class="cd-box"><div class="cd-num" data-part="days">00</div><div class="cd-unit">Gün</div></div>
                         <span class="cd-sep">:</span>
                         <div class="cd-box"><div class="cd-num" data-part="hours">00</div><div class="cd-unit">Saat</div></div>
                         <span class="cd-sep">:</span>
@@ -502,28 +483,28 @@
             <div class="week-summary">
                 <div class="ws-card">
                     <div class="ws-num" style="color:var(--blue)">@totalMatches</div>
-                    <div class="ws-lbl">Toplam Mac</div>
+                    <div class="ws-lbl">Toplam Maç</div>
                 </div>
                 <div class="ws-card">
                     <div class="ws-num" style="color:var(--gold)">@topMatchIds.Count</div>
-                    <div class="ws-lbl">One Cikan Mac</div>
+                    <div class="ws-lbl">Öne Çıkan Maç</div>
                 </div>
                 <div class="ws-card">
                     <div class="ws-num" style="color:var(--green)">
                         @(groupedFixtures.Count > 0 ? groupedFixtures.Count.ToString() : "0")
                     </div>
-                    <div class="ws-lbl">Mac Gunu</div>
+                    <div class="ws-lbl">Maç Günü</div>
                 </div>
                 <div class="ws-card">
                     <div class="ws-num" style="color:var(--live)">@Model.Fixtures.Count(x => x.Status == FixtureStatus.Live)</div>
-                    <div class="ws-lbl">Canli</div>
+                    <div class="ws-lbl">Canlı</div>
                 </div>
             </div>
 
             @if (groupedFixtures.Count == 0)
             {
                 <div class="ws-card" style="text-align:left">
-                    Secilen hafta icin fikstur verisi bulunamadi.
+                    Seçilen hafta için fikstür verisi bulunamadı.
                 </div>
             }
 
@@ -536,10 +517,10 @@
                         ? "db-finished"
                         : "db-future";
                 var badgeText = dayGroup.Key == localToday
-                    ? "Bugun"
+                    ? "Bugün"
                     : dayGroup.Any(x => x.Status == FixtureStatus.Completed)
-                        ? "Oynandi"
-                        : $"{dayGroup.Count()} Mac";
+                        ? "Oynandı"
+                        : $"{dayGroup.Count()} Maç";
 
                 <div class="day-group">
                     <div class="day-header">
@@ -571,7 +552,7 @@
                                     else
                                     {
                                         <div class="fx-day-label">
-                                            @(item.Status == FixtureStatus.Completed ? "Mac Sonu" : item.Status == FixtureStatus.Live ? "Canli" : "Planli")
+                                            @(item.Status == FixtureStatus.Completed ? "Maç Sonu" : item.Status == FixtureStatus.Live ? "Canlı" : "Planlı")
                                         </div>
                                     }
                                 </div>
@@ -608,9 +589,7 @@
                                 </div>
                                 <div class="fx-right">
                                     <span class="fx-stadium"><i class="bi bi-geo-alt" style="font-size:10px;margin-right:3px"></i>@item.VenueName</span>
-                                    <button type="button" class="notify-btn" data-notify-toggle>
-                                        <i class="bi bi-bell"></i> <span>Bildir</span>
-                                    </button>
+                                    <span class="fx-stadium">Hafta @item.MatchWeek</span>
                                 </div>
                             </div>
                         </a>
@@ -658,15 +637,5 @@
             setInterval(updateCountdown, 1000);
         }
 
-        document.querySelectorAll("[data-notify-toggle]").forEach(button => {
-            button.addEventListener("click", event => {
-                event.preventDefault();
-                event.stopPropagation();
-                button.classList.toggle("active");
-                button.innerHTML = button.classList.contains("active")
-                    ? '<i class="bi bi-bell-fill"></i> <span>Bildirim Acik</span>'
-                    : '<i class="bi bi-bell"></i> <span>Bildir</span>';
-            });
-        });
     </script>
 }

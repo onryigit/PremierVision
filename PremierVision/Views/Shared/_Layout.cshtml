@@ -17,21 +17,21 @@
     <link rel="stylesheet" href="~/PremierVision.styles.css" asp-append-version="true" />
     <style>
         :root {
-            --bg: #080d18;
-            --bg2: #0c1220;
-            --card: #111827;
-            --card2: #16202f;
-            --elevated: #1c2d42;
+            --bg: #0d0a18;
+            --bg2: #140f24;
+            --card: #1a1630;
+            --card2: #211b3b;
+            --elevated: #2a2350;
             --green: #00e676;
             --blue: #2979ff;
             --live: #ff1744;
             --gold: #ffd600;
             --yellow: #ffc107;
             --red: #f44336;
-            --t1: #eef2ff;
-            --t2: #7b96c4;
-            --t3: #3d5478;
-            --border: #1a2640;
+            --t1: #f1ecff;
+            --t2: #9d92c8;
+            --t3: #63598d;
+            --border: #31285b;
             --r1: 8px;
             --r2: 12px;
             --r3: 16px;
@@ -49,8 +49,8 @@
             color: var(--t1);
             min-height: 100vh;
             background-image:
-                radial-gradient(ellipse at 15% 0%, rgba(41,121,255,.07) 0%, transparent 55%),
-                radial-gradient(ellipse at 85% 0%, rgba(0,230,118,.04) 0%, transparent 50%);
+                radial-gradient(ellipse at 15% 0%, rgba(108,92,231,.14) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 0%, rgba(155,89,182,.1) 0%, transparent 50%);
         }
         a { color: inherit; text-decoration: none; }
         img { display: block; }
@@ -558,7 +558,7 @@
             </a>
             <div class="nav-links d-none d-lg-flex">
                 <a asp-controller="Home" asp-action="Index" class="nl @(controller == "Home" ? "active" : string.Empty)">Ana Sayfa</a>
-                <a asp-controller="Fixtures" asp-action="Index" class="nl @(controller == "Fixtures" ? "active" : string.Empty)">Fikstur</a>
+                <a asp-controller="Fixtures" asp-action="Index" class="nl @(controller == "Fixtures" ? "active" : string.Empty)">Fikstür</a>
                 <a asp-controller="Standings" asp-action="Index" class="nl @(controller == "Standings" ? "active" : string.Empty)">Puan Durumu</a>
                 <a asp-controller="Admin" asp-action="Index" class="nl @(controller == "Admin" ? "active" : string.Empty)">Admin</a>
             </div>
@@ -569,7 +569,7 @@
         <div class="mob-menu" id="mobMenu">
             <div class="wrap">
                 <a asp-controller="Home" asp-action="Index" class="nl d-block @(controller == "Home" ? "active" : string.Empty)">Ana Sayfa</a>
-                <a asp-controller="Fixtures" asp-action="Index" class="nl d-block @(controller == "Fixtures" ? "active" : string.Empty)">Fikstur</a>
+                <a asp-controller="Fixtures" asp-action="Index" class="nl d-block @(controller == "Fixtures" ? "active" : string.Empty)">Fikstür</a>
                 <a asp-controller="Standings" asp-action="Index" class="nl d-block @(controller == "Standings" ? "active" : string.Empty)">Puan Durumu</a>
                 <a asp-controller="Admin" asp-action="Index" class="nl d-block @(controller == "Admin" ? "active" : string.Empty)">Admin</a>
             </div>
@@ -582,8 +582,8 @@
         <div class="wrap">
             <div class="row g-4">
                 <div class="col-lg-4">
-                    <div class="ft-brand">Goal<span>Zone</span></div>
-                    <p class="ft-desc">Premier League maclari, puan durumu ve detay sayfalari icin proje temasi.</p>
+                    <div class="ft-brand">Premier<span>Vision</span></div>
+                    <p class="ft-desc">Premier League maçları, puan durumu ve detay sayfaları için proje teması.</p>
                     <div class="si-row">
                         <a href="#" class="si"><i class="bi bi-twitter-x"></i></a>
                         <a href="#" class="si"><i class="bi bi-instagram"></i></a>
@@ -601,15 +601,15 @@
                     </ul>
                 </div>
                 <div class="col-6 col-lg-2">
-                    <div class="ft-h">Hizli Erisim</div>
+                    <div class="ft-h">Hızlı Erişim</div>
                     <ul class="ft-ul">
-                        <li><a asp-controller="Home" asp-action="Index">Haftalik Sonuclar</a></li>
-                        <li><a asp-controller="Fixtures" asp-action="Index">Fikstur</a></li>
+                        <li><a asp-controller="Home" asp-action="Index">Haftalık Sonuçlar</a></li>
+                        <li><a asp-controller="Fixtures" asp-action="Index">Fikstür</a></li>
                         <li><a asp-controller="Standings" asp-action="Index">Puan Durumu</a></li>
                     </ul>
                 </div>
                 <div class="col-6 col-lg-2">
-                    <div class="ft-h">Takimlar</div>
+                    <div class="ft-h">Takımlar</div>
                     <ul class="ft-ul">
                         <li><a href="#">Arsenal</a></li>
                         <li><a href="#">Liverpool</a></li>
@@ -620,16 +620,16 @@
                 <div class="col-6 col-lg-2">
                     <div class="ft-h">Destek</div>
                     <ul class="ft-ul">
-                        <li><a href="#">Hakkimizda</a></li>
-                        <li><a href="#">Iletisim</a></li>
+                        <li><a href="#">Hakkımızda</a></li>
+                        <li><a href="#">İletişim</a></li>
                         <li><a href="#">Gizlilik</a></li>
-                        <li><a href="#">Kullanim Sartlari</a></li>
+                        <li><a href="#">Kullanım Şartları</a></li>
                     </ul>
                 </div>
             </div>
             <div class="ft-bot">
-                <span>&copy; 2026 GoalZone. Tum haklari saklidir.</span>
-                <span>Premier League verileri demo ve egitim amaclidir.</span>
+                <span>&copy; 2026 PremierVision. Tüm hakları saklıdır.</span>
+                <span>Premier League verileri demo ve eğitim amaçlıdır.</span>
             </div>
         </div>
     </footer>

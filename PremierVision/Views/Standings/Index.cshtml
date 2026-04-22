@@ -144,7 +144,7 @@
             transition: var(--tr);
         }
 
-        .std-row:hover { background: var(--card2); transform: translateX(3px); }
+        .std-row:hover { background: var(--card2); }
         .std-row td { padding: 11px 10px; text-align: center; border: none; vertical-align: middle; color: var(--t1); }
         .std-row td:first-child { border-radius: var(--r1) 0 0 var(--r1); padding-left: 0; }
         .std-row td:last-child { border-radius: 0 var(--r1) var(--r1) 0; }
@@ -231,13 +231,13 @@
             <div class="col-lg-8">
                 <div class="pg-badge"><i class="bi bi-trophy-fill"></i> Premier League</div>
                 <h1 class="pg-title">Puan <span style="color:var(--green)">Durumu</span></h1>
-                <p class="pg-sub">Mac sonuclarindan dinamik hesaplanan lig tablosu</p>
+                <p class="pg-sub">Maç sonuçlarından dinamik hesaplanan lig tablosu</p>
             </div>
             <div class="col-lg-4 mt-3 mt-lg-0">
                 <div class="legend justify-content-lg-end">
-                    <div class="leg-item"><div class="leg-dot" style="background:rgba(255,214,0,.8)"></div>Sampiyon</div>
+                    <div class="leg-item"><div class="leg-dot" style="background:rgba(255,214,0,.8)"></div>Şampiyon</div>
                     <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Avrupa</div>
-                    <div class="leg-item"><div class="leg-dot" style="background:var(--live)"></div>Kume Dusme</div>
+                    <div class="leg-item"><div class="leg-dot" style="background:var(--live)"></div>Küme Düşme</div>
                 </div>
             </div>
         </div>
@@ -249,17 +249,17 @@
         <div class="tbl-wrap">
             <div class="top-stats">
                 <div class="ts-card">
-                    <div class="ts-label">Lider Takim</div>
+                    <div class="ts-label">Lider Takım</div>
                     <div class="ts-val" style="color:var(--gold)">@(leader?.TeamName ?? "-")</div>
                     <div class="ts-team">@(leader?.Points ?? 0) puan</div>
                 </div>
                 <div class="ts-card">
-                    <div class="ts-label">En Cok Gol</div>
+                    <div class="ts-label">En Çok Gol Atan</div>
                     <div class="ts-val" style="color:var(--green)">@(topScoring?.GoalsFor ?? 0)</div>
                     <div class="ts-team">@(topScoring?.TeamName ?? "-")</div>
                 </div>
                 <div class="ts-card">
-                    <div class="ts-label">En Az Yenen</div>
+                    <div class="ts-label">En Az Gol Yiyen</div>
                     <div class="ts-val" style="color:var(--blue)">@(bestDefense?.GoalsAgainst ?? 0)</div>
                     <div class="ts-team">@(bestDefense?.TeamName ?? "-")</div>
                 </div>
@@ -271,7 +271,7 @@
                         <tr>
                             <th style="width:4px;padding:0"></th>
                             <th style="width:44px">#</th>
-                            <th class="team-col">Takim</th>
+                            <th class="team-col">Takım</th>
                             <th>O</th>
                             <th>G</th>
                             <th>B</th>
@@ -297,17 +297,17 @@
 
                             if (i == 0)
                             {
-                                <tr><td colspan="12"><div class="zone-lbl">Sampiyonlar Ligi Gruplari (1-4)</div></td></tr>
+                                <tr><td colspan="12"><div class="zone-lbl">Şampiyonlar Ligi Grupları (1-4)</div></td></tr>
                             }
 
                             if (i == 4)
                             {
-                                <tr><td colspan="12"><div class="zone-lbl">Avrupa Disi ve Orta Sira</div></td></tr>
+                                <tr><td colspan="12"><div class="zone-lbl">Avrupa Dışı ve Orta Sıra</div></td></tr>
                             }
 
                             if (i == 17)
                             {
-                                <tr><td colspan="12"><div class="zone-lbl">Kume Dusme Hatti (18-20)</div></td></tr>
+                                <tr><td colspan="12"><div class="zone-lbl">Küme Düşme Hattı (18-20)</div></td></tr>
                             }
 
                             var formItems = (item.Form ?? string.Empty)

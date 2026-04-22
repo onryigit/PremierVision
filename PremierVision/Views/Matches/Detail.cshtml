@@ -2,7 +2,7 @@
 @model MatchDetailViewModel
 
 @{
-    ViewData["Title"] = "Mac Detayi";
+    ViewData["Title"] = "Maç Detayı";
 
     var fixture = Model.Fixture;
     var homeInitials = fixture.HomeTeamName[..Math.Min(3, fixture.HomeTeamName.Length)].ToUpperInvariant();
@@ -35,6 +35,29 @@
         var normalized = value.Replace("%", string.Empty).Replace(",", ".").Trim();
         return double.TryParse(normalized, NumberStyles.Any, CultureInfo.InvariantCulture, out var result) ? result : 0;
     }
+
+    static string TranslateStatisticName(string name) => name switch
+    {
+        "Shots on Goal" => "İsabetli Şut",
+        "Shots off Goal" => "İsabetsiz Şut",
+        "Total Shots" => "Toplam Şut",
+        "Blocked Shots" => "Engellenen Şut",
+        "Shots insidebox" => "Ceza Sahası İçi Şut",
+        "Shots outsidebox" => "Ceza Sahası Dışı Şut",
+        "Fouls" => "Fauller",
+        "Corner Kicks" => "Korner",
+        "Offsides" => "Ofsayt",
+        "Ball Possession" => "Topa Sahip Olma",
+        "Expected Goals" => "Beklenen Gol",
+        "Goals Prevented" => "Önlenen Gol",
+        "Yellow Cards" => "Sarı Kart",
+        "Red Cards" => "Kırmızı Kart",
+        "Goalkeeper Saves" => "Kaleci Kurtarışı",
+        "Total passes" => "Toplam Pas",
+        "Passes accurate" => "İsabetli Pas",
+        "Passes %" => "Pas İsabeti",
+        _ => name
+    };
 }
 
 @section Styles {
@@ -536,15 +559,15 @@
             <span class="hbadge hb-gray">
                 @if (fixture.Status == FixtureStatus.Completed)
                 {
-                    <span><i class="bi bi-check2-circle me-1"></i>Mac Sona Erdi</span>
+                    <span><i class="bi bi-check2-circle me-1"></i>Maç Sona Erdi</span>
                 }
                 else if (fixture.Status == FixtureStatus.Live)
                 {
-                    <span><i class="bi bi-broadcast me-1"></i>Canli</span>
+                    <span><i class="bi bi-broadcast me-1"></i>Canlı</span>
                 }
                 else
                 {
-                    <span><i class="bi bi-clock me-1"></i>Planlandi</span>
+                    <span><i class="bi bi-clock me-1"></i>Planlandı</span>
                 }
             </span>
             <span class="hbadge hb-green"><i class="bi bi-calendar3 me-1"></i>@fixture.KickoffUtc.ToLocalTime().ToString("dd MMMM yyyy")</span>
@@ -567,9 +590,9 @@
                 <div class="h-sc">
                     @fullTimeDisplay
                 </div>
-                <div class="h-ht"><i class="bi bi-hourglass-split me-1"></i>IY: @(fixture.HomeHalfTimeScore.HasValue && fixture.AwayHalfTimeScore.HasValue ? $"{fixture.HomeHalfTimeScore} - {fixture.AwayHalfTimeScore}" : "-")</div>
+                <div class="h-ht"><i class="bi bi-hourglass-split me-1"></i>İY: @(fixture.HomeHalfTimeScore.HasValue && fixture.AwayHalfTimeScore.HasValue ? $"{fixture.HomeHalfTimeScore} - {fixture.AwayHalfTimeScore}" : "-")</div>
                 <div class="h-ft">
-                    @(fixture.Status == FixtureStatus.Completed ? "Mac Bitti" : fixture.Status == FixtureStatus.Live ? "Mac Devam Ediyor" : "Mac Henuz Baslamadi")
+                    @(fixture.Status == FixtureStatus.Completed ? "Maç Bitti" : fixture.Status == FixtureStatus.Live ? "Maç Devam Ediyor" : "Maç Henüz Başlamadı")
                 </div>
             </div>
             <div class="h-team">
@@ -596,15 +619,15 @@
 
 <div class="content">
     <div class="wrap">
-        <a asp-controller="Home" asp-action="Index" class="back-btn"><i class="bi bi-arrow-left"></i> Mac Listesine Don</a>
+        <a asp-controller="Home" asp-action="Index" class="back-btn"><i class="bi bi-arrow-left"></i> Maç Listesine Dön</a>
 
         <div class="row g-4">
             <div class="col-lg-7">
                 <div class="dc">
-                    <div class="dc-title"><i class="bi bi-activity me-2" style="color:var(--green)"></i>Mac Olaylari</div>
+                    <div class="dc-title"><i class="bi bi-activity me-2" style="color:var(--green)"></i>Maç Olayları</div>
                     @if (Model.Events.Count == 0)
                     {
-                        <p style="color:var(--t2)">Bu maca ait olay girisi yok.</p>
+                        <p style="color:var(--t2)">Bu maça ait olay girişi yok.</p>
                     }
                     else
                     {
@@ -635,7 +658,7 @@
                                     _ => "bi-arrow-left-right"
                                 };
                                 var detailText = item.EventType == MatchEventType.Substitution
-                                    ? (item.Description ?? string.Empty).Replace("Assist:", "Cikan:")
+                                    ? (item.Description ?? string.Empty).Replace("Assist:", "Çıkan:")
                                     : item.Description;
 
                                 <div class="tl-ev">
@@ -747,11 +770,11 @@
                 </div>
 
                 <div class="dc">
-                    <div class="dc-title"><i class="bi bi-arrow-left-right me-2" style="color:var(--blue)"></i>Oyuncu Degisiklikleri</div>
+                    <div class="dc-title"><i class="bi bi-arrow-left-right me-2" style="color:var(--blue)"></i>Oyuncu Değişiklikleri</div>
                     <div class="sub-lbl">@fixture.HomeTeamName</div>
                     @if (homeSubs.Count == 0)
                     {
-                        <div class="sub-r"><div class="sub-out">Degisiklik yok</div></div>
+                        <div class="sub-r"><div class="sub-out">Değişiklik yok</div></div>
                     }
                     else
                     {
@@ -761,7 +784,7 @@
                                 <div class="sub-min">@item.Minute'</div>
                                 <div class="sub-in">↑ @item.PlayerName</div>
                                 <div class="sub-arr">⇄</div>
-                                <div class="sub-out">↓ @(string.IsNullOrWhiteSpace(item.Description) ? "-" : item.Description.Replace("Assist:", "Cikan:"))</div>
+                                <div class="sub-out">↓ @(string.IsNullOrWhiteSpace(item.Description) ? "-" : item.Description.Replace("Assist:", string.Empty).Replace("Cikan:", string.Empty).Replace("Çıkan:", string.Empty).Trim())</div>
                             </div>
                         }
                     }
@@ -769,7 +792,7 @@
                     <div class="sub-lbl">@fixture.AwayTeamName</div>
                     @if (awaySubs.Count == 0)
                     {
-                        <div class="sub-r"><div class="sub-out">Degisiklik yok</div></div>
+                        <div class="sub-r"><div class="sub-out">Değişiklik yok</div></div>
                     }
                     else
                     {
@@ -779,7 +802,7 @@
                                 <div class="sub-min">@item.Minute'</div>
                                 <div class="sub-in">↑ @item.PlayerName</div>
                                 <div class="sub-arr">⇄</div>
-                                <div class="sub-out">↓ @(string.IsNullOrWhiteSpace(item.Description) ? "-" : item.Description.Replace("Assist:", "Cikan:"))</div>
+                                <div class="sub-out">↓ @(string.IsNullOrWhiteSpace(item.Description) ? "-" : item.Description.Replace("Assist:", string.Empty).Replace("Cikan:", string.Empty).Replace("Çıkan:", string.Empty).Trim())</div>
                             </div>
                         }
                     }
@@ -788,19 +811,19 @@
 
             <div class="col-lg-5">
                 <div class="dc">
-                    <div class="dc-title"><i class="bi bi-bar-chart-fill me-2" style="color:var(--blue)"></i>Mac Ozeti</div>
+                    <div class="dc-title"><i class="bi bi-bar-chart-fill me-2" style="color:var(--blue)"></i>Maç Özeti</div>
                     <div class="sc-pills">
-                        <div class="sc-pill"><div class="sp-lbl">Ilk Yari</div><div class="sp-val">@(fixture.HomeHalfTimeScore.HasValue && fixture.AwayHalfTimeScore.HasValue ? $"{fixture.HomeHalfTimeScore} - {fixture.AwayHalfTimeScore}" : "-")</div></div>
-                        <div class="sc-pill"><div class="sp-lbl">Ikinci Yari</div><div class="sp-val">@(fixture.HomeHalfTimeScore.HasValue && fixture.AwayHalfTimeScore.HasValue && fixture.HomeFullTimeScore.HasValue && fixture.AwayFullTimeScore.HasValue ? $"{homeSecondHalf} - {awaySecondHalf}" : "-")</div></div>
-                        <div class="sc-pill"><div class="sp-lbl">Sonuc</div><div class="sp-val" style="color:var(--green)">@fullTimeDisplay</div></div>
+                        <div class="sc-pill"><div class="sp-lbl">İlk Yarı</div><div class="sp-val">@(fixture.HomeHalfTimeScore.HasValue && fixture.AwayHalfTimeScore.HasValue ? $"{fixture.HomeHalfTimeScore} - {fixture.AwayHalfTimeScore}" : "-")</div></div>
+                        <div class="sc-pill"><div class="sp-lbl">İkinci Yarı</div><div class="sp-val">@(fixture.HomeHalfTimeScore.HasValue && fixture.AwayHalfTimeScore.HasValue && fixture.HomeFullTimeScore.HasValue && fixture.AwayFullTimeScore.HasValue ? $"{homeSecondHalf} - {awaySecondHalf}" : "-")</div></div>
+                        <div class="sc-pill"><div class="sp-lbl">Sonuç</div><div class="sp-val" style="color:var(--green)">@fullTimeDisplay</div></div>
                     </div>
                 </div>
 
                 <div class="dc">
-                    <div class="dc-title"><i class="bi bi-graph-up me-2" style="color:var(--green)"></i>Istatistikler</div>
+                    <div class="dc-title"><i class="bi bi-graph-up me-2" style="color:var(--green)"></i>İstatistikler</div>
                     @if (Model.Statistics.Count == 0)
                     {
-                        <p style="color:var(--t2)">Bu maca ait istatistik girisi yok.</p>
+                        <p style="color:var(--t2)">Bu maça ait istatistik girişi yok.</p>
                     }
                     else
                     {
@@ -816,7 +839,7 @@
 
                             <div class="stat-r">
                                 <div class="sv-h">@homeValue</div>
-                                <div class="sl">@group.Key</div>
+                                <div class="sl">@TranslateStatisticName(group.Key)</div>
                                 <div class="sv-a">@awayValue</div>
                             </div>
                             <div class="bar-r">
@@ -829,14 +852,14 @@
                 </div>
 
                 <div class="dc">
-                    <div class="dc-title"><i class="bi bi-info-circle me-2" style="color:var(--t3)"></i>Mac Bilgileri</div>
+                    <div class="dc-title"><i class="bi bi-info-circle me-2" style="color:var(--t3)"></i>Maç Bilgileri</div>
                     <div class="mi-row"><span class="mi-key">Lig</span><span class="mi-val" style="color:var(--gold)">Premier League</span></div>
                     <div class="mi-row"><span class="mi-key">Sezon</span><span class="mi-val">2024 / 2025</span></div>
                     <div class="mi-row"><span class="mi-key">Hafta</span><span class="mi-val">Hafta @fixture.MatchWeek</span></div>
                     <div class="mi-row"><span class="mi-key">Stadyum</span><span class="mi-val">@fixture.VenueName</span></div>
                     <div class="mi-row"><span class="mi-key">Tarih</span><span class="mi-val">@fixture.KickoffUtc.ToLocalTime().ToString("dd MMMM yyyy")</span></div>
                     <div class="mi-row"><span class="mi-key">Saat</span><span class="mi-val">@fixture.KickoffUtc.ToLocalTime().ToString("HH:mm")</span></div>
-                    <div class="mi-row"><span class="mi-key">Durum</span><span class="mi-val">@(fixture.Status == FixtureStatus.Completed ? "Tamamlandi" : fixture.Status == FixtureStatus.Live ? "Devam Ediyor" : "Henuz Oynanmadi")</span></div>
+                    <div class="mi-row"><span class="mi-key">Durum</span><span class="mi-val">@(fixture.Status == FixtureStatus.Completed ? "Tamamlandı" : fixture.Status == FixtureStatus.Live ? "Devam Ediyor" : "Henüz Oynanmadı")</span></div>
                 </div>
             </div>
         </div>

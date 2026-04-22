@@ -44,7 +44,7 @@ public class MatchesController(AppDbContext context, IApiFootballSyncService api
             }
             catch
             {
-                // Detay senkronizasyonu basarisiz olsa da sayfa mevcut verilerle acilsin.
+                // Detay senkronizasyonu başarısız olsa da sayfa mevcut verilerle açılsın.
             }
         }
 
