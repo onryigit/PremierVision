@@ -4,83 +4,158 @@
     ViewData["Title"] = "Mac Detayi";
 }
 
-<section class="row g-4">
-    <div class="col-12">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <a asp-controller="Fixtures" asp-action="Index" class="btn btn-sm btn-outline-dark mb-3">Fiksture Don</a>
-                <h1 class="h3 mb-1">@Model.Fixture.HomeTeamName - @Model.Fixture.AwayTeamName</h1>
-                <p class="text-muted mb-2">Hafta @Model.Fixture.MatchWeek | @Model.Fixture.VenueName</p>
-                <div class="display-6 fw-bold">
+<section class="hero">
+    <div class="wrap">
+        <div class="hero-badges">
+            <span class="hbadge hb-gold"><i class="bi bi-trophy-fill me-1"></i>Premier League</span>
+            <span class="hbadge hb-gray"><i class="bi bi-calendar3 me-1"></i>Hafta @Model.Fixture.MatchWeek</span>
+            <span class="hbadge hb-green">
+                @if (Model.Fixture.Status == FixtureStatus.Completed)
+                {
+                    <span><i class="bi bi-check2-circle me-1"></i>Mac Sona Erdi</span>
+                }
+                else if (Model.Fixture.Status == FixtureStatus.Live)
+                {
+                    <span><i class="bi bi-broadcast me-1"></i>Canli</span>
+                }
+                else
+                {
+                    <span><i class="bi bi-clock me-1"></i>Planlandi</span>
+                }
+            </span>
+        </div>
+
+        <div class="hero-grid">
+            <div class="h-team">
+                <div class="h-logo">@Model.Fixture.HomeTeamName[..Math.Min(3, Model.Fixture.HomeTeamName.Length)].ToUpperInvariant()</div>
+                <div class="h-name">@Model.Fixture.HomeTeamName</div>
+                <div class="h-type">Ev Sahibi</div>
+            </div>
+            <div class="h-score-c">
+                <div class="h-sc">
                     @(Model.Fixture.HomeFullTimeScore.HasValue && Model.Fixture.AwayFullTimeScore.HasValue
-                        ? $"{Model.Fixture.HomeFullTimeScore} - {Model.Fixture.AwayFullTimeScore}"
-                        : "Planlandi")
+                        ? $"{Model.Fixture.HomeFullTimeScore}-{Model.Fixture.AwayFullTimeScore}"
+                        : "-")
+                </div>
+                <div class="h-ht">
+                    IY:
+                    @(Model.Fixture.HomeHalfTimeScore.HasValue && Model.Fixture.AwayHalfTimeScore.HasValue
+                        ? $"{Model.Fixture.HomeHalfTimeScore}-{Model.Fixture.AwayHalfTimeScore}"
+                        : "-")
+                </div>
+            </div>
+            <div class="h-team">
+                <div class="h-logo">@Model.Fixture.AwayTeamName[..Math.Min(3, Model.Fixture.AwayTeamName.Length)].ToUpperInvariant()</div>
+                <div class="h-name">@Model.Fixture.AwayTeamName</div>
+                <div class="h-type">Deplasman</div>
+            </div>
+        </div>
+
+        <div class="info-strip">
+            <div class="istrip"><i class="bi bi-geo-alt-fill"></i><span>@Model.Fixture.VenueName</span></div>
+            <div class="istrip"><i class="bi bi-calendar3"></i><span>@Model.Fixture.KickoffUtc.ToLocalTime().ToString("dd.MM.yyyy")</span></div>
+            <div class="istrip"><i class="bi bi-clock"></i><span>@Model.Fixture.KickoffUtc.ToLocalTime().ToString("HH:mm")</span></div>
+        </div>
+    </div>
+</section>
+
+<div class="content">
+    <div class="wrap">
+        <a asp-controller="Home" asp-action="Index" class="back-btn"><i class="bi bi-arrow-left"></i> Mac Listesine Don</a>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="dc">
+                    <div class="dc-title"><i class="bi bi-activity"></i> Mac Olaylari</div>
+                    @if (Model.Events.Count == 0)
+                    {
+                        <p style="color:var(--t2)">Bu maca ait olay girisi yok.</p>
+                    }
+                    else
+                    {
+                        <div class="tl-wrap">
+                            <div class="tl-line"></div>
+                            @foreach (var item in Model.Events)
+                            {
+                                var isHome = item.TeamName == Model.Fixture.HomeTeamName;
+                                var chipClass = item.EventType switch
+                                {
+                                    MatchEventType.Goal => "goal-ev",
+                                    MatchEventType.YellowCard => "yel-ev",
+                                    MatchEventType.RedCard => "red-ev",
+                                    _ => "sub-ev"
+                                };
+                                var iconClass = item.EventType switch
+                                {
+                                    MatchEventType.Goal => "ei-goal",
+                                    MatchEventType.YellowCard => "ei-yel",
+                                    MatchEventType.RedCard => "ei-red",
+                                    _ => "ei-sub"
+                                };
+                                <div class="tl-ev">
+                                    <div class="@(isHome ? "tl-home" : "tl-home")">
+                                        @if (isHome)
+                                        {
+                                            <div class="chip home @chipClass">
+                                                <div class="ev-ico @iconClass"><i class="bi bi-circle-fill" style="font-size:9px"></i></div>
+                                                <div>
+                                                    <div class="ev-pl">@item.PlayerName</div>
+                                                    <div class="ev-dt">@item.TeamName @if (!string.IsNullOrWhiteSpace(item.Description)) { <span>- @item.Description</span> }</div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="tl-min-c"><div class="min-b">@item.Minute'</div></div>
+                                    <div class="tl-away">
+                                        @if (!isHome)
+                                        {
+                                            <div class="chip away @chipClass">
+                                                <div class="ev-ico @iconClass"><i class="bi bi-circle-fill" style="font-size:9px"></i></div>
+                                                <div>
+                                                    <div class="ev-pl">@item.PlayerName</div>
+                                                    <div class="ev-dt">@item.TeamName @if (!string.IsNullOrWhiteSpace(item.Description)) { <span>- @item.Description</span> }</div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="dc">
+                    <div class="dc-title"><i class="bi bi-bar-chart-fill"></i> Mac Istatistikleri</div>
+                    @if (Model.Statistics.Count == 0)
+                    {
+                        <p style="color:var(--t2)">Bu maca ait istatistik girisi yok.</p>
+                    }
+                    else
+                    {
+                        @foreach (var group in Model.Statistics.GroupBy(x => x.Name))
+                        {
+                            var home = group.FirstOrDefault(x => x.TeamName == Model.Fixture.HomeTeamName)?.Value ?? "-";
+                            var away = group.FirstOrDefault(x => x.TeamName == Model.Fixture.AwayTeamName)?.Value ?? "-";
+                            <div class="stat-r">
+                                <div class="sv-h">@home</div>
+                                <div class="sl">@group.Key</div>
+                                <div class="sv-a">@away</div>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <div class="dc">
+                    <div class="dc-title"><i class="bi bi-info-circle-fill"></i> Mac Bilgisi</div>
+                    <div class="mi-row"><span class="mi-key">Stadyum</span><span class="mi-val">@Model.Fixture.VenueName</span></div>
+                    <div class="mi-row"><span class="mi-key">Tarih</span><span class="mi-val">@Model.Fixture.KickoffUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span></div>
+                    <div class="mi-row"><span class="mi-key">Durum</span><span class="mi-val">@Model.Fixture.Status</span></div>
+                    <div class="mi-row"><span class="mi-key">Ilk Yari</span><span class="mi-val">@((Model.Fixture.HomeHalfTimeScore.HasValue && Model.Fixture.AwayHalfTimeScore.HasValue) ? $"{Model.Fixture.HomeHalfTimeScore}-{Model.Fixture.AwayHalfTimeScore}" : "-")</span></div>
+                    <div class="mi-row"><span class="mi-key">Mac Sonu</span><span class="mi-val">@((Model.Fixture.HomeFullTimeScore.HasValue && Model.Fixture.AwayFullTimeScore.HasValue) ? $"{Model.Fixture.HomeFullTimeScore}-{Model.Fixture.AwayFullTimeScore}" : "-")</span></div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="col-lg-6">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h2 class="h4 mb-3">Mac Olaylari</h2>
-                @if (Model.Events.Count == 0)
-                {
-                    <p class="text-muted mb-0">Bu maca ait olay girisi yok.</p>
-                }
-                else
-                {
-                    <div class="list-group">
-                        @foreach (var item in Model.Events)
-                        {
-                            <div class="list-group-item">
-                                <div class="d-flex justify-content-between">
-                                    <span class="fw-semibold">@item.Minute'</span>
-                                    <span>@item.EventType</span>
-                                </div>
-                                <div>@item.PlayerName</div>
-                                <div class="small text-muted">@item.TeamName @if (!string.IsNullOrWhiteSpace(item.Description)) { <span>- @item.Description</span> }</div>
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-6">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h2 class="h4 mb-3">Mac Istatistikleri</h2>
-                @if (Model.Statistics.Count == 0)
-                {
-                    <p class="text-muted mb-0">Bu maca ait istatistik girisi yok.</p>
-                }
-                else
-                {
-                    <div class="table-responsive">
-                        <table class="table table-striped mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Takim</th>
-                                    <th>Istatistik</th>
-                                    <th>Deger</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model.Statistics)
-                                {
-                                    <tr>
-                                        <td>@item.TeamName</td>
-                                        <td>@item.Name</td>
-                                        <td>@item.Value</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-</section>
+</div>

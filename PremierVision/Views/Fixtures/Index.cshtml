@@ -2,59 +2,116 @@
 
 @{
     ViewData["Title"] = "Fikstur";
+    var totalMatches = Model.Fixtures.Count;
+    var topMatches = Model.Fixtures.Take(2).ToList();
 }
 
-<section class="card shadow-sm">
-    <div class="card-body">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-            <div>
-                <h1 class="h3 mb-1">Fikstur</h1>
-                <p class="text-muted mb-0">Bir sonraki asamada API-Football verileri burada kullanilacak.</p>
+<section class="pg-head">
+    <div class="wrap">
+        <div class="row align-items-end">
+            <div class="col-lg-8">
+                <div class="pg-badge"><i class="bi bi-trophy-fill"></i> Premier League</div>
+                <h1 class="pg-title">Hafta <span style="color:var(--blue)">@Model.CurrentWeek</span> Fiksturu</h1>
+                <p class="pg-sub">Case gereksinimine uygun olarak bir sonraki / secili hafta maclari</p>
             </div>
-
-            <form method="get" class="d-flex gap-2">
-                <label class="form-label mb-0 align-self-center" for="week">Hafta</label>
-                <select id="week" name="week" class="form-select" onchange="this.form.submit()">
-                    @foreach (var week in Model.AvailableWeeks)
-                    {
-                        <option value="@week" selected="@(week == Model.CurrentWeek)">@week</option>
-                    }
-                </select>
-            </form>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table table-striped align-middle">
-                <thead>
-                    <tr>
-                        <th>Tarih</th>
-                        <th>Mac</th>
-                        <th>Durum</th>
-                        <th>Skor</th>
-                        <th>Stadyum</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Fixtures)
-                    {
-                        <tr>
-                            <td>@item.KickoffUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
-                            <td class="fw-semibold">@item.HomeTeamName - @item.AwayTeamName</td>
-                            <td>@item.Status</td>
-                            <td>
-                                @(item.HomeFullTimeScore.HasValue && item.AwayFullTimeScore.HasValue
-                                    ? $"{item.HomeFullTimeScore} - {item.AwayFullTimeScore}"
-                                    : "-")
-                            </td>
-                            <td>@item.VenueName</td>
-                            <td>
-                                <a asp-controller="Matches" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-sm btn-dark">Detay</a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <div class="col-lg-4 mt-3 mt-lg-0">
+                <form method="get" class="d-flex gap-2 justify-content-lg-end">
+                    <label for="week" class="visually-hidden">Hafta</label>
+                    <select id="week" name="week" class="form-select" onchange="this.form.submit()">
+                        @foreach (var week in Model.AvailableWeeks)
+                        {
+                            <option value="@week" selected="@(week == Model.CurrentWeek)">@week. hafta</option>
+                        }
+                    </select>
+                </form>
+            </div>
         </div>
     </div>
 </section>
+
+<main>
+    <div class="wrap" style="padding-top:28px;padding-bottom:56px">
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
+                    <div class="card-body text-center">
+                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--blue)">@totalMatches</div>
+                        <div class="small text-uppercase" style="letter-spacing:1px;color:var(--t3)">Toplam Mac</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
+                    <div class="card-body text-center">
+                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--green)">@Model.Fixtures.Count(x => x.Status == FixtureStatus.NotStarted)</div>
+                        <div class="small text-uppercase" style="letter-spacing:1px;color:var(--t3)">Bekleyen</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
+                    <div class="card-body text-center">
+                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--gold)">@topMatches.Count</div>
+                        <div class="small text-uppercase" style="letter-spacing:1px;color:var(--t3)">One Cikan</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
+                    <div class="card-body text-center">
+                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--live)">@Model.Fixtures.Count(x => x.Status == FixtureStatus.Live)</div>
+                        <div class="small text-uppercase" style="letter-spacing:1px;color:var(--t3)">Canli</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @foreach (var item in Model.Fixtures)
+        {
+            var isTop = topMatches.Any(x => x.Id == item.Id);
+            <div class="mc-wrap">
+                <a asp-controller="Matches" asp-action="Detail" asp-route-id="@item.Id" class="mc @(item.Status == FixtureStatus.Live ? "live" : string.Empty)" style="@(isTop ? "border-color:rgba(255,214,0,.22);background:linear-gradient(135deg,var(--card),rgba(255,214,0,.03))" : string.Empty)">
+                    <div class="mc-time">
+                        <div class="mc-min @(item.Status == FixtureStatus.NotStarted ? "bc" : item.Status == FixtureStatus.Live ? "lc" : string.Empty)">
+                            @(item.Status == FixtureStatus.Live ? "CANLI" : item.KickoffUtc.ToLocalTime().ToString("HH:mm"))
+                        </div>
+                        @if (item.Status == FixtureStatus.Completed)
+                        {
+                            <div class="sbadge sb-fin">MS</div>
+                        }
+                        else if (item.Status == FixtureStatus.Live)
+                        {
+                            <div class="sbadge sb-live"><span class="live-dot"></span>CANLI</div>
+                        }
+                        else
+                        {
+                            <div class="sbadge sb-up">@item.KickoffUtc.ToLocalTime().ToString("dd MMM")</div>
+                        }
+                    </div>
+                    <div class="dvv"></div>
+                    <div class="mc-teams">
+                        <div class="mc-tr">
+                            <div class="tl-sm">@item.HomeTeamName[..Math.Min(3, item.HomeTeamName.Length)].ToUpperInvariant()</div>
+                            <span class="tn">@item.HomeTeamName</span>
+                            <span class="ts @(item.Status == FixtureStatus.NotStarted ? "dim" : string.Empty)">
+                                @(item.Status == FixtureStatus.NotStarted ? "-" : (item.HomeFullTimeScore ?? 0).ToString())
+                            </span>
+                        </div>
+                        <div class="mc-tr">
+                            <div class="tl-sm">@item.AwayTeamName[..Math.Min(3, item.AwayTeamName.Length)].ToUpperInvariant()</div>
+                            <span class="tn">@item.AwayTeamName</span>
+                            <span class="ts @(item.Status == FixtureStatus.NotStarted ? "dim" : string.Empty)">
+                                @(item.Status == FixtureStatus.NotStarted ? "-" : (item.AwayFullTimeScore ?? 0).ToString())
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-end small" style="min-width:150px;color:var(--t3)">
+                        <div>@item.VenueName</div>
+                        <div>Hafta @item.MatchWeek</div>
+                    </div>
+                    <span class="det-btn ms-3"><i class="bi bi-chevron-right"></i> <span>Detay</span></span>
+                </a>
+            </div>
+        }
+    </div>
+</main>

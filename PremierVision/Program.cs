@@ -10,6 +10,13 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IStandingsService, StandingsService>();
+builder.Services.AddHttpClient<IApiFootballSyncService, ApiFootballSyncService>((serviceProvider, client) =>
+{
+    var apiOptions = serviceProvider
+        .GetRequiredService<Microsoft.Extensions.Options.IOptions<ApiFootballOptions>>()
+        .Value;
+    client.BaseAddress = new Uri(apiOptions.BaseUrl.TrimEnd('/') + "/");
+});
 builder.Services.Configure<ApiFootballOptions>(
     builder.Configuration.GetSection(ApiFootballOptions.SectionName));
 

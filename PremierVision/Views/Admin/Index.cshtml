@@ -1,0 +1,167 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model PremierVision.Models.ViewModels.Admin.AdminPanelViewModel
+
+@{
+    ViewData["Title"] = "Admin Panel";
+}
+
+<section class="pg-head">
+    <div class="wrap">
+        <div class="pg-badge"><i class="bi bi-shield-lock-fill"></i> Admin Panel</div>
+        <h1 class="pg-title">Sadece <span style="color:var(--green)">Ekleme</span> Islemleri</h1>
+        <p class="pg-sub">Case kapsamina uygun olarak mac, mac olayi ve mac istatistigi ekleme ekranlari</p>
+    </div>
+</section>
+
+<main>
+    <div class="wrap" style="padding-top:28px;padding-bottom:56px">
+        @if (TempData["AdminMessage"] is string message)
+        {
+            <div class="alert alert-success">@message</div>
+        }
+
+        <div class="card border-0 shadow-sm mb-4" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
+            <div class="card-body d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <div>
+                    <h2 class="h4 mb-1">API-Football Senkronizasyonu</h2>
+                    <p class="mb-0" style="color:var(--t2)">API key tanimlandiginda takımlar ve fiksturler dogrudan veritabanina alinabilir.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <form asp-action="SyncTeams" method="post">
+                        <button class="btn btn-outline-light">Takimlari Cek</button>
+                    </form>
+                    <form asp-action="SyncFixtures" method="post">
+                        <button class="btn btn-primary">Fiksturu Cek</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm h-100" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
+                    <div class="card-body">
+                        <h2 class="h4 mb-3">Mac Ekle</h2>
+                        <form asp-action="AddFixture" method="post" class="d-grid gap-3">
+                            <div>
+                                <label asp-for="Fixture.MatchWeek" class="form-label"></label>
+                                <input asp-for="Fixture.MatchWeek" class="form-control" />
+                                <span asp-validation-for="Fixture.MatchWeek" class="text-danger small"></span>
+                            </div>
+                            <div>
+                                <label asp-for="Fixture.HomeTeamId" class="form-label">Ev Sahibi</label>
+                                <select asp-for="Fixture.HomeTeamId" class="form-select" asp-items="@(new SelectList(Model.Teams, "Value", "Label"))"></select>
+                            </div>
+                            <div>
+                                <label asp-for="Fixture.AwayTeamId" class="form-label">Deplasman</label>
+                                <select asp-for="Fixture.AwayTeamId" class="form-select" asp-items="@(new SelectList(Model.Teams, "Value", "Label"))"></select>
+                                <span asp-validation-for="Fixture.AwayTeamId" class="text-danger small"></span>
+                            </div>
+                            <div>
+                                <label asp-for="Fixture.KickoffUtc" class="form-label">Tarih ve Saat (UTC)</label>
+                                <input asp-for="Fixture.KickoffUtc" class="form-control" type="datetime-local" />
+                            </div>
+                            <div>
+                                <label asp-for="Fixture.VenueName" class="form-label">Stadyum</label>
+                                <input asp-for="Fixture.VenueName" class="form-control" />
+                            </div>
+                            <div>
+                                <label asp-for="Fixture.Status" class="form-label">Durum</label>
+                                <select asp-for="Fixture.Status" class="form-select" asp-items="Html.GetEnumSelectList<FixtureStatus>()"></select>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label asp-for="Fixture.HomeHalfTimeScore" class="form-label">IY Ev</label>
+                                    <input asp-for="Fixture.HomeHalfTimeScore" class="form-control" />
+                                </div>
+                                <div class="col-6">
+                                    <label asp-for="Fixture.AwayHalfTimeScore" class="form-label">IY Dep</label>
+                                    <input asp-for="Fixture.AwayHalfTimeScore" class="form-control" />
+                                </div>
+                                <div class="col-6">
+                                    <label asp-for="Fixture.HomeFullTimeScore" class="form-label">MS Ev</label>
+                                    <input asp-for="Fixture.HomeFullTimeScore" class="form-control" />
+                                </div>
+                                <div class="col-6">
+                                    <label asp-for="Fixture.AwayFullTimeScore" class="form-label">MS Dep</label>
+                                    <input asp-for="Fixture.AwayFullTimeScore" class="form-control" />
+                                </div>
+                            </div>
+                            <button class="btn btn-success">Mac Ekle</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm h-100" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
+                    <div class="card-body">
+                        <h2 class="h4 mb-3">Mac Olayi Ekle</h2>
+                        <form asp-action="AddEvent" method="post" class="d-grid gap-3">
+                            <div>
+                                <label asp-for="Event.FixtureId" class="form-label">Mac</label>
+                                <select asp-for="Event.FixtureId" class="form-select" asp-items="@(new SelectList(Model.Fixtures, "Value", "Label"))"></select>
+                            </div>
+                            <div>
+                                <label asp-for="Event.TeamId" class="form-label">Takim</label>
+                                <select asp-for="Event.TeamId" class="form-select" asp-items="@(new SelectList(Model.Teams, "Value", "Label"))">
+                                    <option value="">Seciniz</option>
+                                </select>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label asp-for="Event.Minute" class="form-label">Dakika</label>
+                                    <input asp-for="Event.Minute" class="form-control" />
+                                </div>
+                                <div class="col-6">
+                                    <label asp-for="Event.EventType" class="form-label">Olay</label>
+                                    <select asp-for="Event.EventType" class="form-select" asp-items="Html.GetEnumSelectList<MatchEventType>()"></select>
+                                </div>
+                            </div>
+                            <div>
+                                <label asp-for="Event.PlayerName" class="form-label">Oyuncu Ismi</label>
+                                <input asp-for="Event.PlayerName" class="form-control" />
+                            </div>
+                            <div>
+                                <label asp-for="Event.Description" class="form-label">Aciklama</label>
+                                <input asp-for="Event.Description" class="form-control" />
+                            </div>
+                            <button class="btn btn-warning">Mac Olayi Ekle</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm h-100" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
+                    <div class="card-body">
+                        <h2 class="h4 mb-3">Mac Istatistigi Ekle</h2>
+                        <form asp-action="AddStatistic" method="post" class="d-grid gap-3">
+                            <div>
+                                <label asp-for="Statistic.FixtureId" class="form-label">Mac</label>
+                                <select asp-for="Statistic.FixtureId" class="form-select" asp-items="@(new SelectList(Model.Fixtures, "Value", "Label"))"></select>
+                            </div>
+                            <div>
+                                <label asp-for="Statistic.TeamId" class="form-label">Takim</label>
+                                <select asp-for="Statistic.TeamId" class="form-select" asp-items="@(new SelectList(Model.Teams, "Value", "Label"))"></select>
+                            </div>
+                            <div>
+                                <label asp-for="Statistic.Name" class="form-label">Istatistik Adi</label>
+                                <input asp-for="Statistic.Name" class="form-control" />
+                            </div>
+                            <div>
+                                <label asp-for="Statistic.Value" class="form-label">Deger</label>
+                                <input asp-for="Statistic.Value" class="form-control" />
+                            </div>
+                            <button class="btn btn-info text-white">Istatistik Ekle</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
