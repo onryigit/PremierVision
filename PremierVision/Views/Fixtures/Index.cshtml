@@ -2,141 +2,671 @@
 
 @{
     ViewData["Title"] = "Fikstur";
+
     var totalMatches = Model.Fixtures.Count;
-    var topMatches = Model.Fixtures.Take(2).ToList();
+    var firstMatch = Model.Fixtures.OrderBy(x => x.KickoffUtc).FirstOrDefault();
+    var weekStart = Model.Fixtures.OrderBy(x => x.KickoffUtc).Select(x => x.KickoffUtc.ToLocalTime()).FirstOrDefault();
+    var weekEnd = Model.Fixtures.OrderByDescending(x => x.KickoffUtc).Select(x => x.KickoffUtc.ToLocalTime()).FirstOrDefault();
+    var prevWeek = Model.AvailableWeeks.Where(x => x < Model.CurrentWeek).DefaultIfEmpty(Model.CurrentWeek).Max();
+    var nextWeek = Model.AvailableWeeks.Where(x => x > Model.CurrentWeek).DefaultIfEmpty(Model.CurrentWeek).Min();
+    var topMatchIds = Model.Fixtures
+        .OrderBy(x => x.Status == FixtureStatus.NotStarted ? 0 : 1)
+        .ThenBy(x => x.KickoffUtc)
+        .Take(2)
+        .Select(x => x.Id)
+        .ToHashSet();
+    var groupedFixtures = Model.Fixtures
+        .GroupBy(x => x.KickoffUtc.ToLocalTime().Date)
+        .OrderBy(x => x.Key)
+        .ToList();
+}
+
+@section Styles {
+    <style>
+        .pg-head {
+            background: linear-gradient(135deg, var(--bg2), var(--card));
+            border-bottom: 1px solid var(--border);
+            padding: 32px 0 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pg-head::before {
+            content: "";
+            position: absolute;
+            top: -40%;
+            right: -5%;
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(41,121,255,.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .pg-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255,214,0,.09);
+            border: 1px solid rgba(255,214,0,.22);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-family: var(--fd);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .pg-title {
+            font-family: var(--fd);
+            font-size: clamp(26px, 5vw, 42px);
+            font-weight: 900;
+            letter-spacing: .5px;
+            line-height: 1;
+        }
+
+        .pg-sub {
+            font-size: 13px;
+            color: var(--t2);
+            margin-top: 6px;
+        }
+
+        .week-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .wn-btn, .wn-cur {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r1);
+            padding: 8px 14px;
+            font-family: var(--fd);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .wn-btn {
+            color: var(--t2);
+            transition: var(--tr);
+        }
+
+        .wn-btn:hover {
+            background: var(--elevated);
+            color: var(--t1);
+            border-color: var(--blue);
+        }
+
+        .wn-cur {
+            color: var(--t1);
+            padding-inline: 20px;
+        }
+
+        .countdown-strip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: rgba(41,121,255,.06);
+            border: 1px solid rgba(41,121,255,.15);
+            border-radius: var(--r2);
+            padding: 12px 20px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .cd-label, .cd-unit {
+            font-family: var(--fd);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .cd-label { color: var(--t3); }
+        .cd-unit { font-size: 9px; color: var(--t3); margin-top: 2px; }
+        .cd-sep { font-family: var(--fd); font-size: 22px; font-weight: 900; color: var(--t3); }
+
+        .cd-box {
+            background: var(--elevated);
+            border-radius: var(--r1);
+            padding: 6px 14px;
+            text-align: center;
+        }
+
+        .cd-num {
+            font-family: var(--fd);
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--blue);
+            line-height: 1;
+        }
+
+        .content { padding: 28px 0 56px; }
+
+        .week-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .ws-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r2);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .ws-num {
+            font-family: var(--fd);
+            font-size: 26px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .ws-lbl {
+            font-size: 11px;
+            color: var(--t3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .day-group { margin-bottom: 28px; }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .day-title, .day-date, .day-badge, .top-match-tag {
+            font-family: var(--fd);
+            text-transform: uppercase;
+        }
+
+        .day-title {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--t2);
+        }
+
+        .day-date {
+            font-size: 12px;
+            color: var(--t3);
+            letter-spacing: 1px;
+        }
+
+        .day-line { flex: 1; height: 1px; background: var(--border); }
+
+        .day-badge {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 3px 10px;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .db-today { background: rgba(0,230,118,.1); border: 1px solid rgba(0,230,118,.2); color: var(--green); }
+        .db-future { background: rgba(41,121,255,.1); border: 1px solid rgba(41,121,255,.2); color: var(--blue); }
+        .db-finished { background: rgba(255,214,0,.08); border: 1px solid rgba(255,214,0,.18); color: var(--gold); }
+
+        .fx-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r2);
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: var(--tr);
+            position: relative;
+        }
+
+        .fx-card:hover {
+            background: var(--card2);
+            border-color: rgba(41,121,255,.3);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(0,0,0,.4);
+        }
+
+        .fx-card.top-match {
+            border-color: rgba(255,214,0,.22);
+            background: linear-gradient(135deg, var(--card), rgba(255,214,0,.03));
+        }
+
+        .fx-top-badge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+        }
+
+        .fx-inner {
+            display: grid;
+            grid-template-columns: 88px minmax(0, 1fr) 170px;
+            align-items: center;
+            padding: 14px 18px;
+            gap: 18px;
+            min-height: 76px;
+        }
+
+        .fx-time-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding-right: 18px;
+            border-right: 1px solid var(--border);
+        }
+
+        .fx-time {
+            font-family: var(--fd);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--t2);
+        }
+
+        .fx-day-label {
+            font-family: var(--fd);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            color: var(--t3);
+        }
+
+        .fx-teams {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 22px;
+        }
+
+        .fx-team-home, .fx-team-away {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            flex: 1 1 0;
+        }
+
+        .fx-team-home { justify-content: flex-end; }
+        .fx-team-away { justify-content: flex-start; }
+
+        .fx-name {
+            font-family: var(--fd);
+            font-size: 18px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .fx-name.home { text-align: right; }
+
+        .fx-logo {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--elevated);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--fd);
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--t2);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .fx-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 3px;
+            background: #fff;
+        }
+
+        .vs-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+
+        .vs-text {
+            font-family: var(--fd);
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--t3);
+            min-width: 54px;
+            text-align: center;
+        }
+
+        .fx-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 6px;
+            min-width: 0;
+            border-left: 1px solid var(--border);
+            padding-left: 18px;
+        }
+
+        .fx-stadium {
+            font-size: 11px;
+            color: var(--t3);
+            text-align: right;
+            max-width: 100%;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .notify-btn, .notify-btn:focus {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(41,121,255,.08);
+            border: 1px solid rgba(41,121,255,.2);
+            color: var(--blue);
+            border-radius: var(--r1);
+            padding: 5px 10px;
+            font-family: var(--fd);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--tr);
+        }
+
+        .notify-btn:hover { background: rgba(41,121,255,.18); }
+        .notify-btn.active { background: rgba(0,230,118,.1); border-color: rgba(0,230,118,.3); color: var(--green); }
+
+        .top-match-tag {
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: var(--gold);
+            background: rgba(255,214,0,.08);
+            border: 1px solid rgba(255,214,0,.2);
+            padding: 2px 8px;
+            border-radius: 7px;
+        }
+
+        @@media (max-width: 768px) {
+            .week-summary { grid-template-columns: repeat(2, 1fr); }
+            .fx-name { font-size: 13px; }
+            .fx-time { font-size: 14px; }
+            .fx-teams { gap: 8px; }
+            .fx-inner { grid-template-columns: 74px minmax(0, 1fr) 112px; gap: 12px; }
+            .fx-time-col { padding-right: 12px; }
+            .fx-right { padding-left: 12px; }
+            .fx-right .fx-stadium { display: none; }
+        }
+
+        @@media (max-width: 500px) {
+            .fx-inner { grid-template-columns: 60px minmax(0, 1fr) 78px; gap: 8px; padding: 12px; }
+            .fx-teams { gap: 4px; }
+            .fx-name { font-size: 12px; }
+            .fx-logo { width: 22px; height: 22px; }
+            .week-summary { gap: 8px; }
+            .ws-num { font-size: 20px; }
+            .notify-btn span { display: none; }
+            .fx-right { padding-left: 8px; }
+        }
+    </style>
 }
 
 <section class="pg-head">
     <div class="wrap">
         <div class="row align-items-end">
-            <div class="col-lg-8">
+            <div class="col-lg-7">
                 <div class="pg-badge"><i class="bi bi-trophy-fill"></i> Premier League</div>
                 <h1 class="pg-title">Hafta <span style="color:var(--blue)">@Model.CurrentWeek</span> Fiksturu</h1>
-                <p class="pg-sub">Case gereksinimine uygun olarak bir sonraki / secili hafta maclari</p>
+                <p class="pg-sub">
+                    @if (totalMatches > 0)
+                    {
+                        <span>@weekStart.ToString("dd MMMM yyyy") - @weekEnd.ToString("dd MMMM yyyy")</span>
+                        <span>&nbsp;·&nbsp; @totalMatches Mac</span>
+                    }
+                    else
+                    {
+                        <span>Secilen haftaya ait mac bulunamadi</span>
+                    }
+                </p>
+                <div class="week-nav">
+                    @if (prevWeek != Model.CurrentWeek)
+                    {
+                        <a asp-action="Index" asp-route-week="@prevWeek" class="wn-btn"><i class="bi bi-chevron-left"></i> <span>Hafta @prevWeek</span></a>
+                    }
+                    <div class="wn-cur">Hafta @Model.CurrentWeek</div>
+                    @if (nextWeek != Model.CurrentWeek)
+                    {
+                        <a asp-action="Index" asp-route-week="@nextWeek" class="wn-btn"><span>Hafta @nextWeek</span> <i class="bi bi-chevron-right"></i></a>
+                    }
+                </div>
             </div>
-            <div class="col-lg-4 mt-3 mt-lg-0">
-                <form method="get" class="d-flex gap-2 justify-content-lg-end">
-                    <label for="week" class="visually-hidden">Hafta</label>
-                    <select id="week" name="week" class="form-select" onchange="this.form.submit()">
-                        @foreach (var week in Model.AvailableWeeks)
-                        {
-                            <option value="@week" selected="@(week == Model.CurrentWeek)">@week. hafta</option>
-                        }
-                    </select>
-                </form>
+            <div class="col-lg-5 mt-3 mt-lg-0">
+                @if (firstMatch is not null)
+                {
+                    <div class="countdown-strip" data-kickoff="@firstMatch.KickoffUtc.ToString("O")">
+                        <span class="cd-label">Ilk Macta Kalan</span>
+                        <div class="cd-box"><div class="cd-num" data-part="days">00</div><div class="cd-unit">Gun</div></div>
+                        <span class="cd-sep">:</span>
+                        <div class="cd-box"><div class="cd-num" data-part="hours">00</div><div class="cd-unit">Saat</div></div>
+                        <span class="cd-sep">:</span>
+                        <div class="cd-box"><div class="cd-num" data-part="minutes">00</div><div class="cd-unit">Dakika</div></div>
+                        <span class="cd-sep">:</span>
+                        <div class="cd-box"><div class="cd-num" data-part="seconds">00</div><div class="cd-unit">Saniye</div></div>
+                    </div>
+                }
             </div>
         </div>
     </div>
 </section>
 
 <main>
-    <div class="wrap" style="padding-top:28px;padding-bottom:56px">
-        <div class="row g-3 mb-4">
-            <div class="col-6 col-lg-3">
-                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body text-center">
-                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--blue)">@totalMatches</div>
-                        <div class="small text-uppercase" style="letter-spacing:1px;color:var(--t3)">Toplam Mac</div>
+    <div class="wrap">
+        <div class="content">
+            <div class="week-summary">
+                <div class="ws-card">
+                    <div class="ws-num" style="color:var(--blue)">@totalMatches</div>
+                    <div class="ws-lbl">Toplam Mac</div>
+                </div>
+                <div class="ws-card">
+                    <div class="ws-num" style="color:var(--gold)">@topMatchIds.Count</div>
+                    <div class="ws-lbl">One Cikan Mac</div>
+                </div>
+                <div class="ws-card">
+                    <div class="ws-num" style="color:var(--green)">
+                        @(groupedFixtures.Count > 0 ? groupedFixtures.Count.ToString() : "0")
                     </div>
+                    <div class="ws-lbl">Mac Gunu</div>
+                </div>
+                <div class="ws-card">
+                    <div class="ws-num" style="color:var(--live)">@Model.Fixtures.Count(x => x.Status == FixtureStatus.Live)</div>
+                    <div class="ws-lbl">Canli</div>
                 </div>
             </div>
-            <div class="col-6 col-lg-3">
-                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body text-center">
-                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--green)">@Model.Fixtures.Count(x => x.Status == FixtureStatus.NotStarted)</div>
-                        <div class="small text-uppercase" style="letter-spacing:1px;color:var(--t3)">Bekleyen</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body text-center">
-                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--gold)">@topMatches.Count</div>
-                        <div class="small text-uppercase" style="letter-spacing:1px;color:var(--t3)">One Cikan</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body text-center">
-                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--live)">@Model.Fixtures.Count(x => x.Status == FixtureStatus.Live)</div>
-                        <div class="small text-uppercase" style="letter-spacing:1px;color:var(--t3)">Canli</div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        @foreach (var item in Model.Fixtures)
-        {
-            var isTop = topMatches.Any(x => x.Id == item.Id);
-            var homeInitials = item.HomeTeamName[..Math.Min(3, item.HomeTeamName.Length)].ToUpperInvariant();
-            var awayInitials = item.AwayTeamName[..Math.Min(3, item.AwayTeamName.Length)].ToUpperInvariant();
-            <div class="mc-wrap">
-                <a asp-controller="Matches" asp-action="Detail" asp-route-id="@item.Id" class="mc @(item.Status == FixtureStatus.Live ? "live" : string.Empty)" style="@(isTop ? "border-color:rgba(255,214,0,.22);background:linear-gradient(135deg,var(--card),rgba(255,214,0,.03))" : string.Empty)">
-                    <div class="mc-time">
-                        <div class="mc-min @(item.Status == FixtureStatus.NotStarted ? "bc" : item.Status == FixtureStatus.Live ? "lc" : string.Empty)">
-                            @(item.Status == FixtureStatus.Live ? "CANLI" : item.KickoffUtc.ToLocalTime().ToString("HH:mm"))
-                        </div>
-                        @if (item.Status == FixtureStatus.Completed)
-                        {
-                            <div class="sbadge sb-fin">MS</div>
-                        }
-                        else if (item.Status == FixtureStatus.Live)
-                        {
-                            <div class="sbadge sb-live"><span class="live-dot"></span>CANLI</div>
-                        }
-                        else
-                        {
-                            <div class="sbadge sb-up">@item.KickoffUtc.ToLocalTime().ToString("dd MMM")</div>
-                        }
-                    </div>
-                    <div class="dvv"></div>
-                    <div class="mc-teams">
-                        <div class="mc-tr">
-                            @if (!string.IsNullOrWhiteSpace(item.HomeTeamLogoUrl))
-                            {
-                                <img src="@item.HomeTeamLogoUrl" alt="@item.HomeTeamName logo" class="tl-sm" style="object-fit:contain;background:#fff;padding:3px" />
-                            }
-                            else
-                            {
-                                <div class="tl-sm">@homeInitials</div>
-                            }
-                            <span class="tn">@item.HomeTeamName</span>
-                            <span class="ts @(item.Status == FixtureStatus.NotStarted ? "dim" : string.Empty)">
-                                @(item.Status == FixtureStatus.NotStarted ? "-" : (item.HomeFullTimeScore ?? 0).ToString())
-                            </span>
-                        </div>
-                        <div class="mc-tr">
-                            @if (!string.IsNullOrWhiteSpace(item.AwayTeamLogoUrl))
-                            {
-                                <img src="@item.AwayTeamLogoUrl" alt="@item.AwayTeamName logo" class="tl-sm" style="object-fit:contain;background:#fff;padding:3px" />
-                            }
-                            else
-                            {
-                                <div class="tl-sm">@awayInitials</div>
-                            }
-                            <span class="tn">@item.AwayTeamName</span>
-                            <span class="ts @(item.Status == FixtureStatus.NotStarted ? "dim" : string.Empty)">
-                                @(item.Status == FixtureStatus.NotStarted ? "-" : (item.AwayFullTimeScore ?? 0).ToString())
-                            </span>
-                        </div>
-                    </div>
-                    <div class="text-end small" style="min-width:150px;color:var(--t3)">
-                        <div>@item.VenueName</div>
-                        <div>Hafta @item.MatchWeek</div>
-                    </div>
-                    <span class="det-btn ms-3"><i class="bi bi-chevron-right"></i> <span>Detay</span></span>
-                </a>
-            </div>
-        }
-
-        @if (Model.Fixtures.Count == 0)
-        {
-            <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                <div class="card-body">
+            @if (groupedFixtures.Count == 0)
+            {
+                <div class="ws-card" style="text-align:left">
                     Secilen hafta icin fikstur verisi bulunamadi.
                 </div>
-            </div>
-        }
+            }
+
+            @foreach (var dayGroup in groupedFixtures)
+            {
+                var localToday = DateTime.Now.Date;
+                var badgeClass = dayGroup.Key == localToday
+                    ? "db-today"
+                    : dayGroup.Any(x => x.Status == FixtureStatus.Completed)
+                        ? "db-finished"
+                        : "db-future";
+                var badgeText = dayGroup.Key == localToday
+                    ? "Bugun"
+                    : dayGroup.Any(x => x.Status == FixtureStatus.Completed)
+                        ? "Oynandi"
+                        : $"{dayGroup.Count()} Mac";
+
+                <div class="day-group">
+                    <div class="day-header">
+                        <span class="day-title">@dayGroup.Key.ToString("dddd")</span>
+                        <span class="day-date">@dayGroup.Key.ToString("dd MMMM yyyy")</span>
+                        <div class="day-line"></div>
+                        <span class="day-badge @badgeClass">@badgeText</span>
+                    </div>
+
+                    @foreach (var item in dayGroup.OrderBy(x => x.KickoffUtc))
+                    {
+                        var isTopMatch = topMatchIds.Contains(item.Id);
+                        var homeInitials = item.HomeTeamName[..Math.Min(3, item.HomeTeamName.Length)].ToUpperInvariant();
+                        var awayInitials = item.AwayTeamName[..Math.Min(3, item.AwayTeamName.Length)].ToUpperInvariant();
+
+                        <a asp-controller="Matches" asp-action="Detail" asp-route-id="@item.Id" class="fx-card @(isTopMatch ? "top-match" : string.Empty)">
+                            @if (isTopMatch)
+                            {
+                                <div class="fx-top-badge"></div>
+                            }
+
+                            <div class="fx-inner">
+                                <div class="fx-time-col">
+                                    <div class="fx-time">@item.KickoffUtc.ToLocalTime().ToString("HH:mm")</div>
+                                    @if (isTopMatch)
+                                    {
+                                        <div class="top-match-tag">Top</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="fx-day-label">
+                                            @(item.Status == FixtureStatus.Completed ? "Mac Sonu" : item.Status == FixtureStatus.Live ? "Canli" : "Planli")
+                                        </div>
+                                    }
+                                </div>
+                                <div class="fx-teams">
+                                    <div class="fx-team-home">
+                                        <span class="fx-name home">@item.HomeTeamName</span>
+                                        <div class="fx-logo">
+                                            @if (!string.IsNullOrWhiteSpace(item.HomeTeamLogoUrl))
+                                            {
+                                                <img src="@item.HomeTeamLogoUrl" alt="@item.HomeTeamName logo" />
+                                            }
+                                            else
+                                            {
+                                                <span>@homeInitials</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="vs-block">
+                                        <span class="vs-text">@(item.Status == FixtureStatus.NotStarted ? "VS" : $"{item.HomeFullTimeScore ?? 0}-{item.AwayFullTimeScore ?? 0}")</span>
+                                    </div>
+                                    <div class="fx-team-away">
+                                        <div class="fx-logo">
+                                            @if (!string.IsNullOrWhiteSpace(item.AwayTeamLogoUrl))
+                                            {
+                                                <img src="@item.AwayTeamLogoUrl" alt="@item.AwayTeamName logo" />
+                                            }
+                                            else
+                                            {
+                                                <span>@awayInitials</span>
+                                            }
+                                        </div>
+                                        <span class="fx-name">@item.AwayTeamName</span>
+                                    </div>
+                                </div>
+                                <div class="fx-right">
+                                    <span class="fx-stadium"><i class="bi bi-geo-alt" style="font-size:10px;margin-right:3px"></i>@item.VenueName</span>
+                                    <button type="button" class="notify-btn" data-notify-toggle>
+                                        <i class="bi bi-bell"></i> <span>Bildir</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
+        </div>
     </div>
 </main>
+
+@section Scripts {
+    <script>
+        const countdown = document.querySelector("[data-kickoff]");
+
+        if (countdown) {
+            const kickoff = new Date(countdown.dataset.kickoff);
+            const daysNode = countdown.querySelector("[data-part='days']");
+            const hoursNode = countdown.querySelector("[data-part='hours']");
+            const minutesNode = countdown.querySelector("[data-part='minutes']");
+            const secondsNode = countdown.querySelector("[data-part='seconds']");
+
+            const updateCountdown = () => {
+                const diff = kickoff - new Date();
+
+                if (diff <= 0) {
+                    daysNode.textContent = "00";
+                    hoursNode.textContent = "00";
+                    minutesNode.textContent = "00";
+                    secondsNode.textContent = "00";
+                    return;
+                }
+
+                const days = Math.floor(diff / 86400000);
+                const hours = Math.floor((diff % 86400000) / 3600000);
+                const minutes = Math.floor((diff % 3600000) / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+
+                daysNode.textContent = String(days).padStart(2, "0");
+                hoursNode.textContent = String(hours).padStart(2, "0");
+                minutesNode.textContent = String(minutes).padStart(2, "0");
+                secondsNode.textContent = String(seconds).padStart(2, "0");
+            };
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+
+        document.querySelectorAll("[data-notify-toggle]").forEach(button => {
+            button.addEventListener("click", event => {
+                event.preventDefault();
+                event.stopPropagation();
+                button.classList.toggle("active");
+                button.innerHTML = button.classList.contains("active")
+                    ? '<i class="bi bi-bell-fill"></i> <span>Bildirim Acik</span>'
+                    : '<i class="bi bi-bell"></i> <span>Bildir</span>';
+            });
+        });
+    </script>
+}

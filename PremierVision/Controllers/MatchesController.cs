@@ -1,28 +1,51 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PremierVision.Data;
+using PremierVision.Models;
 using PremierVision.Models.ViewModels;
+using PremierVision.Services;
 
 namespace PremierVision.Controllers;
 
-public class MatchesController(AppDbContext context) : Controller
+public class MatchesController(AppDbContext context, IApiFootballSyncService apiFootballSyncService) : Controller
 {
     public async Task<IActionResult> Detail(int? id, CancellationToken cancellationToken)
     {
-        var fixture = await context.Fixtures
-            .AsNoTracking()
-            .Include(x => x.HomeTeam)
-            .Include(x => x.AwayTeam)
-            .Include(x => x.Events)
-                .ThenInclude(x => x.Team)
-            .Include(x => x.Statistics)
-                .ThenInclude(x => x.Team)
-            .OrderByDescending(x => x.KickoffUtc)
-            .FirstOrDefaultAsync(x => !id.HasValue || x.Id == id.Value, cancellationToken);
+        async Task<Fixture?> LoadFixtureAsync()
+        {
+            return await context.Fixtures
+                .AsNoTracking()
+                .Include(x => x.HomeTeam)
+                .Include(x => x.AwayTeam)
+                .Include(x => x.Events)
+                    .ThenInclude(x => x.Team)
+                .Include(x => x.Statistics)
+                    .ThenInclude(x => x.Team)
+                .OrderByDescending(x => x.KickoffUtc)
+                .FirstOrDefaultAsync(x => !id.HasValue || x.Id == id.Value, cancellationToken);
+        }
+
+        var fixture = await LoadFixtureAsync();
 
         if (fixture is null)
         {
             return NotFound();
+        }
+
+        if (fixture.ApiFootballFixtureId.HasValue &&
+            fixture.Status != FixtureStatus.NotStarted &&
+            fixture.Events.Count == 0 &&
+            fixture.Statistics.Count == 0)
+        {
+            try
+            {
+                await apiFootballSyncService.SyncFixtureDetailsAsync(fixture.Id, cancellationToken);
+                fixture = await LoadFixtureAsync();
+            }
+            catch
+            {
+                // Detay senkronizasyonu basarisiz olsa da sayfa mevcut verilerle acilsin.
+            }
         }
 
         return View(new MatchDetailViewModel

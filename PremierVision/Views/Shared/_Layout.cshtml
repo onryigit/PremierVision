@@ -554,31 +554,24 @@
         <div class="nb-inner">
             <a asp-controller="Home" asp-action="Index" class="brand">
                 <div class="brand-ico">⚽</div>
-                <span class="brand-txt">Goal<span>Zone</span></span>
+                <span class="brand-txt">Premier<span>Vision</span></span>
             </a>
             <div class="nav-links d-none d-lg-flex">
                 <a asp-controller="Home" asp-action="Index" class="nl @(controller == "Home" ? "active" : string.Empty)">Ana Sayfa</a>
-                <a href="#" class="nl">Canli Skorlar</a>
                 <a asp-controller="Fixtures" asp-action="Index" class="nl @(controller == "Fixtures" ? "active" : string.Empty)">Fikstur</a>
                 <a asp-controller="Standings" asp-action="Index" class="nl @(controller == "Standings" ? "active" : string.Empty)">Puan Durumu</a>
                 <a asp-controller="Admin" asp-action="Index" class="nl @(controller == "Admin" ? "active" : string.Empty)">Admin</a>
-                <a href="#" class="nl">Ligler</a>
             </div>
             <div class="nb-icons">
-                <a href="#" class="ico-btn d-none d-sm-flex"><i class="bi bi-search"></i></a>
-                <a href="#" class="ico-btn d-none d-sm-flex"><i class="bi bi-bell"></i></a>
-                <a href="#" class="ico-btn"><i class="bi bi-person"></i></a>
                 <button class="tog d-lg-none" id="tog" type="button"><i class="bi bi-list"></i></button>
             </div>
         </div>
         <div class="mob-menu" id="mobMenu">
             <div class="wrap">
                 <a asp-controller="Home" asp-action="Index" class="nl d-block @(controller == "Home" ? "active" : string.Empty)">Ana Sayfa</a>
-                <a href="#" class="nl d-block">Canli Skorlar</a>
                 <a asp-controller="Fixtures" asp-action="Index" class="nl d-block @(controller == "Fixtures" ? "active" : string.Empty)">Fikstur</a>
                 <a asp-controller="Standings" asp-action="Index" class="nl d-block @(controller == "Standings" ? "active" : string.Empty)">Puan Durumu</a>
                 <a asp-controller="Admin" asp-action="Index" class="nl d-block @(controller == "Admin" ? "active" : string.Empty)">Admin</a>
-                <a href="#" class="nl d-block">Ligler</a>
             </div>
         </div>
     </nav>

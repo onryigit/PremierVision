@@ -139,6 +139,52 @@ public class AdminController(AppDbContext context, IApiFootballSyncService apiFo
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SyncMatchDetails(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var fixtures = await context.Fixtures
+                .AsNoTracking()
+                .Where(x => x.ApiFootballFixtureId.HasValue && x.Status != FixtureStatus.NotStarted)
+                .Where(x => !context.MatchEvents.Any(e => e.FixtureId == x.Id) && !context.MatchStatistics.Any(s => s.FixtureId == x.Id))
+                .OrderByDescending(x => x.KickoffUtc)
+                .Take(5)
+                .Select(x => x.Id)
+                .ToListAsync(cancellationToken);
+
+            var syncedCount = 0;
+            foreach (var fixtureId in fixtures)
+            {
+                try
+                {
+                    if (await apiFootballSyncService.SyncFixtureDetailsAsync(fixtureId, cancellationToken))
+                    {
+                        syncedCount++;
+                    }
+                }
+                catch (HttpRequestException exception) when ((int?)exception.StatusCode == 429)
+                {
+                    TempData["AdminMessage"] = syncedCount > 0
+                        ? $"{syncedCount} mac detayi senkronize edildi. API limiti nedeniyle islem erken durduruldu."
+                        : "API limiti asildi. Biraz bekleyip tekrar deneyin.";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
+            TempData["AdminMessage"] = fixtures.Count == 0
+                ? "Detayi eksik uygun mac bulunamadi."
+                : $"{syncedCount} mac detayi senkronize edildi.";
+        }
+        catch (Exception exception)
+        {
+            TempData["AdminMessage"] = $"Mac detay senkronizasyonu basarisiz: {exception.Message}";
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
     private async Task<AdminPanelViewModel> BuildViewModelAsync(
         CancellationToken cancellationToken,
         CreateFixtureInputModel? fixture = null,

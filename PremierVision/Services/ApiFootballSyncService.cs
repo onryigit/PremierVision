@@ -151,6 +151,142 @@ public class ApiFootballSyncService(
         return count;
     }
 
+    public async Task<bool> SyncFixtureDetailsAsync(int fixtureId, CancellationToken cancellationToken = default)
+    {
+        EnsureApiKey();
+
+        var fixture = await context.Fixtures
+            .Include(x => x.HomeTeam)
+            .Include(x => x.AwayTeam)
+            .FirstOrDefaultAsync(x => x.Id == fixtureId, cancellationToken);
+
+        if (fixture is null || !fixture.ApiFootballFixtureId.HasValue || fixture.Status == FixtureStatus.NotStarted)
+        {
+            return false;
+        }
+
+        using var eventsDocument = await GetAsync(
+            $"fixtures/events?fixture={fixture.ApiFootballFixtureId.Value}",
+            cancellationToken);
+
+        using var statisticsDocument = await GetAsync(
+            $"fixtures/statistics?fixture={fixture.ApiFootballFixtureId.Value}",
+            cancellationToken);
+
+        var teams = await context.Teams
+            .Where(x => x.ApiFootballTeamId.HasValue)
+            .ToDictionaryAsync(x => x.ApiFootballTeamId!.Value, cancellationToken);
+
+        var existingEvents = await context.MatchEvents
+            .Where(x => x.FixtureId == fixture.Id)
+            .ToListAsync(cancellationToken);
+
+        var existingStatistics = await context.MatchStatistics
+            .Where(x => x.FixtureId == fixture.Id)
+            .ToListAsync(cancellationToken);
+
+        if (existingEvents.Count > 0)
+        {
+            context.MatchEvents.RemoveRange(existingEvents);
+        }
+
+        if (existingStatistics.Count > 0)
+        {
+            context.MatchStatistics.RemoveRange(existingStatistics);
+        }
+
+        foreach (var item in eventsDocument.RootElement.GetProperty("response").EnumerateArray())
+        {
+            var elapsed = item.GetProperty("time").TryGetProperty("elapsed", out var elapsedProp) && elapsedProp.ValueKind != JsonValueKind.Null
+                ? elapsedProp.GetInt32()
+                : 0;
+
+            var teamId = item.GetProperty("team").TryGetProperty("id", out var teamIdProp) && teamIdProp.ValueKind != JsonValueKind.Null
+                ? teamIdProp.GetInt32()
+                : (int?)null;
+
+            var playerName = item.GetProperty("player").TryGetProperty("name", out var playerNameProp)
+                ? playerNameProp.GetString() ?? string.Empty
+                : string.Empty;
+
+            var assistName = item.TryGetProperty("assist", out var assistProp) &&
+                             assistProp.ValueKind != JsonValueKind.Null &&
+                             assistProp.TryGetProperty("name", out var assistNameProp)
+                ? assistNameProp.GetString()
+                : null;
+
+            var type = item.TryGetProperty("type", out var typeProp) ? typeProp.GetString() : null;
+            var detail = item.TryGetProperty("detail", out var detailProp) ? detailProp.GetString() : null;
+            var comments = item.TryGetProperty("comments", out var commentsProp) ? commentsProp.GetString() : null;
+
+            if (!TryMapEventType(type, detail, out var eventType))
+            {
+                continue;
+            }
+
+            var description = BuildEventDescription(eventType, detail, assistName, comments);
+
+            context.MatchEvents.Add(new MatchEvent
+            {
+                FixtureId = fixture.Id,
+                TeamId = teamId.HasValue && teams.TryGetValue(teamId.Value, out var team) ? team.Id : null,
+                Minute = elapsed,
+                PlayerName = playerName,
+                EventType = eventType,
+                Description = description
+            });
+        }
+
+        foreach (var teamStats in statisticsDocument.RootElement.GetProperty("response").EnumerateArray())
+        {
+            var apiTeamId = teamStats.GetProperty("team").GetProperty("id").GetInt32();
+            if (!teams.TryGetValue(apiTeamId, out var team))
+            {
+                continue;
+            }
+
+            foreach (var statItem in teamStats.GetProperty("statistics").EnumerateArray())
+            {
+                var name = statItem.GetProperty("type").GetString();
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    continue;
+                }
+
+                var valueElement = statItem.GetProperty("value");
+                if (valueElement.ValueKind == JsonValueKind.Null)
+                {
+                    continue;
+                }
+
+                var value = valueElement.ValueKind switch
+                {
+                    JsonValueKind.String => valueElement.GetString(),
+                    JsonValueKind.Number => valueElement.ToString(),
+                    JsonValueKind.True => "True",
+                    JsonValueKind.False => "False",
+                    _ => null
+                };
+
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    continue;
+                }
+
+                context.MatchStatistics.Add(new MatchStatistic
+                {
+                    FixtureId = fixture.Id,
+                    TeamId = team.Id,
+                    Name = name,
+                    Value = value
+                });
+            }
+        }
+
+        await context.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
     private async Task<JsonDocument> GetAsync(string path, CancellationToken cancellationToken)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, path);
@@ -200,5 +336,56 @@ public class ApiFootballSyncService(
         }
 
         return property.GetInt32();
+    }
+
+    private static bool TryMapEventType(string? type, string? detail, out MatchEventType eventType)
+    {
+        if (string.Equals(type, "Goal", StringComparison.OrdinalIgnoreCase))
+        {
+            eventType = MatchEventType.Goal;
+            return true;
+        }
+
+        if (string.Equals(type, "subst", StringComparison.OrdinalIgnoreCase))
+        {
+            eventType = MatchEventType.Substitution;
+            return true;
+        }
+
+        if (string.Equals(type, "Card", StringComparison.OrdinalIgnoreCase))
+        {
+            if (string.Equals(detail, "Yellow Card", StringComparison.OrdinalIgnoreCase))
+            {
+                eventType = MatchEventType.YellowCard;
+                return true;
+            }
+
+            if (string.Equals(detail, "Red Card", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(detail, "Yellow Red Card", StringComparison.OrdinalIgnoreCase))
+            {
+                eventType = MatchEventType.RedCard;
+                return true;
+            }
+        }
+
+        eventType = default;
+        return false;
+    }
+
+    private static string? BuildEventDescription(
+        MatchEventType eventType,
+        string? detail,
+        string? assistName,
+        string? comments)
+    {
+        return eventType switch
+        {
+            MatchEventType.Substitution => string.IsNullOrWhiteSpace(assistName)
+                ? detail
+                : $"Cikan: {assistName}",
+            MatchEventType.Goal => string.Join(" | ", new[] { detail, assistName is null ? null : $"Asist: {assistName}", comments }
+                .Where(x => !string.IsNullOrWhiteSpace(x))),
+            _ => string.Join(" | ", new[] { detail, comments }.Where(x => !string.IsNullOrWhiteSpace(x)))
+        };
     }
 }

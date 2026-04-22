@@ -1,24 +1,544 @@
+@using System.Globalization
 @model MatchDetailViewModel
 
 @{
     ViewData["Title"] = "Mac Detayi";
+
+    var fixture = Model.Fixture;
+    var homeInitials = fixture.HomeTeamName[..Math.Min(3, fixture.HomeTeamName.Length)].ToUpperInvariant();
+    var awayInitials = fixture.AwayTeamName[..Math.Min(3, fixture.AwayTeamName.Length)].ToUpperInvariant();
+
+    var goalEvents = Model.Events.Where(x => x.EventType == MatchEventType.Goal).OrderBy(x => x.Minute).ToList();
+    var yellowCards = Model.Events.Where(x => x.EventType == MatchEventType.YellowCard).OrderBy(x => x.Minute).ToList();
+    var redCards = Model.Events.Where(x => x.EventType == MatchEventType.RedCard).OrderBy(x => x.Minute).ToList();
+    var substitutions = Model.Events.Where(x => x.EventType == MatchEventType.Substitution).OrderBy(x => x.Minute).ToList();
+
+    var homeGoals = goalEvents.Where(x => x.TeamName == fixture.HomeTeamName).ToList();
+    var awayGoals = goalEvents.Where(x => x.TeamName == fixture.AwayTeamName).ToList();
+    var homeCards = yellowCards.Concat(redCards).Where(x => x.TeamName == fixture.HomeTeamName).OrderBy(x => x.Minute).ToList();
+    var awayCards = yellowCards.Concat(redCards).Where(x => x.TeamName == fixture.AwayTeamName).OrderBy(x => x.Minute).ToList();
+    var homeSubs = substitutions.Where(x => x.TeamName == fixture.HomeTeamName).ToList();
+    var awaySubs = substitutions.Where(x => x.TeamName == fixture.AwayTeamName).ToList();
+    var fullTimeDisplay = fixture.HomeFullTimeScore.HasValue && fixture.AwayFullTimeScore.HasValue
+        ? $"{fixture.HomeFullTimeScore} - {fixture.AwayFullTimeScore}"
+        : "-";
+
+    var homeFirstHalf = fixture.HomeHalfTimeScore ?? 0;
+    var awayFirstHalf = fixture.AwayHalfTimeScore ?? 0;
+    var homeFullTime = fixture.HomeFullTimeScore ?? 0;
+    var awayFullTime = fixture.AwayFullTimeScore ?? 0;
+    var homeSecondHalf = fixture.HomeFullTimeScore.HasValue && fixture.HomeHalfTimeScore.HasValue ? homeFullTime - homeFirstHalf : 0;
+    var awaySecondHalf = fixture.AwayFullTimeScore.HasValue && fixture.AwayHalfTimeScore.HasValue ? awayFullTime - awayFirstHalf : 0;
+
+    static double ParseComparableValue(string value)
+    {
+        var normalized = value.Replace("%", string.Empty).Replace(",", ".").Trim();
+        return double.TryParse(normalized, NumberStyles.Any, CultureInfo.InvariantCulture, out var result) ? result : 0;
+    }
+}
+
+@section Styles {
+    <style>
+        .hero {
+            background: linear-gradient(180deg, #0b1830 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 36px 0 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(0,230,118,.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(41,121,255,.05) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-badges {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 26px;
+            flex-wrap: wrap;
+        }
+
+        .hbadge {
+            font-family: var(--fd);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .hb-gold { background: rgba(255,214,0,.09); border: 1px solid rgba(255,214,0,.2); color: var(--gold); }
+        .hb-gray { background: rgba(143,163,200,.08); color: var(--t3); }
+        .hb-green { background: rgba(0,230,118,.08); border: 1px solid rgba(0,230,118,.18); color: var(--green); }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .h-team {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .h-logo {
+            width: 86px;
+            height: 86px;
+            border-radius: 50%;
+            background: var(--card);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--fd);
+            font-size: 24px;
+            font-weight: 900;
+            overflow: hidden;
+        }
+
+        .h-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+            background: #fff;
+        }
+
+        .h-name {
+            font-family: var(--fd);
+            font-size: clamp(18px, 3vw, 26px);
+            font-weight: 900;
+            letter-spacing: .3px;
+            text-align: center;
+        }
+
+        .h-type {
+            font-size: 10px;
+            color: var(--t3);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+
+        .h-score-c {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .h-sc {
+            font-family: var(--fd);
+            font-size: clamp(54px, 10vw, 88px);
+            font-weight: 900;
+            letter-spacing: -4px;
+            line-height: 1;
+            background: linear-gradient(180deg, #fff 0%, #8fa3c8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .h-ht, .h-ft {
+            font-family: var(--fd);
+            font-size: 12px;
+        }
+
+        .h-ht {
+            color: var(--t2);
+            background: var(--card);
+            padding: 4px 14px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+        }
+
+        .h-ft {
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--t3);
+        }
+
+        .info-strip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 22px;
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .istrip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--t2);
+        }
+
+        .content { padding: 28px 0 56px; }
+
+        .dc {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r3);
+            padding: 22px;
+            margin-bottom: 18px;
+        }
+
+        .dc-title {
+            font-family: var(--fd);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--t3);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dc-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .tl-wrap { position: relative; }
+        .tl-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: var(--border);
+            transform: translateX(-50%);
+        }
+
+        .tl-ev {
+            display: grid;
+            grid-template-columns: 1fr 58px 1fr;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .tl-home, .tl-away { display: flex; }
+        .tl-home { justify-content: flex-end; }
+        .tl-away { justify-content: flex-start; }
+        .tl-min-c { display: flex; align-items: center; justify-content: center; }
+
+        .min-b {
+            background: var(--elevated);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 3px 8px;
+            font-family: var(--fd);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--t2);
+            white-space: nowrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chip {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--r1);
+            padding: 8px 11px;
+            max-width: 210px;
+        }
+
+        .chip.home { flex-direction: row-reverse; text-align: right; }
+        .chip.goal-ev { border-color: rgba(0,230,118,.25); background: rgba(0,230,118,.06); }
+        .chip.yel-ev { border-color: rgba(255,193,7,.25); background: rgba(255,193,7,.06); }
+        .chip.red-ev { border-color: rgba(244,67,54,.25); background: rgba(244,67,54,.06); }
+        .chip.sub-ev { border-color: rgba(41,121,255,.2); background: rgba(41,121,255,.05); }
+
+        .ev-ico {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .ei-goal { background: rgba(0,230,118,.15); color: var(--green); }
+        .ei-yel { background: rgba(255,193,7,.15); color: var(--yellow); }
+        .ei-red { background: rgba(244,67,54,.15); color: var(--red); }
+        .ei-sub { background: rgba(41,121,255,.12); color: var(--blue); }
+
+        .ev-pl { font-family: var(--fd); font-size: 14px; font-weight: 700; color: var(--t1); }
+        .ev-dt { font-size: 10px; color: var(--t3); }
+
+        .split2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        .box2 {
+            padding: 14px;
+            background: var(--bg2);
+            border-radius: var(--r2);
+            border: 1px solid var(--border);
+        }
+
+        .box2-title, .sub-lbl, .sp-lbl, .sl {
+            font-family: var(--fd);
+            text-transform: uppercase;
+        }
+
+        .box2-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--t3);
+            margin-bottom: 10px;
+        }
+
+        .gl {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,.04);
+        }
+
+        .gl:last-child { border-bottom: none; }
+
+        .gl-ico {
+            width: 20px;
+            height: 20px;
+            background: rgba(0,230,118,.12);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: var(--green);
+            flex-shrink: 0;
+        }
+
+        .gl-pl { font-family: var(--fd); font-size: 14px; font-weight: 700; flex: 1; }
+
+        .gl-min {
+            font-family: var(--fd);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--t3);
+            background: var(--elevated);
+            padding: 2px 7px;
+            border-radius: 7px;
+        }
+
+        .ycard, .rcard {
+            width: 12px;
+            height: 16px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .ycard { background: var(--yellow); box-shadow: 0 2px 5px rgba(255,193,7,.3); }
+        .rcard { background: var(--red); box-shadow: 0 2px 5px rgba(244,67,54,.3); }
+
+        .sub-r {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255,255,255,.04);
+        }
+
+        .sub-r:last-child { border-bottom: none; }
+
+        .sub-min {
+            font-family: var(--fd);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--t3);
+            background: var(--elevated);
+            padding: 3px 9px;
+            border-radius: 9px;
+            width: 46px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sub-in { font-family: var(--fd); font-size: 13px; font-weight: 700; color: var(--green); }
+        .sub-out { font-family: var(--fd); font-size: 13px; font-weight: 700; color: var(--live); }
+        .sub-arr { color: var(--t3); font-size: 15px; }
+
+        .sub-lbl {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--t3);
+            margin: 14px 0 6px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+
+        .sub-lbl:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+        .sc-pills {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .sc-pill {
+            background: var(--bg2);
+            border-radius: var(--r2);
+            padding: 11px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .sp-lbl {
+            font-size: 10px;
+            color: var(--t3);
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
+
+        .sp-val {
+            font-family: var(--fd);
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .stat-r {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .sv-h, .sv-a {
+            font-family: var(--fd);
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .sv-h { text-align: right; }
+        .sv-a { text-align: left; }
+
+        .sl {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--t3);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .bar-r {
+            display: grid;
+            grid-template-columns: 1fr 20px 1fr;
+            gap: 7px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .bh, .ba {
+            height: 3px;
+            background: var(--elevated);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .bh { display: flex; justify-content: flex-end; }
+        .bh .f, .ba .f { height: 100%; border-radius: 2px; }
+        .bh .f { background: linear-gradient(90deg, var(--blue), #6aabff); }
+        .ba .f { background: linear-gradient(90deg, #ff6b6b, var(--live)); }
+
+        .mi-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .mi-row:last-child { border-bottom: none; }
+        .mi-key { color: var(--t3); }
+        .mi-val { font-family: var(--fd); font-size: 14px; font-weight: 700; text-align: right; }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r2);
+            color: var(--t2);
+            padding: 10px 18px;
+            font-family: var(--fd);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: var(--tr);
+            margin-bottom: 22px;
+        }
+
+        .back-btn:hover {
+            background: var(--elevated);
+            border-color: var(--blue);
+            color: var(--t1);
+        }
+
+        @@media (max-width: 768px) {
+            .hero-grid { gap: 10px; }
+            .h-logo { width: 60px; height: 60px; }
+            .h-name { font-size: 14px; }
+            .h-sc { font-size: 52px; letter-spacing: -2px; }
+            .tl-ev { grid-template-columns: 1fr 46px 1fr; gap: 5px; }
+            .chip { padding: 6px 8px; max-width: 140px; }
+            .ev-pl { font-size: 12px; }
+            .ev-dt { display: none; }
+            .ev-ico { width: 22px; height: 22px; font-size: 11px; }
+            .split2 { grid-template-columns: 1fr; }
+            .info-strip { gap: 12px; }
+            .istrip { font-size: 11px; }
+        }
+    </style>
 }
 
 <section class="hero">
     <div class="wrap">
-        @{
-            var homeInitials = Model.Fixture.HomeTeamName[..Math.Min(3, Model.Fixture.HomeTeamName.Length)].ToUpperInvariant();
-            var awayInitials = Model.Fixture.AwayTeamName[..Math.Min(3, Model.Fixture.AwayTeamName.Length)].ToUpperInvariant();
-        }
         <div class="hero-badges">
-            <span class="hbadge hb-gold"><i class="bi bi-trophy-fill me-1"></i>Premier League</span>
-            <span class="hbadge hb-gray"><i class="bi bi-calendar3 me-1"></i>Hafta @Model.Fixture.MatchWeek</span>
-            <span class="hbadge hb-green">
-                @if (Model.Fixture.Status == FixtureStatus.Completed)
+            <span class="hbadge hb-gold"><i class="bi bi-trophy-fill me-1"></i>Premier League · Hafta @fixture.MatchWeek</span>
+            <span class="hbadge hb-gray">
+                @if (fixture.Status == FixtureStatus.Completed)
                 {
                     <span><i class="bi bi-check2-circle me-1"></i>Mac Sona Erdi</span>
                 }
-                else if (Model.Fixture.Status == FixtureStatus.Live)
+                else if (fixture.Status == FixtureStatus.Live)
                 {
                     <span><i class="bi bi-broadcast me-1"></i>Canli</span>
                 }
@@ -27,52 +547,49 @@
                     <span><i class="bi bi-clock me-1"></i>Planlandi</span>
                 }
             </span>
+            <span class="hbadge hb-green"><i class="bi bi-calendar3 me-1"></i>@fixture.KickoffUtc.ToLocalTime().ToString("dd MMMM yyyy")</span>
         </div>
 
         <div class="hero-grid">
             <div class="h-team">
-                @if (!string.IsNullOrWhiteSpace(Model.Fixture.HomeTeamLogoUrl))
+                @if (!string.IsNullOrWhiteSpace(fixture.HomeTeamLogoUrl))
                 {
-                    <img src="@Model.Fixture.HomeTeamLogoUrl" alt="@Model.Fixture.HomeTeamName logo" class="h-logo" style="object-fit:contain;background:#fff;padding:10px" />
+                    <img src="@fixture.HomeTeamLogoUrl" alt="@fixture.HomeTeamName logo" class="h-logo" />
                 }
                 else
                 {
                     <div class="h-logo">@homeInitials</div>
                 }
-                <div class="h-name">@Model.Fixture.HomeTeamName</div>
+                <div class="h-name">@fixture.HomeTeamName</div>
                 <div class="h-type">Ev Sahibi</div>
             </div>
             <div class="h-score-c">
                 <div class="h-sc">
-                    @(Model.Fixture.HomeFullTimeScore.HasValue && Model.Fixture.AwayFullTimeScore.HasValue
-                        ? $"{Model.Fixture.HomeFullTimeScore}-{Model.Fixture.AwayFullTimeScore}"
-                        : "-")
+                    @fullTimeDisplay
                 </div>
-                <div class="h-ht">
-                    IY:
-                    @(Model.Fixture.HomeHalfTimeScore.HasValue && Model.Fixture.AwayHalfTimeScore.HasValue
-                        ? $"{Model.Fixture.HomeHalfTimeScore}-{Model.Fixture.AwayHalfTimeScore}"
-                        : "-")
+                <div class="h-ht"><i class="bi bi-hourglass-split me-1"></i>IY: @(fixture.HomeHalfTimeScore.HasValue && fixture.AwayHalfTimeScore.HasValue ? $"{fixture.HomeHalfTimeScore} - {fixture.AwayHalfTimeScore}" : "-")</div>
+                <div class="h-ft">
+                    @(fixture.Status == FixtureStatus.Completed ? "Mac Bitti" : fixture.Status == FixtureStatus.Live ? "Mac Devam Ediyor" : "Mac Henuz Baslamadi")
                 </div>
             </div>
             <div class="h-team">
-                @if (!string.IsNullOrWhiteSpace(Model.Fixture.AwayTeamLogoUrl))
+                @if (!string.IsNullOrWhiteSpace(fixture.AwayTeamLogoUrl))
                 {
-                    <img src="@Model.Fixture.AwayTeamLogoUrl" alt="@Model.Fixture.AwayTeamName logo" class="h-logo" style="object-fit:contain;background:#fff;padding:10px" />
+                    <img src="@fixture.AwayTeamLogoUrl" alt="@fixture.AwayTeamName logo" class="h-logo" />
                 }
                 else
                 {
                     <div class="h-logo">@awayInitials</div>
                 }
-                <div class="h-name">@Model.Fixture.AwayTeamName</div>
+                <div class="h-name">@fixture.AwayTeamName</div>
                 <div class="h-type">Deplasman</div>
             </div>
         </div>
 
         <div class="info-strip">
-            <div class="istrip"><i class="bi bi-geo-alt-fill"></i><span>@Model.Fixture.VenueName</span></div>
-            <div class="istrip"><i class="bi bi-calendar3"></i><span>@Model.Fixture.KickoffUtc.ToLocalTime().ToString("dd.MM.yyyy")</span></div>
-            <div class="istrip"><i class="bi bi-clock"></i><span>@Model.Fixture.KickoffUtc.ToLocalTime().ToString("HH:mm")</span></div>
+            <div class="istrip"><i class="bi bi-geo-alt-fill"></i><span>@fixture.VenueName</span></div>
+            <div class="istrip"><i class="bi bi-calendar3"></i><span>@fixture.KickoffUtc.ToLocalTime().ToString("dd.MM.yyyy")</span></div>
+            <div class="istrip"><i class="bi bi-clock"></i><span>@fixture.KickoffUtc.ToLocalTime().ToString("HH:mm")</span></div>
         </div>
     </div>
 </section>
@@ -84,7 +601,7 @@
         <div class="row g-4">
             <div class="col-lg-7">
                 <div class="dc">
-                    <div class="dc-title"><i class="bi bi-activity"></i> Mac Olaylari</div>
+                    <div class="dc-title"><i class="bi bi-activity me-2" style="color:var(--green)"></i>Mac Olaylari</div>
                     @if (Model.Events.Count == 0)
                     {
                         <p style="color:var(--t2)">Bu maca ait olay girisi yok.</p>
@@ -93,9 +610,9 @@
                     {
                         <div class="tl-wrap">
                             <div class="tl-line"></div>
-                            @foreach (var item in Model.Events)
+                            @foreach (var item in Model.Events.OrderBy(x => x.Minute))
                             {
-                                var isHome = item.TeamName == Model.Fixture.HomeTeamName;
+                                var isHome = item.TeamName == fixture.HomeTeamName;
                                 var chipClass = item.EventType switch
                                 {
                                     MatchEventType.Goal => "goal-ev",
@@ -110,15 +627,26 @@
                                     MatchEventType.RedCard => "ei-red",
                                     _ => "ei-sub"
                                 };
+                                var icon = item.EventType switch
+                                {
+                                    MatchEventType.Goal => "bi-circle-fill",
+                                    MatchEventType.YellowCard => "bi-square-fill",
+                                    MatchEventType.RedCard => "bi-square-fill",
+                                    _ => "bi-arrow-left-right"
+                                };
+                                var detailText = item.EventType == MatchEventType.Substitution
+                                    ? (item.Description ?? string.Empty).Replace("Assist:", "Cikan:")
+                                    : item.Description;
+
                                 <div class="tl-ev">
-                                    <div class="@(isHome ? "tl-home" : "tl-home")">
+                                    <div class="tl-home">
                                         @if (isHome)
                                         {
                                             <div class="chip home @chipClass">
-                                                <div class="ev-ico @iconClass"><i class="bi bi-circle-fill" style="font-size:9px"></i></div>
+                                                <div class="ev-ico @iconClass"><i class="bi @icon" style="font-size:9px"></i></div>
                                                 <div>
                                                     <div class="ev-pl">@item.PlayerName</div>
-                                                    <div class="ev-dt">@item.TeamName @if (!string.IsNullOrWhiteSpace(item.Description)) { <span>- @item.Description</span> }</div>
+                                                    <div class="ev-dt">@(!string.IsNullOrWhiteSpace(detailText) ? detailText : item.TeamName)</div>
                                                 </div>
                                             </div>
                                         }
@@ -128,10 +656,10 @@
                                         @if (!isHome)
                                         {
                                             <div class="chip away @chipClass">
-                                                <div class="ev-ico @iconClass"><i class="bi bi-circle-fill" style="font-size:9px"></i></div>
+                                                <div class="ev-ico @iconClass"><i class="bi @icon" style="font-size:9px"></i></div>
                                                 <div>
                                                     <div class="ev-pl">@item.PlayerName</div>
-                                                    <div class="ev-dt">@item.TeamName @if (!string.IsNullOrWhiteSpace(item.Description)) { <span>- @item.Description</span> }</div>
+                                                    <div class="ev-dt">@(!string.IsNullOrWhiteSpace(detailText) ? detailText : item.TeamName)</div>
                                                 </div>
                                             </div>
                                         }
@@ -141,11 +669,135 @@
                         </div>
                     }
                 </div>
+
+                <div class="dc">
+                    <div class="dc-title"><i class="bi bi-circle-fill me-2" style="color:var(--green);font-size:9px"></i>Goller</div>
+                    <div class="split2">
+                        <div class="box2">
+                            <div class="box2-title">⚽ @fixture.HomeTeamName</div>
+                            @if (homeGoals.Count == 0)
+                            {
+                                <div class="gl"><div class="gl-pl">Gol yok</div></div>
+                            }
+                            else
+                            {
+                                @foreach (var item in homeGoals)
+                                {
+                            <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">@item.PlayerName</div><div class="gl-min">@item.Minute'</div></div>
+                                }
+                            }
+                        </div>
+                        <div class="box2">
+                            <div class="box2-title">⚽ @fixture.AwayTeamName</div>
+                            @if (awayGoals.Count == 0)
+                            {
+                                <div class="gl"><div class="gl-pl">Gol yok</div></div>
+                            }
+                            else
+                            {
+                                @foreach (var item in awayGoals)
+                                {
+                            <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">@item.PlayerName</div><div class="gl-min">@item.Minute'</div></div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dc">
+                    <div class="dc-title"><i class="bi bi-square-fill me-2" style="color:var(--yellow);font-size:10px"></i>Kartlar</div>
+                    <div class="split2">
+                        <div class="box2">
+                            <div class="box2-title">@fixture.HomeTeamName</div>
+                            @if (homeCards.Count == 0)
+                            {
+                                <div class="gl"><div class="gl-pl">Kart yok</div></div>
+                            }
+                            else
+                            {
+                                @foreach (var item in homeCards)
+                                {
+                                    <div class="gl">
+                                        <div class="@(item.EventType == MatchEventType.RedCard ? "rcard" : "ycard")"></div>
+                                        <div class="gl-pl">@item.PlayerName</div>
+                                        <div class="gl-min">@item.Minute'</div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="box2">
+                            <div class="box2-title">@fixture.AwayTeamName</div>
+                            @if (awayCards.Count == 0)
+                            {
+                                <div class="gl"><div class="gl-pl">Kart yok</div></div>
+                            }
+                            else
+                            {
+                                @foreach (var item in awayCards)
+                                {
+                                    <div class="gl">
+                                        <div class="@(item.EventType == MatchEventType.RedCard ? "rcard" : "ycard")"></div>
+                                        <div class="gl-pl">@item.PlayerName</div>
+                                        <div class="gl-min">@item.Minute'</div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dc">
+                    <div class="dc-title"><i class="bi bi-arrow-left-right me-2" style="color:var(--blue)"></i>Oyuncu Degisiklikleri</div>
+                    <div class="sub-lbl">@fixture.HomeTeamName</div>
+                    @if (homeSubs.Count == 0)
+                    {
+                        <div class="sub-r"><div class="sub-out">Degisiklik yok</div></div>
+                    }
+                    else
+                    {
+                        @foreach (var item in homeSubs)
+                        {
+                            <div class="sub-r">
+                                <div class="sub-min">@item.Minute'</div>
+                                <div class="sub-in">↑ @item.PlayerName</div>
+                                <div class="sub-arr">⇄</div>
+                                <div class="sub-out">↓ @(string.IsNullOrWhiteSpace(item.Description) ? "-" : item.Description.Replace("Assist:", "Cikan:"))</div>
+                            </div>
+                        }
+                    }
+
+                    <div class="sub-lbl">@fixture.AwayTeamName</div>
+                    @if (awaySubs.Count == 0)
+                    {
+                        <div class="sub-r"><div class="sub-out">Degisiklik yok</div></div>
+                    }
+                    else
+                    {
+                        @foreach (var item in awaySubs)
+                        {
+                            <div class="sub-r">
+                                <div class="sub-min">@item.Minute'</div>
+                                <div class="sub-in">↑ @item.PlayerName</div>
+                                <div class="sub-arr">⇄</div>
+                                <div class="sub-out">↓ @(string.IsNullOrWhiteSpace(item.Description) ? "-" : item.Description.Replace("Assist:", "Cikan:"))</div>
+                            </div>
+                        }
+                    }
+                </div>
             </div>
 
             <div class="col-lg-5">
                 <div class="dc">
-                    <div class="dc-title"><i class="bi bi-bar-chart-fill"></i> Mac Istatistikleri</div>
+                    <div class="dc-title"><i class="bi bi-bar-chart-fill me-2" style="color:var(--blue)"></i>Mac Ozeti</div>
+                    <div class="sc-pills">
+                        <div class="sc-pill"><div class="sp-lbl">Ilk Yari</div><div class="sp-val">@(fixture.HomeHalfTimeScore.HasValue && fixture.AwayHalfTimeScore.HasValue ? $"{fixture.HomeHalfTimeScore} - {fixture.AwayHalfTimeScore}" : "-")</div></div>
+                        <div class="sc-pill"><div class="sp-lbl">Ikinci Yari</div><div class="sp-val">@(fixture.HomeHalfTimeScore.HasValue && fixture.AwayHalfTimeScore.HasValue && fixture.HomeFullTimeScore.HasValue && fixture.AwayFullTimeScore.HasValue ? $"{homeSecondHalf} - {awaySecondHalf}" : "-")</div></div>
+                        <div class="sc-pill"><div class="sp-lbl">Sonuc</div><div class="sp-val" style="color:var(--green)">@fullTimeDisplay</div></div>
+                    </div>
+                </div>
+
+                <div class="dc">
+                    <div class="dc-title"><i class="bi bi-graph-up me-2" style="color:var(--green)"></i>Istatistikler</div>
                     @if (Model.Statistics.Count == 0)
                     {
                         <p style="color:var(--t2)">Bu maca ait istatistik girisi yok.</p>
@@ -154,24 +806,37 @@
                     {
                         @foreach (var group in Model.Statistics.GroupBy(x => x.Name))
                         {
-                            var home = group.FirstOrDefault(x => x.TeamName == Model.Fixture.HomeTeamName)?.Value ?? "-";
-                            var away = group.FirstOrDefault(x => x.TeamName == Model.Fixture.AwayTeamName)?.Value ?? "-";
+                            var homeValue = group.FirstOrDefault(x => x.TeamName == fixture.HomeTeamName)?.Value ?? "-";
+                            var awayValue = group.FirstOrDefault(x => x.TeamName == fixture.AwayTeamName)?.Value ?? "-";
+                            var homeComparable = ParseComparableValue(homeValue);
+                            var awayComparable = ParseComparableValue(awayValue);
+                            var totalComparable = homeComparable + awayComparable;
+                            var homeWidth = totalComparable > 0 ? (homeComparable / totalComparable) * 100 : 50;
+                            var awayWidth = totalComparable > 0 ? (awayComparable / totalComparable) * 100 : 50;
+
                             <div class="stat-r">
-                                <div class="sv-h">@home</div>
+                                <div class="sv-h">@homeValue</div>
                                 <div class="sl">@group.Key</div>
-                                <div class="sv-a">@away</div>
+                                <div class="sv-a">@awayValue</div>
+                            </div>
+                            <div class="bar-r">
+                                <div class="bh"><div class="f" style="width:@homeWidth.ToString("0.##", CultureInfo.InvariantCulture)%"></div></div>
+                                <div></div>
+                                <div class="ba"><div class="f" style="width:@awayWidth.ToString("0.##", CultureInfo.InvariantCulture)%"></div></div>
                             </div>
                         }
                     }
                 </div>
 
                 <div class="dc">
-                    <div class="dc-title"><i class="bi bi-info-circle-fill"></i> Mac Bilgisi</div>
-                    <div class="mi-row"><span class="mi-key">Stadyum</span><span class="mi-val">@Model.Fixture.VenueName</span></div>
-                    <div class="mi-row"><span class="mi-key">Tarih</span><span class="mi-val">@Model.Fixture.KickoffUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span></div>
-                    <div class="mi-row"><span class="mi-key">Durum</span><span class="mi-val">@Model.Fixture.Status</span></div>
-                    <div class="mi-row"><span class="mi-key">Ilk Yari</span><span class="mi-val">@((Model.Fixture.HomeHalfTimeScore.HasValue && Model.Fixture.AwayHalfTimeScore.HasValue) ? $"{Model.Fixture.HomeHalfTimeScore}-{Model.Fixture.AwayHalfTimeScore}" : "-")</span></div>
-                    <div class="mi-row"><span class="mi-key">Mac Sonu</span><span class="mi-val">@((Model.Fixture.HomeFullTimeScore.HasValue && Model.Fixture.AwayFullTimeScore.HasValue) ? $"{Model.Fixture.HomeFullTimeScore}-{Model.Fixture.AwayFullTimeScore}" : "-")</span></div>
+                    <div class="dc-title"><i class="bi bi-info-circle me-2" style="color:var(--t3)"></i>Mac Bilgileri</div>
+                    <div class="mi-row"><span class="mi-key">Lig</span><span class="mi-val" style="color:var(--gold)">Premier League</span></div>
+                    <div class="mi-row"><span class="mi-key">Sezon</span><span class="mi-val">2024 / 2025</span></div>
+                    <div class="mi-row"><span class="mi-key">Hafta</span><span class="mi-val">Hafta @fixture.MatchWeek</span></div>
+                    <div class="mi-row"><span class="mi-key">Stadyum</span><span class="mi-val">@fixture.VenueName</span></div>
+                    <div class="mi-row"><span class="mi-key">Tarih</span><span class="mi-val">@fixture.KickoffUtc.ToLocalTime().ToString("dd MMMM yyyy")</span></div>
+                    <div class="mi-row"><span class="mi-key">Saat</span><span class="mi-val">@fixture.KickoffUtc.ToLocalTime().ToString("HH:mm")</span></div>
+                    <div class="mi-row"><span class="mi-key">Durum</span><span class="mi-val">@(fixture.Status == FixtureStatus.Completed ? "Tamamlandi" : fixture.Status == FixtureStatus.Live ? "Devam Ediyor" : "Henuz Oynanmadi")</span></div>
                 </div>
             </div>
         </div>

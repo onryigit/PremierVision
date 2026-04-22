@@ -7,6 +7,224 @@
     var bestDefense = Model.Rows.OrderBy(x => x.GoalsAgainst).FirstOrDefault();
 }
 
+@section Styles {
+    <style>
+        .pg-head {
+            background: linear-gradient(135deg, var(--bg2), var(--card));
+            border-bottom: 1px solid var(--border);
+            padding: 32px 0 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pg-head::before {
+            content: "";
+            position: absolute;
+            top: -40%;
+            right: -5%;
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(0,230,118,.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .pg-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255,214,0,.09);
+            border: 1px solid rgba(255,214,0,.22);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-family: var(--fd);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .pg-title {
+            font-family: var(--fd);
+            font-size: clamp(26px, 5vw, 42px);
+            font-weight: 900;
+            letter-spacing: .5px;
+            line-height: 1;
+        }
+
+        .pg-sub { font-size: 13px; color: var(--t2); margin-top: 6px; }
+
+        .legend {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .leg-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--t2);
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 5px 10px;
+            border-radius: 7px;
+        }
+
+        .leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+        .tbl-wrap { padding: 28px 0 56px; }
+
+        .top-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .ts-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r2);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ts-label {
+            font-family: var(--fd);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--t3);
+        }
+
+        .ts-val {
+            font-family: var(--fd);
+            font-size: 28px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .ts-team { font-size: 12px; color: var(--t2); margin-top: 2px; }
+
+        .zone-lbl {
+            font-family: var(--fd);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--t2);
+            padding: 14px 0 8px;
+            border-top: 1px solid var(--border);
+            margin-top: 4px;
+        }
+
+        .std-table { width: 100%; border-collapse: separate; border-spacing: 0 4px; min-width: 720px; }
+        .std-table thead th {
+            font-family: var(--fd);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #6e95d2;
+            padding: 8px 10px;
+            text-align: center;
+            border: none;
+        }
+
+        .std-table thead th.team-col { text-align: left; padding-left: 14px; }
+
+        .std-row {
+            background: var(--card);
+            transition: var(--tr);
+        }
+
+        .std-row:hover { background: var(--card2); transform: translateX(3px); }
+        .std-row td { padding: 11px 10px; text-align: center; border: none; vertical-align: middle; color: var(--t1); }
+        .std-row td:first-child { border-radius: var(--r1) 0 0 var(--r1); padding-left: 0; }
+        .std-row td:last-child { border-radius: 0 var(--r1) var(--r1) 0; }
+
+        .pos-strip { width: 4px; height: 42px; border-radius: 2px 0 0 2px; }
+        .pos-num {
+            font-family: var(--fd);
+            font-size: 16px;
+            font-weight: 800;
+            width: 38px;
+            text-align: center;
+        }
+
+        .team-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+            min-width: 160px;
+        }
+
+        .t-logo {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--elevated);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .t-logo img { width: 100%; height: 100%; object-fit: contain; padding: 3px; background: #fff; }
+        .t-name { font-family: var(--fd); font-size: 15px; font-weight: 700; }
+        .s-mp { font-family: var(--fd); font-size: 14px; font-weight: 600; color: var(--t2); }
+        .s-w { font-family: var(--fd); font-size: 14px; font-weight: 700; color: var(--green); }
+        .s-d { font-family: var(--fd); font-size: 14px; font-weight: 700; color: var(--t2); }
+        .s-l { font-family: var(--fd); font-size: 14px; font-weight: 700; color: var(--live); }
+        .s-gd { font-family: var(--fd); font-size: 14px; font-weight: 700; }
+        .s-gd.pos { color: var(--green); }
+        .s-gd.neg { color: var(--live); }
+        .s-gd.zero { color: var(--t3); }
+        .s-pts { font-family: var(--fd); font-size: 18px; font-weight: 900; color: var(--t1); }
+
+        .form-row { display: flex; gap: 3px; justify-content: center; }
+        .fp {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            font-family: var(--fd);
+            font-size: 10px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .fp-w { background: rgba(0,230,118,.18); color: var(--green); }
+        .fp-d { background: rgba(123,150,196,.12); color: var(--t2); }
+        .fp-l { background: rgba(255,23,68,.14); color: var(--live); }
+
+        @@media (max-width: 900px) {
+            .top-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @@media (max-width: 600px) {
+            .top-stats { grid-template-columns: 1fr; gap: 8px; }
+            .ts-val { font-size: 22px; }
+            .s-pts { font-size: 15px; }
+            .pos-num { width: 28px; font-size: 14px; }
+            .team-cell { min-width: 120px; gap: 7px; }
+            .t-logo { width: 22px; height: 22px; }
+            .fp { width: 15px; height: 15px; font-size: 9px; }
+        }
+    </style>
+}
+
 <section class="pg-head">
     <div class="wrap">
         <div class="row align-items-center">
@@ -16,10 +234,10 @@
                 <p class="pg-sub">Mac sonuclarindan dinamik hesaplanan lig tablosu</p>
             </div>
             <div class="col-lg-4 mt-3 mt-lg-0">
-                <div class="d-flex flex-wrap gap-2 justify-content-lg-end small">
-                    <span class="px-2 py-1 rounded" style="background:rgba(255,214,0,.09);border:1px solid rgba(255,214,0,.22);color:var(--gold)">Sampiyon</span>
-                    <span class="px-2 py-1 rounded" style="background:rgba(0,230,118,.09);border:1px solid rgba(0,230,118,.22);color:var(--green)">Avrupa</span>
-                    <span class="px-2 py-1 rounded" style="background:rgba(255,23,68,.09);border:1px solid rgba(255,23,68,.22);color:var(--live)">Kume Dusme</span>
+                <div class="legend justify-content-lg-end">
+                    <div class="leg-item"><div class="leg-dot" style="background:rgba(255,214,0,.8)"></div>Sampiyon</div>
+                    <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Avrupa</div>
+                    <div class="leg-item"><div class="leg-dot" style="background:var(--live)"></div>Kume Dusme</div>
                 </div>
             </div>
         </div>
@@ -27,97 +245,116 @@
 </section>
 
 <main>
-    <div class="wrap" style="padding-top:28px;padding-bottom:56px">
-        <div class="row g-3 mb-4">
-            <div class="col-12 col-md-4">
-                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body">
-                        <div class="small text-uppercase mb-2" style="letter-spacing:1px;color:var(--t3)">Lider</div>
-                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--gold)">@(leader?.TeamName ?? "-")</div>
-                        <div class="small" style="color:var(--t2)">@(leader?.Points ?? 0) puan</div>
-                    </div>
+    <div class="wrap">
+        <div class="tbl-wrap">
+            <div class="top-stats">
+                <div class="ts-card">
+                    <div class="ts-label">Lider Takim</div>
+                    <div class="ts-val" style="color:var(--gold)">@(leader?.TeamName ?? "-")</div>
+                    <div class="ts-team">@(leader?.Points ?? 0) puan</div>
+                </div>
+                <div class="ts-card">
+                    <div class="ts-label">En Cok Gol</div>
+                    <div class="ts-val" style="color:var(--green)">@(topScoring?.GoalsFor ?? 0)</div>
+                    <div class="ts-team">@(topScoring?.TeamName ?? "-")</div>
+                </div>
+                <div class="ts-card">
+                    <div class="ts-label">En Az Yenen</div>
+                    <div class="ts-val" style="color:var(--blue)">@(bestDefense?.GoalsAgainst ?? 0)</div>
+                    <div class="ts-team">@(bestDefense?.TeamName ?? "-")</div>
                 </div>
             </div>
-            <div class="col-6 col-md-4">
-                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body">
-                        <div class="small text-uppercase mb-2" style="letter-spacing:1px;color:var(--t3)">En Cok Gol</div>
-                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--green)">@(topScoring?.GoalsFor ?? 0)</div>
-                        <div class="small" style="color:var(--t2)">@(topScoring?.TeamName ?? "-")</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-4">
-                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body">
-                        <div class="small text-uppercase mb-2" style="letter-spacing:1px;color:var(--t3)">En Az Yenen</div>
-                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--blue)">@(bestDefense?.GoalsAgainst ?? 0)</div>
-                        <div class="small" style="color:var(--t2)">@(bestDefense?.TeamName ?? "-")</div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="table-responsive rounded-4 shadow-sm" style="border:1px solid var(--border);background:var(--card)">
-            <table class="table align-middle mb-0">
-                <thead>
-                    <tr style="color:var(--t3)">
-                        <th>#</th>
-                        <th>Takim</th>
-                        <th>O</th>
-                        <th>G</th>
-                        <th>B</th>
-                        <th>M</th>
-                        <th>AG</th>
-                        <th>YG</th>
-                        <th>AV</th>
-                        <th>Form</th>
-                        <th>P</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Rows)
-                    {
-                        var rowColor = item.Position == 1
-                            ? "rgba(255,214,0,.55)"
-                            : item.Position <= 4
-                                ? "rgba(0,230,118,.7)"
-                                : item.Position >= Math.Max(Model.Rows.Count - 2, 1)
-                                    ? "rgba(255,23,68,.7)"
-                                    : "transparent";
-                        <tr style="color:var(--t1)">
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span style="display:inline-block;width:4px;height:36px;border-radius:2px;background:@rowColor"></span>
-                                    <strong>@item.Position</strong>
-                                </div>
-                            </td>
-                            <td class="fw-semibold">
-                                <div class="d-flex align-items-center gap-2">
-                                    @if (!string.IsNullOrWhiteSpace(item.TeamLogoUrl))
-                                    {
-                                        <img src="@item.TeamLogoUrl" alt="@item.TeamName logo" style="width:24px;height:24px;object-fit:contain;background:#fff;border-radius:50%;padding:2px" />
-                                    }
-                                    else
-                                    {
-                                        <span class="tl-sm" style="width:24px;height:24px;font-size:10px">@item.TeamName[..Math.Min(3, item.TeamName.Length)].ToUpperInvariant()</span>
-                                    }
-                                    <span>@item.TeamName</span>
-                                </div>
-                            </td>
-                            <td>@item.Played</td>
-                            <td style="color:var(--green)">@item.Wins</td>
-                            <td style="color:var(--t2)">@item.Draws</td>
-                            <td style="color:var(--live)">@item.Losses</td>
-                            <td>@item.GoalsFor</td>
-                            <td>@item.GoalsAgainst</td>
-                            <td style="color:@(item.GoalDifference > 0 ? "var(--green)" : item.GoalDifference < 0 ? "var(--live)" : "var(--t2)")">@item.GoalDifference</td>
-                            <td>@item.Form</td>
-                            <td class="fw-bold fs-5">@item.Points</td>
+            <div style="overflow-x:auto;border-radius:var(--r3);border:1px solid var(--border)">
+                <table class="std-table">
+                    <thead>
+                        <tr>
+                            <th style="width:4px;padding:0"></th>
+                            <th style="width:44px">#</th>
+                            <th class="team-col">Takim</th>
+                            <th>O</th>
+                            <th>G</th>
+                            <th>B</th>
+                            <th>M</th>
+                            <th>AG</th>
+                            <th>YG</th>
+                            <th>AV</th>
+                            <th>Son 5</th>
+                            <th>P</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @for (var i = 0; i < Model.Rows.Count; i++)
+                        {
+                            var item = Model.Rows[i];
+                            var stripClass = item.Position == 1
+                                ? "rgba(255,214,0,.7)"
+                                : item.Position <= 4
+                                    ? "var(--green)"
+                                    : item.Position >= Math.Max(Model.Rows.Count - 2, 1)
+                                        ? "var(--live)"
+                                        : "transparent";
+
+                            if (i == 0)
+                            {
+                                <tr><td colspan="12"><div class="zone-lbl">Sampiyonlar Ligi Gruplari (1-4)</div></td></tr>
+                            }
+
+                            if (i == 4)
+                            {
+                                <tr><td colspan="12"><div class="zone-lbl">Avrupa Disi ve Orta Sira</div></td></tr>
+                            }
+
+                            if (i == 17)
+                            {
+                                <tr><td colspan="12"><div class="zone-lbl">Kume Dusme Hatti (18-20)</div></td></tr>
+                            }
+
+                            var formItems = (item.Form ?? string.Empty)
+                                .Split(" - ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                            var gdClass = item.GoalDifference > 0 ? "pos" : item.GoalDifference < 0 ? "neg" : "zero";
+                            var gdText = item.GoalDifference > 0 ? $"+{item.GoalDifference}" : item.GoalDifference.ToString();
+
+                            <tr class="std-row">
+                                <td style="padding:0;width:4px"><div class="pos-strip" style="background:@stripClass"></div></td>
+                                <td><span class="pos-num">@item.Position</span></td>
+                                <td>
+                                    <div class="team-cell">
+                                        <div class="t-logo">
+                                            @if (!string.IsNullOrWhiteSpace(item.TeamLogoUrl))
+                                            {
+                                                <img src="@item.TeamLogoUrl" alt="@item.TeamName logo" />
+                                            }
+                                            else
+                                            {
+                                                <span>@item.TeamName[..Math.Min(3, item.TeamName.Length)].ToUpperInvariant()</span>
+                                            }
+                                        </div>
+                                        <div class="t-name">@item.TeamName</div>
+                                    </div>
+                                </td>
+                                <td class="s-mp">@item.Played</td>
+                                <td class="s-w">@item.Wins</td>
+                                <td class="s-d">@item.Draws</td>
+                                <td class="s-l">@item.Losses</td>
+                                <td>@item.GoalsFor</td>
+                                <td>@item.GoalsAgainst</td>
+                                <td class="s-gd @gdClass">@gdText</td>
+                                <td>
+                                    <div class="form-row">
+                                        @foreach (var formItem in formItems)
+                                        {
+                                            var pillClass = formItem == "W" ? "fp-w" : formItem == "L" ? "fp-l" : "fp-d";
+                                            <div class="fp @pillClass">@formItem</div>
+                                        }
+                                    </div>
+                                </td>
+                                <td class="s-pts">@item.Points</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </main>
