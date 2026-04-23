@@ -43,6 +43,9 @@ public class PremierVisionApiClient(HttpClient httpClient) : IPremierVisionApiCl
     public Task ImportLiveFixturesAsync(CancellationToken cancellationToken = default) =>
         PostAsync<object?>("api/admin/import/live", null, cancellationToken);
 
+    public Task EnsureDemoScenarioAsync(CancellationToken cancellationToken = default) =>
+        PostAsync<object?>("api/admin/demo-scenario", null, cancellationToken);
+
     public Task AddFixtureAsync(CreateFixtureInputModel request, CancellationToken cancellationToken = default) =>
         PostAsync("api/admin/fixtures", request, cancellationToken);
 

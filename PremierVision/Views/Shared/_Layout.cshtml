@@ -79,15 +79,13 @@
             gap: 10px;
             padding: 14px 0;
         }
-        .brand-ico {
-            width: 34px;
-            height: 34px;
-            background: linear-gradient(135deg, var(--green), var(--blue));
-            border-radius: 7px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 17px;
+        .brand-logo {
+            width: 52px;
+            height: 36px;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,.25));
         }
         .brand-txt {
             font-family: var(--fd);
@@ -534,6 +532,7 @@
         }
 
         @@media (max-width: 600px) {
+            .brand-logo { width: 46px; height: 32px; }
             .tn { font-size: 13px; }
             .ts { font-size: 18px; }
             .mc-time { width: 60px; }
@@ -553,7 +552,7 @@
     <nav class="nb">
         <div class="nb-inner">
             <a asp-controller="Home" asp-action="Index" class="brand">
-                <div class="brand-ico">⚽</div>
+                <img src="~/dosyalar/premierlogo.png" alt="PremierVision logo" class="brand-logo" />
                 <span class="brand-txt">Premier<span>Vision</span></span>
             </a>
             <div class="nav-links d-none d-lg-flex">

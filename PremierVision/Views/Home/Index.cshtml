@@ -2,197 +2,50 @@
 
 @{
     ViewData["Title"] = "Ana Sayfa";
-    var totalMatches = Model.WeeklyFixtures.Count;
-    var completedMatches = Model.WeeklyFixtures.Count(x => x.Status == FixtureStatus.Completed);
-    var liveMatches = Model.WeeklyFixtures.Count(x => x.Status == FixtureStatus.Live);
-    var upcomingMatches = Model.WeeklyFixtures.Count(x => x.Status == FixtureStatus.NotStarted);
+
+    var liveCount = Model.LiveFixtures.Count;
+    var finishedCount = Model.LatestResults.Count;
+    var upcomingCount = Model.UpcomingFixtures.Count;
+    var totalCount = liveCount + finishedCount + upcomingCount;
+    var featured = Model.FeaturedMatch;
 }
 
 @section Styles {
     <style>
-        .week-filter {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 12px;
-            padding: 12px 0;
+        .home-main {
+            padding-top: 28px;
+            padding-bottom: 56px;
         }
 
-        .week-filter-label {
-            font-family: var(--fd);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1.8px;
-            text-transform: uppercase;
-            color: var(--t2);
-            white-space: nowrap;
+        .sec-ttl[data-section="live"] {
+            color: rgba(0,230,118,.78);
         }
 
-        .week-select-wrap {
-            position: relative;
-            min-width: 190px;
+        .mc.live {
+            border-color: rgba(0,230,118,.3);
+            background: linear-gradient(90deg, var(--card), rgba(0,230,118,.05));
         }
 
-        .week-select {
-            appearance: none;
-            width: 100%;
-            height: 48px;
-            border-radius: 14px;
-            border: 1px solid rgba(106, 171, 255, .28);
-            background:
-                linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)),
-                var(--card);
-            color: var(--t1);
-            font-family: var(--fb);
-            font-size: 15px;
-            font-weight: 600;
-            padding: 0 46px 0 16px;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 10px 24px rgba(0,0,0,.18);
-            transition: var(--tr);
-            cursor: pointer;
+        .mc.live .mc-min.lc {
+            color: var(--green);
         }
 
-        .week-select:hover {
-            border-color: rgba(106, 171, 255, .45);
-            background:
-                linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025)),
-                var(--card2);
+        .mc.live .sbadge.sb-live {
+            background: rgba(0,230,118,.12);
+            color: var(--green);
+            border-color: rgba(0,230,118,.25);
         }
 
-        .week-select:focus {
-            outline: none;
-            border-color: rgba(0,230,118,.45);
-            box-shadow: 0 0 0 3px rgba(0,230,118,.08), 0 12px 30px rgba(0,0,0,.22);
+        .mc.live .live-dot {
+            background: var(--green);
         }
 
-        .week-select-wrap::after {
-            content: "\F282";
-            font-family: "bootstrap-icons";
-            position: absolute;
-            top: 50%;
-            right: 15px;
-            transform: translateY(-50%);
-            color: var(--t2);
-            font-size: 14px;
-            pointer-events: none;
-        }
-
-        .home-mc-wrap { margin-bottom: 10px; }
-
-        .home-mc {
-            width: 100%;
-            display: grid;
-            grid-template-columns: 78px minmax(0, 1fr) 74px 150px 92px;
-            align-items: center;
-            gap: 16px;
+        .empty-card {
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: var(--r2);
-            padding: 0 16px;
-            min-height: 78px;
-            transition: var(--tr);
-        }
-
-        .home-mc:hover {
-            background: var(--card2);
-            border-color: rgba(41,121,255,.3);
-            box-shadow: 0 6px 24px rgba(0,0,0,.35);
-        }
-
-        .home-mc.live {
-            border-color: rgba(255,23,68,.22);
-            background: linear-gradient(90deg, var(--card), rgba(255,23,68,.04));
-        }
-
-        .home-time {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            padding-right: 14px;
-            border-right: 1px solid var(--border);
-        }
-
-        .home-teams {
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .home-team-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 0;
-        }
-
-        .home-team-row:first-child {
-            border-bottom: 1px solid rgba(255,255,255,.04);
-        }
-
-        .home-score {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            justify-content: center;
-            gap: 10px;
-            min-width: 0;
-            padding-right: 8px;
-        }
-
-        .home-score-value {
-            font-family: var(--fd);
-            font-size: 26px;
-            font-weight: 900;
-            line-height: 1;
-            color: var(--t1);
-        }
-
-        .home-score-value.win { color: var(--green); }
-        .home-score-value.dim {
-            font-size: 18px;
-            color: var(--t3);
-        }
-
-        .home-meta {
-            min-width: 0;
-            text-align: right;
-            color: var(--t3);
-            font-size: 12px;
-            line-height: 1.45;
-            border-left: 1px solid var(--border);
-            padding-left: 16px;
-            padding-right: 8px;
-        }
-
-        .home-meta div {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        @@media (max-width: 768px) {
-            .week-filter {
-                justify-content: flex-start;
-            }
-
-            .week-select-wrap {
-                min-width: 170px;
-            }
-
-            .home-mc {
-                grid-template-columns: 66px minmax(0, 1fr) 58px 78px;
-                gap: 12px;
-            }
-
-            .home-meta {
-                display: none;
-            }
-
-            .home-score-value {
-                font-size: 22px;
-            }
+            padding: 18px;
+            color: var(--t2);
         }
     </style>
 }
@@ -202,134 +55,281 @@
         <div class="row align-items-center">
             <div class="col-lg-7">
                 <div class="lg-badge"><i class="bi bi-trophy-fill"></i> Premier League</div>
-                <h1 class="lg-title">Hafta <span style="color:var(--green)">@Model.CurrentWeek</span> Sonuçları</h1>
-                <p class="lg-sub">Case gereksinimine uygun olarak seçilen haftanın tüm maçları ve skor bilgileri</p>
+                <h1 class="lg-title">Hafta <span style="color:var(--green)">@Model.CurrentWeek</span> Merkezi</h1>
+                <p class="lg-sub">Canli skorlar, son tamamlanan maclar ve yaklasan karsilasmalar tek ekranda</p>
             </div>
-            <div class="col-lg-5">
-                <form method="get" class="week-filter">
-                    <label for="week" class="week-filter-label">Hafta</label>
-                    <div class="week-select-wrap">
-                    <select id="week" name="week" class="week-select" onchange="this.form.submit()">
-                        @foreach (var week in Model.AvailableWeeks)
-                        {
-                            <option value="@week" selected="@(week == Model.CurrentWeek)">@week. hafta</option>
-                        }
-                    </select>
-                    </div>
-                </form>
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="lg-stats">
+                    <div style="text-align:center"><div class="ls-num">@liveCount</div><div class="ls-lbl">Canli</div></div>
+                    <div style="text-align:center"><div class="ls-num">@finishedCount</div><div class="ls-lbl">Biten</div></div>
+                    <div style="text-align:center"><div class="ls-num">@upcomingCount</div><div class="ls-lbl">Yaklasan</div></div>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<main>
-    <div class="wrap" style="padding-top:28px;padding-bottom:56px">
-        <div class="row g-3 mb-4">
-            <div class="col-6 col-lg-3">
-                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body text-center">
-                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--blue)">@totalMatches</div>
-                        <div class="small text-uppercase" style="letter-spacing:1px;color:var(--t3)">Toplam Maç</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body text-center">
-                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--green)">@completedMatches</div>
-                        <div class="small text-uppercase" style="letter-spacing:1px;color:var(--t3)">Tamamlandı</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body text-center">
-                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--live)">@liveMatches</div>
-                        <div class="small text-uppercase" style="letter-spacing:1px;color:var(--t3)">Devam Ediyor</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body text-center">
-                        <div class="h2 mb-1" style="font-family:var(--fd);font-weight:900;color:var(--gold)">@upcomingMatches</div>
-                        <div class="small text-uppercase" style="letter-spacing:1px;color:var(--t3)">Henüz Oynanmadı</div>
-                    </div>
-                </div>
-            </div>
+<div class="ftabs-wrap">
+    <div class="wrap">
+        <div class="ftabs">
+            <button class="ftab active" type="button" data-filter="all">Tum Maclar <span class="bcnt">@totalCount</span></button>
+            <button class="ftab" type="button" data-filter="live"><span class="live-dot"></span>Canli <span class="bcnt">@liveCount</span></button>
+            <button class="ftab" type="button" data-filter="finished">Tamamlananlar</button>
+            <button class="ftab" type="button" data-filter="upcoming">Yaklasanlar</button>
         </div>
+    </div>
+</div>
 
-        @if (Model.WeeklyFixtures.Count == 0)
+<main>
+    <div class="wrap home-main">
+        @if (featured is not null)
         {
-            <div class="card border-0 shadow-sm" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                <div class="card-body">
-                    Seçilen hafta için maç bulunamadı.
-                </div>
-            </div>
-        }
+            var homeInitials = featured.HomeTeamName[..Math.Min(3, featured.HomeTeamName.Length)].ToUpperInvariant();
+            var awayInitials = featured.AwayTeamName[..Math.Min(3, featured.AwayTeamName.Length)].ToUpperInvariant();
+            var featuredScore = featured.Status == FixtureStatus.NotStarted
+                ? "VS"
+                : $"{featured.HomeFullTimeScore ?? 0}-{featured.AwayFullTimeScore ?? 0}";
+            var featuredStatus = featured.Status == FixtureStatus.Completed
+                ? "Mac Bitti"
+                : featured.Status == FixtureStatus.Live
+                    ? "Canli"
+                    : "Yaklasan Mac";
 
-        @foreach (var item in Model.WeeklyFixtures)
-        {
-            var homeInitials = item.HomeTeamName[..Math.Min(3, item.HomeTeamName.Length)].ToUpperInvariant();
-            var awayInitials = item.AwayTeamName[..Math.Min(3, item.AwayTeamName.Length)].ToUpperInvariant();
-            var homeWon = item.Status != FixtureStatus.NotStarted &&
-                (item.HomeFullTimeScore ?? 0) > (item.AwayFullTimeScore ?? 0);
-            var awayWon = item.Status != FixtureStatus.NotStarted &&
-                (item.AwayFullTimeScore ?? 0) > (item.HomeFullTimeScore ?? 0);
-
-            <div class="home-mc-wrap">
-                <a asp-controller="Matches" asp-action="Detail" asp-route-id="@item.Id" class="home-mc @(item.Status == FixtureStatus.Live ? "live" : string.Empty)">
-                    <div class="home-time">
-                        <div class="mc-min @(item.Status == FixtureStatus.Live ? "lc" : item.Status == FixtureStatus.NotStarted ? "bc" : string.Empty)">
-                            @(item.Status == FixtureStatus.Live ? "CANLI" : item.KickoffUtc.ToLocalTime().ToString("HH:mm"))
+            <div class="feat-wrap" id="featuredBlock">
+                <div class="feat-lbl">One Cikan Mac</div>
+                <a asp-controller="Matches" asp-action="Detail" asp-route-id="@featured.Id" class="feat-card">
+                    <div class="row align-items-center g-2">
+                        <div class="col-5">
+                            <div class="ft-team">
+                                <div class="ft-logo">
+                                    @if (!string.IsNullOrWhiteSpace(featured.HomeTeamLogoUrl))
+                                    {
+                                        <img src="@featured.HomeTeamLogoUrl" alt="@featured.HomeTeamName logo" />
+                                    }
+                                    else
+                                    {
+                                        <span>@homeInitials</span>
+                                    }
+                                </div>
+                                <div class="ft-name">@featured.HomeTeamName</div>
+                                <div class="ft-type">Ev Sahibi</div>
+                            </div>
                         </div>
-                        <div class="sbadge @(item.Status == FixtureStatus.Completed ? "sb-fin" : item.Status == FixtureStatus.Live ? "sb-live" : "sb-up")">
-                            @if (item.Status == FixtureStatus.Live)
-                            {
-                                <span class="live-dot"></span>
-                            }
-                            @(item.Status == FixtureStatus.Completed ? "MS" : item.Status == FixtureStatus.Live ? "CANLI" : item.KickoffUtc.ToLocalTime().ToString("dd MMM"))
+                        <div class="col-2 text-center">
+                            <div class="ft-sc-area">
+                                <div class="ft-sc">@featuredScore</div>
+                                <div class="ft-stat">@featuredStatus</div>
+                                <div class="ft-meta">@featured.KickoffUtc.ToLocalTime().ToString("dd MMM yyyy HH:mm")</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="home-teams">
-                        <div class="home-team-row">
-                            @if (!string.IsNullOrWhiteSpace(item.HomeTeamLogoUrl))
-                            {
-                                <img src="@item.HomeTeamLogoUrl" alt="@item.HomeTeamName logo" class="tl-sm" style="object-fit:contain;background:#fff;padding:3px" />
-                            }
-                            else
-                            {
-                                <div class="tl-sm">@homeInitials</div>
-                            }
-                            <span class="tn">@item.HomeTeamName</span>
-                        </div>
-                        <div class="home-team-row">
-                            @if (!string.IsNullOrWhiteSpace(item.AwayTeamLogoUrl))
-                            {
-                                <img src="@item.AwayTeamLogoUrl" alt="@item.AwayTeamName logo" class="tl-sm" style="object-fit:contain;background:#fff;padding:3px" />
-                            }
-                            else
-                            {
-                                <div class="tl-sm">@awayInitials</div>
-                            }
-                            <span class="tn">@item.AwayTeamName</span>
+                        <div class="col-5">
+                            <div class="ft-team">
+                                <div class="ft-logo">
+                                    @if (!string.IsNullOrWhiteSpace(featured.AwayTeamLogoUrl))
+                                    {
+                                        <img src="@featured.AwayTeamLogoUrl" alt="@featured.AwayTeamName logo" />
+                                    }
+                                    else
+                                    {
+                                        <span>@awayInitials</span>
+                                    }
+                                </div>
+                                <div class="ft-name">@featured.AwayTeamName</div>
+                                <div class="ft-type">Deplasman</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="home-score">
-                        <div class="home-score-value @(item.Status == FixtureStatus.NotStarted ? "dim" : homeWon ? "win" : string.Empty)">
-                            @(item.Status == FixtureStatus.NotStarted ? "-" : (item.HomeFullTimeScore ?? 0).ToString())
-                        </div>
-                        <div class="home-score-value @(item.Status == FixtureStatus.NotStarted ? "dim" : awayWon ? "win" : string.Empty)">
-                            @(item.Status == FixtureStatus.NotStarted ? "-" : (item.AwayFullTimeScore ?? 0).ToString())
-                        </div>
+                    <div class="text-center mt-3" style="font-size:12px;color:var(--t2)">
+                        <i class="bi bi-geo-alt"></i> @featured.VenueName
+                        &nbsp;·&nbsp;
+                        <span style="color:var(--blue)">Detaylari Gor</span>
                     </div>
-                    <div class="home-meta">
-                        <div>@item.VenueName</div>
-                        <div>Hafta @item.MatchWeek</div>
-                    </div>
-                    <span class="det-btn"><i class="bi bi-chevron-right"></i> <span>Detay</span></span>
                 </a>
             </div>
         }
+
+        <div class="sec-ttl home-section" data-section="live">Canli Maclar</div>
+        @if (Model.LiveFixtures.Count == 0)
+        {
+            <div class="empty-card home-section" data-section="live">Canli mac bulunmuyor.</div>
+        }
+        else
+        {
+            @foreach (var item in Model.LiveFixtures)
+            {
+                var homeInitials = item.HomeTeamName[..Math.Min(3, item.HomeTeamName.Length)].ToUpperInvariant();
+                var awayInitials = item.AwayTeamName[..Math.Min(3, item.AwayTeamName.Length)].ToUpperInvariant();
+                var homeWon = (item.HomeFullTimeScore ?? 0) > (item.AwayFullTimeScore ?? 0);
+                var awayWon = (item.AwayFullTimeScore ?? 0) > (item.HomeFullTimeScore ?? 0);
+
+                <div class="mc-wrap home-section" data-section="live">
+                    <a asp-controller="Matches" asp-action="Detail" asp-route-id="@item.Id" class="mc live">
+                        <div class="mc-time">
+                            <div class="mc-min lc">CANLI</div>
+                            <div class="sbadge sb-live"><span class="live-dot"></span>CANLI</div>
+                        </div>
+                        <div class="dvv"></div>
+                        <div class="mc-teams">
+                            <div class="mc-tr">
+                                @if (!string.IsNullOrWhiteSpace(item.HomeTeamLogoUrl))
+                                {
+                                    <img src="@item.HomeTeamLogoUrl" alt="@item.HomeTeamName logo" class="tl-sm" style="background:#fff;padding:3px" />
+                                }
+                                else
+                                {
+                                    <div class="tl-sm">@homeInitials</div>
+                                }
+                                <span class="tn">@item.HomeTeamName</span>
+                                <span class="ts @(homeWon ? "win" : string.Empty)">@item.HomeFullTimeScore</span>
+                            </div>
+                            <div class="mc-tr">
+                                @if (!string.IsNullOrWhiteSpace(item.AwayTeamLogoUrl))
+                                {
+                                    <img src="@item.AwayTeamLogoUrl" alt="@item.AwayTeamName logo" class="tl-sm" style="background:#fff;padding:3px" />
+                                }
+                                else
+                                {
+                                    <div class="tl-sm">@awayInitials</div>
+                                }
+                                <span class="tn">@item.AwayTeamName</span>
+                                <span class="ts @(awayWon ? "win" : string.Empty)">@item.AwayFullTimeScore</span>
+                            </div>
+                        </div>
+                        <span class="det-btn"><i class="bi bi-chevron-right"></i><span>Detay</span></span>
+                    </a>
+                </div>
+            }
+        }
+
+        <div class="sec-ttl home-section" data-section="finished">Tamamlanan Maclar</div>
+        @if (Model.LatestResults.Count == 0)
+        {
+            <div class="empty-card home-section" data-section="finished">Tamamlanmis mac bulunmuyor.</div>
+        }
+        else
+        {
+            @foreach (var item in Model.LatestResults)
+            {
+                var homeInitials = item.HomeTeamName[..Math.Min(3, item.HomeTeamName.Length)].ToUpperInvariant();
+                var awayInitials = item.AwayTeamName[..Math.Min(3, item.AwayTeamName.Length)].ToUpperInvariant();
+                var homeWon = (item.HomeFullTimeScore ?? 0) > (item.AwayFullTimeScore ?? 0);
+                var awayWon = (item.AwayFullTimeScore ?? 0) > (item.HomeFullTimeScore ?? 0);
+
+                <div class="mc-wrap home-section" data-section="finished">
+                    <a asp-controller="Matches" asp-action="Detail" asp-route-id="@item.Id" class="mc">
+                        <div class="mc-time">
+                            <div class="mc-min">@item.KickoffUtc.ToLocalTime().ToString("HH:mm")</div>
+                            <div class="sbadge sb-fin">MS</div>
+                        </div>
+                        <div class="dvv"></div>
+                        <div class="mc-teams">
+                            <div class="mc-tr">
+                                @if (!string.IsNullOrWhiteSpace(item.HomeTeamLogoUrl))
+                                {
+                                    <img src="@item.HomeTeamLogoUrl" alt="@item.HomeTeamName logo" class="tl-sm" style="background:#fff;padding:3px" />
+                                }
+                                else
+                                {
+                                    <div class="tl-sm">@homeInitials</div>
+                                }
+                                <span class="tn">@item.HomeTeamName</span>
+                                <span class="ts @(homeWon ? "win" : string.Empty)">@item.HomeFullTimeScore</span>
+                            </div>
+                            <div class="mc-tr">
+                                @if (!string.IsNullOrWhiteSpace(item.AwayTeamLogoUrl))
+                                {
+                                    <img src="@item.AwayTeamLogoUrl" alt="@item.AwayTeamName logo" class="tl-sm" style="background:#fff;padding:3px" />
+                                }
+                                else
+                                {
+                                    <div class="tl-sm">@awayInitials</div>
+                                }
+                                <span class="tn">@item.AwayTeamName</span>
+                                <span class="ts @(awayWon ? "win" : string.Empty)">@item.AwayFullTimeScore</span>
+                            </div>
+                        </div>
+                        <span class="det-btn"><i class="bi bi-chevron-right"></i><span>Detay</span></span>
+                    </a>
+                </div>
+            }
+        }
+
+        <div class="sec-ttl home-section" data-section="upcoming">Yaklasan Maclar</div>
+        @if (Model.UpcomingFixtures.Count == 0)
+        {
+            <div class="empty-card home-section" data-section="upcoming">Yaklasan mac bulunmuyor.</div>
+        }
+        else
+        {
+            @foreach (var item in Model.UpcomingFixtures)
+            {
+                var homeInitials = item.HomeTeamName[..Math.Min(3, item.HomeTeamName.Length)].ToUpperInvariant();
+                var awayInitials = item.AwayTeamName[..Math.Min(3, item.AwayTeamName.Length)].ToUpperInvariant();
+
+                <div class="mc-wrap home-section" data-section="upcoming">
+                    <a asp-controller="Matches" asp-action="Detail" asp-route-id="@item.Id" class="mc">
+                        <div class="mc-time">
+                            <div class="mc-min bc">@item.KickoffUtc.ToLocalTime().ToString("HH:mm")</div>
+                            <div class="sbadge sb-up">@item.KickoffUtc.ToLocalTime().ToString("dd MMM")</div>
+                        </div>
+                        <div class="dvv"></div>
+                        <div class="mc-teams">
+                            <div class="mc-tr">
+                                @if (!string.IsNullOrWhiteSpace(item.HomeTeamLogoUrl))
+                                {
+                                    <img src="@item.HomeTeamLogoUrl" alt="@item.HomeTeamName logo" class="tl-sm" style="background:#fff;padding:3px" />
+                                }
+                                else
+                                {
+                                    <div class="tl-sm">@homeInitials</div>
+                                }
+                                <span class="tn">@item.HomeTeamName</span>
+                                <span class="ts dim">-</span>
+                            </div>
+                            <div class="mc-tr">
+                                @if (!string.IsNullOrWhiteSpace(item.AwayTeamLogoUrl))
+                                {
+                                    <img src="@item.AwayTeamLogoUrl" alt="@item.AwayTeamName logo" class="tl-sm" style="background:#fff;padding:3px" />
+                                }
+                                else
+                                {
+                                    <div class="tl-sm">@awayInitials</div>
+                                }
+                                <span class="tn">@item.AwayTeamName</span>
+                                <span class="ts dim">-</span>
+                            </div>
+                        </div>
+                        <span class="det-btn"><i class="bi bi-chevron-right"></i><span>Detay</span></span>
+                    </a>
+                </div>
+            }
+        }
     </div>
 </main>
+
+@section Scripts {
+    <script>
+        const tabs = document.querySelectorAll("[data-filter]");
+        const sections = document.querySelectorAll(".home-section");
+        const featured = document.getElementById("featuredBlock");
+
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(item => item.classList.remove("active"));
+                tab.classList.add("active");
+
+                const filter = tab.dataset.filter;
+
+                sections.forEach(section => {
+                    section.style.display = filter === "all" || section.dataset.section === filter
+                        ? ""
+                        : "none";
+                });
+
+                if (featured) {
+                    featured.style.display = filter === "all" ? "" : "none";
+                }
+            });
+        });
+    </script>
+}

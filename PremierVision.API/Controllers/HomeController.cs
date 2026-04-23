@@ -41,6 +41,17 @@ public class HomeController(AppDbContext context, IStandingsService standingsSer
             .Select(x => x.ToFixtureCardDto())
             .ToList();
 
+        var liveFixtures = (await context.Fixtures
+            .AsNoTracking()
+            .Include(x => x.HomeTeam)
+            .Include(x => x.AwayTeam)
+            .Where(x => x.Status == FixtureStatus.Live)
+            .OrderBy(x => x.KickoffUtc)
+            .Take(5)
+            .ToListAsync(cancellationToken))
+            .Select(x => x.ToFixtureCardDto())
+            .ToList();
+
         var latestResults = (await context.Fixtures
             .AsNoTracking()
             .Include(x => x.HomeTeam)
@@ -56,7 +67,7 @@ public class HomeController(AppDbContext context, IStandingsService standingsSer
             .AsNoTracking()
             .Include(x => x.HomeTeam)
             .Include(x => x.AwayTeam)
-            .Where(x => x.Status != FixtureStatus.Completed)
+            .Where(x => x.Status == FixtureStatus.NotStarted)
             .OrderBy(x => x.KickoffUtc)
             .Take(5)
             .ToListAsync(cancellationToken))
@@ -69,11 +80,13 @@ public class HomeController(AppDbContext context, IStandingsService standingsSer
         {
             CurrentWeek = selectedWeek,
             AvailableWeeks = availableWeeks,
-            FeaturedMatch = weeklyFixtures
-                .Where(x => x.Status == FixtureStatus.Completed)
-                .OrderByDescending(x => (x.HomeFullTimeScore ?? 0) + (x.AwayFullTimeScore ?? 0))
-                .ThenByDescending(x => x.KickoffUtc)
-                .FirstOrDefault() ?? weeklyFixtures.FirstOrDefault(),
+            FeaturedMatch = liveFixtures
+                .OrderByDescending(x => x.KickoffUtc)
+                .FirstOrDefault()
+                ?? latestResults.FirstOrDefault()
+                ?? upcomingFixtures.FirstOrDefault()
+                ?? weeklyFixtures.FirstOrDefault(),
+            LiveFixtures = liveFixtures,
             WeeklyFixtures = weeklyFixtures,
             LatestResults = latestResults,
             UpcomingFixtures = upcomingFixtures,

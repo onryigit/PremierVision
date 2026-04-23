@@ -22,6 +22,8 @@
     var fullTimeDisplay = fixture.HomeFullTimeScore.HasValue && fixture.AwayFullTimeScore.HasValue
         ? $"{fixture.HomeFullTimeScore} - {fixture.AwayFullTimeScore}"
         : "-";
+    var isNotStarted = fixture.Status == FixtureStatus.NotStarted;
+    var isLive = fixture.Status == FixtureStatus.Live;
 
     var homeFirstHalf = fixture.HomeHalfTimeScore ?? 0;
     var awayFirstHalf = fixture.AwayHalfTimeScore ?? 0;
@@ -627,7 +629,13 @@
                     <div class="dc-title"><i class="bi bi-activity me-2" style="color:var(--green)"></i>Maç Olayları</div>
                     @if (Model.Events.Count == 0)
                     {
-                        <p style="color:var(--t2)">Bu maça ait olay girişi yok.</p>
+                        <p style="color:var(--t2)">
+                            @(isNotStarted
+                                ? "Mac henuz baslamadi. Asagidaki veriler mac on izlemesi icin hazirlandi."
+                                : isLive
+                                    ? "Bu canli maca ait olay akisi henuz girilmedi."
+                                    : "Bu maca ait olay girisi yok.")
+                        </p>
                     }
                     else
                     {
@@ -700,7 +708,7 @@
                             <div class="box2-title">⚽ @fixture.HomeTeamName</div>
                             @if (homeGoals.Count == 0)
                             {
-                                <div class="gl"><div class="gl-pl">Gol yok</div></div>
+                                <div class="gl"><div class="gl-pl">@(isNotStarted ? "Mac henuz baslamadi" : "Gol yok")</div></div>
                             }
                             else
                             {
@@ -714,7 +722,7 @@
                             <div class="box2-title">⚽ @fixture.AwayTeamName</div>
                             @if (awayGoals.Count == 0)
                             {
-                                <div class="gl"><div class="gl-pl">Gol yok</div></div>
+                                <div class="gl"><div class="gl-pl">@(isNotStarted ? "Mac henuz baslamadi" : "Gol yok")</div></div>
                             }
                             else
                             {
@@ -734,7 +742,7 @@
                             <div class="box2-title">@fixture.HomeTeamName</div>
                             @if (homeCards.Count == 0)
                             {
-                                <div class="gl"><div class="gl-pl">Kart yok</div></div>
+                                <div class="gl"><div class="gl-pl">@(isNotStarted ? "Mac henuz baslamadi" : "Kart yok")</div></div>
                             }
                             else
                             {
@@ -752,7 +760,7 @@
                             <div class="box2-title">@fixture.AwayTeamName</div>
                             @if (awayCards.Count == 0)
                             {
-                                <div class="gl"><div class="gl-pl">Kart yok</div></div>
+                                <div class="gl"><div class="gl-pl">@(isNotStarted ? "Mac henuz baslamadi" : "Kart yok")</div></div>
                             }
                             else
                             {
@@ -774,7 +782,7 @@
                     <div class="sub-lbl">@fixture.HomeTeamName</div>
                     @if (homeSubs.Count == 0)
                     {
-                        <div class="sub-r"><div class="sub-out">Değişiklik yok</div></div>
+                        <div class="sub-r"><div class="sub-out">@(isNotStarted ? "Mac henuz baslamadi" : "Degisiklik yok")</div></div>
                     }
                     else
                     {
@@ -792,7 +800,7 @@
                     <div class="sub-lbl">@fixture.AwayTeamName</div>
                     @if (awaySubs.Count == 0)
                     {
-                        <div class="sub-r"><div class="sub-out">Değişiklik yok</div></div>
+                        <div class="sub-r"><div class="sub-out">@(isNotStarted ? "Mac henuz baslamadi" : "Degisiklik yok")</div></div>
                     }
                     else
                     {
@@ -823,7 +831,11 @@
                     <div class="dc-title"><i class="bi bi-graph-up me-2" style="color:var(--green)"></i>İstatistikler</div>
                     @if (Model.Statistics.Count == 0)
                     {
-                        <p style="color:var(--t2)">Bu maça ait istatistik girişi yok.</p>
+                        <p style="color:var(--t2)">
+                            @(isNotStarted
+                                ? "Mac oncesi karsilastirma istatistikleri henuz eklenmedi."
+                                : "Bu maca ait istatistik girisi yok.")
+                        </p>
                     }
                     else
                     {

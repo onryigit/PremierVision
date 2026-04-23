@@ -51,6 +51,15 @@ public class AdminController(IPremierVisionApiClient apiClient) : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EnsureDemoScenario(CancellationToken cancellationToken)
+    {
+        await apiClient.EnsureDemoScenarioAsync(cancellationToken);
+        TempData["AdminMessage"] = "Demo canli ve gelecek mac senaryosu olusturuldu.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddFixture(CreateFixtureInputModel input, CancellationToken cancellationToken)
     {
         if (input.HomeTeamId == input.AwayTeamId)

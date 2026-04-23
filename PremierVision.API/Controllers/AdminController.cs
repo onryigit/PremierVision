@@ -11,7 +11,8 @@ namespace PremierVision.API.Controllers;
 [Route("api/admin")]
 public class AdminController(
     AppDbContext context,
-    IApiFootballImportService apiFootballImportService) : ControllerBase
+    IApiFootballImportService apiFootballImportService,
+    IDemoFixtureScenarioService demoFixtureScenarioService) : ControllerBase
 {
     [HttpGet("options")]
     public async Task<ActionResult<AdminPanelDto>> GetOptions(CancellationToken cancellationToken)
@@ -64,6 +65,13 @@ public class AdminController(
     {
         var count = await apiFootballImportService.ImportLiveFixturesAsync(cancellationToken);
         return Ok(new { count });
+    }
+
+    [HttpPost("demo-scenario")]
+    public async Task<ActionResult> EnsureDemoScenario(CancellationToken cancellationToken)
+    {
+        var summary = await demoFixtureScenarioService.EnsureScenarioAsync(cancellationToken);
+        return Ok(summary);
     }
 
     [HttpPost("fixtures")]
