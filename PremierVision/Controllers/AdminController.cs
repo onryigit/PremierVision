@@ -1,13 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PremierVision.Data;
-using PremierVision.Models;
 using PremierVision.Models.ViewModels.Admin;
 using PremierVision.Services;
 
 namespace PremierVision.Controllers;
 
-public class AdminController(AppDbContext context, IApiFootballSyncService apiFootballSyncService) : Controller
+public class AdminController(IPremierVisionApiClient apiClient) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
@@ -20,9 +17,36 @@ public class AdminController(AppDbContext context, IApiFootballSyncService apiFo
         {
             return View(new AdminPanelViewModel
             {
-                ErrorMessage = $"Admin paneli yüklenirken veritabanı bağlantısı kurulamadı: {exception.Message}"
+                ErrorMessage = $"Admin paneli yuklenirken API baglantisi kurulamadi: {exception.Message}"
             });
         }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ImportTeams(CancellationToken cancellationToken)
+    {
+        await apiClient.ImportTeamsAsync(cancellationToken);
+        TempData["AdminMessage"] = "Takimlar import edildi.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ImportFixtures(CancellationToken cancellationToken)
+    {
+        await apiClient.ImportFixturesAsync(cancellationToken);
+        TempData["AdminMessage"] = "Fikstur import edildi.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ImportLive(CancellationToken cancellationToken)
+    {
+        await apiClient.ImportLiveFixturesAsync(cancellationToken);
+        TempData["AdminMessage"] = "Canli maclar guncellendi.";
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
@@ -31,7 +55,7 @@ public class AdminController(AppDbContext context, IApiFootballSyncService apiFo
     {
         if (input.HomeTeamId == input.AwayTeamId)
         {
-            ModelState.AddModelError(nameof(input.AwayTeamId), "Aynı takım iki kez seçilemez.");
+            ModelState.AddModelError(nameof(input.AwayTeamId), "Ayni takim iki kez secilemez.");
         }
 
         if (!ModelState.IsValid)
@@ -39,23 +63,9 @@ public class AdminController(AppDbContext context, IApiFootballSyncService apiFo
             return View("Index", await BuildViewModelAsyncSafe(cancellationToken, fixture: input));
         }
 
-        context.Fixtures.Add(new Fixture
-        {
-            MatchWeek = input.MatchWeek,
-            HomeTeamId = input.HomeTeamId,
-            AwayTeamId = input.AwayTeamId,
-            KickoffUtc = DateTime.SpecifyKind(input.KickoffUtc, DateTimeKind.Utc),
-            VenueName = input.VenueName,
-            ImageUrl = input.ImageUrl,
-            Status = input.Status,
-            HomeHalfTimeScore = input.HomeHalfTimeScore,
-            AwayHalfTimeScore = input.AwayHalfTimeScore,
-            HomeFullTimeScore = input.HomeFullTimeScore,
-            AwayFullTimeScore = input.AwayFullTimeScore
-        });
+        await apiClient.AddFixtureAsync(input, cancellationToken);
 
-        await context.SaveChangesAsync(cancellationToken);
-        TempData["AdminMessage"] = "Maç eklendi.";
+        TempData["AdminMessage"] = "Mac eklendi.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -68,18 +78,9 @@ public class AdminController(AppDbContext context, IApiFootballSyncService apiFo
             return View("Index", await BuildViewModelAsyncSafe(cancellationToken, @event: input));
         }
 
-        context.MatchEvents.Add(new MatchEvent
-        {
-            FixtureId = input.FixtureId,
-            TeamId = input.TeamId,
-            Minute = input.Minute,
-            PlayerName = input.PlayerName,
-            EventType = input.EventType,
-            Description = input.Description
-        });
+        await apiClient.AddEventAsync(input, cancellationToken);
 
-        await context.SaveChangesAsync(cancellationToken);
-        TempData["AdminMessage"] = "Maç olayı eklendi.";
+        TempData["AdminMessage"] = "Mac olayi eklendi.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -92,96 +93,9 @@ public class AdminController(AppDbContext context, IApiFootballSyncService apiFo
             return View("Index", await BuildViewModelAsyncSafe(cancellationToken, statistic: input));
         }
 
-        context.MatchStatistics.Add(new MatchStatistic
-        {
-            FixtureId = input.FixtureId,
-            TeamId = input.TeamId,
-            Name = input.Name,
-            Value = input.Value
-        });
+        await apiClient.AddStatisticAsync(input, cancellationToken);
 
-        await context.SaveChangesAsync(cancellationToken);
-        TempData["AdminMessage"] = "Maç istatistiği eklendi.";
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SyncTeams(CancellationToken cancellationToken)
-    {
-        try
-        {
-            var count = await apiFootballSyncService.SyncTeamsAsync(cancellationToken);
-            TempData["AdminMessage"] = $"{count} takım senkronize edildi.";
-        }
-        catch (Exception exception)
-        {
-            TempData["AdminMessage"] = $"Takım senkronizasyonu başarısız: {exception.Message}";
-        }
-
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SyncFixtures(CancellationToken cancellationToken)
-    {
-        try
-        {
-            var count = await apiFootballSyncService.SyncFixturesAsync(cancellationToken);
-            TempData["AdminMessage"] = $"{count} fikstür senkronize edildi.";
-        }
-        catch (Exception exception)
-        {
-            TempData["AdminMessage"] = $"Fikstür senkronizasyonu başarısız: {exception.Message}";
-        }
-
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SyncMatchDetails(CancellationToken cancellationToken)
-    {
-        try
-        {
-            var fixtures = await context.Fixtures
-                .AsNoTracking()
-                .Where(x => x.ApiFootballFixtureId.HasValue && x.Status != FixtureStatus.NotStarted)
-                .Where(x => !context.MatchEvents.Any(e => e.FixtureId == x.Id) && !context.MatchStatistics.Any(s => s.FixtureId == x.Id))
-                .OrderByDescending(x => x.KickoffUtc)
-                .Take(5)
-                .Select(x => x.Id)
-                .ToListAsync(cancellationToken);
-
-            var syncedCount = 0;
-            foreach (var fixtureId in fixtures)
-            {
-                try
-                {
-                    if (await apiFootballSyncService.SyncFixtureDetailsAsync(fixtureId, cancellationToken))
-                    {
-                        syncedCount++;
-                    }
-                }
-                catch (HttpRequestException exception) when ((int?)exception.StatusCode == 429)
-                {
-                    TempData["AdminMessage"] = syncedCount > 0
-                        ? $"{syncedCount} maç detayı senkronize edildi. API limiti nedeniyle işlem erken durduruldu."
-                        : "API limiti aşıldı. Biraz bekleyip tekrar deneyin.";
-                    return RedirectToAction(nameof(Index));
-                }
-            }
-
-            TempData["AdminMessage"] = fixtures.Count == 0
-                ? "Detayı eksik uygun maç bulunamadı."
-                : $"{syncedCount} maç detayı senkronize edildi.";
-        }
-        catch (Exception exception)
-        {
-            TempData["AdminMessage"] = $"Maç detay senkronizasyonu başarısız: {exception.Message}";
-        }
-
+        TempData["AdminMessage"] = "Mac istatistigi eklendi.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -191,35 +105,15 @@ public class AdminController(AppDbContext context, IApiFootballSyncService apiFo
         CreateMatchEventInputModel? @event = null,
         CreateMatchStatisticInputModel? statistic = null)
     {
-        var teams = await context.Teams
-            .AsNoTracking()
-            .OrderBy(x => x.Name)
-            .Select(x => new SimpleOptionViewModel
-            {
-                Value = x.Id,
-                Label = x.Name
-            })
-            .ToListAsync(cancellationToken);
-
-        var fixtures = await context.Fixtures
-            .AsNoTracking()
-            .Include(x => x.HomeTeam)
-            .Include(x => x.AwayTeam)
-            .OrderByDescending(x => x.KickoffUtc)
-            .Select(x => new SimpleOptionViewModel
-            {
-                Value = x.Id,
-                Label = $"Hafta {x.MatchWeek} - {x.HomeTeam.Name} - {x.AwayTeam.Name}"
-            })
-            .ToListAsync(cancellationToken);
+        var options = await apiClient.GetAdminOptionsAsync(cancellationToken);
 
         return new AdminPanelViewModel
         {
             Fixture = fixture ?? new CreateFixtureInputModel(),
             Event = @event ?? new CreateMatchEventInputModel(),
             Statistic = statistic ?? new CreateMatchStatisticInputModel(),
-            Teams = teams,
-            Fixtures = fixtures
+            Teams = options.Teams,
+            Fixtures = options.Fixtures
         };
     }
 
@@ -237,7 +131,7 @@ public class AdminController(AppDbContext context, IApiFootballSyncService apiFo
         {
             return new AdminPanelViewModel
             {
-                ErrorMessage = $"Veritabanı bağlantısı kurulamadı: {exception.Message}",
+                ErrorMessage = $"API baglantisi kurulamadi: {exception.Message}",
                 Fixture = fixture ?? new CreateFixtureInputModel(),
                 Event = @event ?? new CreateMatchEventInputModel(),
                 Statistic = statistic ?? new CreateMatchStatisticInputModel()

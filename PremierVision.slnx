@@ -1,3 +1,4 @@
 <Solution>
-  <Project Path="PremierVision/PremierVision.csproj" />
+  <Project Path="PremierVision.API/PremierVision.API.csproj" />
+  <Project Path="PremierVision/PremierVision.UI.csproj" />
 </Solution>

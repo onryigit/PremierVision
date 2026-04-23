@@ -6,7 +6,6 @@ namespace PremierVision.Data;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Team> Teams => Set<Team>();
-    public DbSet<Player> Players => Set<Player>();
     public DbSet<Fixture> Fixtures => Set<Fixture>();
     public DbSet<MatchEvent> MatchEvents => Set<MatchEvent>();
     public DbSet<MatchStatistic> MatchStatistics => Set<MatchStatistic>();
@@ -26,23 +25,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasIndex(x => x.ApiFootballTeamId).IsUnique();
         });
 
-        modelBuilder.Entity<Player>(entity =>
-        {
-            entity.Property(x => x.FullName).HasMaxLength(120);
-            entity.Property(x => x.Position).HasMaxLength(50);
-            entity.Property(x => x.PhotoUrl).HasMaxLength(500);
-            entity.HasOne(x => x.Team)
-                .WithMany(x => x.Players)
-                .HasForeignKey(x => x.TeamId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
-
         modelBuilder.Entity<Fixture>(entity =>
         {
             entity.Property(x => x.VenueName).HasMaxLength(150);
             entity.Property(x => x.ImageUrl).HasMaxLength(500);
             entity.HasIndex(x => x.ApiFootballFixtureId).IsUnique();
-
             entity.HasOne(x => x.HomeTeam)
                 .WithMany(x => x.HomeFixtures)
                 .HasForeignKey(x => x.HomeTeamId)

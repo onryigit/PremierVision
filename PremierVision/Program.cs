@@ -1,38 +1,29 @@
-using Microsoft.EntityFrameworkCore;
-using PremierVision.Data;
 using PremierVision.Options;
 using PremierVision.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<IStandingsService, StandingsService>();
-builder.Services.AddHttpClient<IApiFootballSyncService, ApiFootballSyncService>((serviceProvider, client) =>
+builder.Services.Configure<PremierVisionApiOptions>(
+    builder.Configuration.GetSection(PremierVisionApiOptions.SectionName));
+builder.Services.AddHttpClient<IPremierVisionApiClient, PremierVisionApiClient>((serviceProvider, client) =>
 {
     var apiOptions = serviceProvider
-        .GetRequiredService<Microsoft.Extensions.Options.IOptions<ApiFootballOptions>>()
+        .GetRequiredService<Microsoft.Extensions.Options.IOptions<PremierVisionApiOptions>>()
         .Value;
     client.BaseAddress = new Uri(apiOptions.BaseUrl.TrimEnd('/') + "/");
 });
-builder.Services.Configure<ApiFootballOptions>(
-    builder.Configuration.GetSection(ApiFootballOptions.SectionName));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -60,19 +51,5 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-using (var scope = app.Services.CreateScope())
-{
-    try
-    {
-        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await SeedData.EnsureSeededAsync(dbContext);
-    }
-    catch (Exception exception)
-    {
-        Console.WriteLine($"Database initialization skipped: {exception.Message}");
-    }
-}
-
 
 app.Run();

@@ -4,14 +4,13 @@ using PremierVision.Services;
 
 namespace PremierVision.Controllers;
 
-public class StandingsController(IStandingsService standingsService) : Controller
+public class StandingsController(IPremierVisionApiClient apiClient) : Controller
 {
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        var rows = await standingsService.CalculateAsync(cancellationToken);
         return View(new StandingsPageViewModel
         {
-            Rows = rows 
+            Rows = await apiClient.GetStandingsAsync(cancellationToken)
         });
     }
 }

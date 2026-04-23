@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
+using PremierVision.Contracts;
 using PremierVision.Data;
 using PremierVision.Models;
-using PremierVision.Models.ViewModels;
 
 namespace PremierVision.Services;
 
 public class StandingsService(AppDbContext context) : IStandingsService
 {
-    public async Task<IReadOnlyList<StandingRowViewModel>> CalculateAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<StandingRowDto>> CalculateAsync(CancellationToken cancellationToken = default)
     {
         var teams = await context.Teams
             .AsNoTracking()
@@ -59,7 +59,7 @@ public class StandingsService(AppDbContext context) : IStandingsService
                 }
             }
 
-            return new StandingRowViewModel
+            return new StandingRowDto
             {
                 TeamId = team.Id,
                 TeamName = team.Name,
@@ -82,7 +82,7 @@ public class StandingsService(AppDbContext context) : IStandingsService
         .ToList();
 
         return rows
-            .Select((row, index) => new StandingRowViewModel
+            .Select((row, index) => new StandingRowDto
             {
                 Position = index + 1,
                 TeamId = row.TeamId,
