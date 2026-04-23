@@ -8,10 +8,18 @@
     var homeInitials = fixture.HomeTeamName[..Math.Min(3, fixture.HomeTeamName.Length)].ToUpperInvariant();
     var awayInitials = fixture.AwayTeamName[..Math.Min(3, fixture.AwayTeamName.Length)].ToUpperInvariant();
 
-    var goalEvents = Model.Events.Where(x => x.EventType == MatchEventType.Goal).OrderBy(x => x.Minute).ToList();
-    var yellowCards = Model.Events.Where(x => x.EventType == MatchEventType.YellowCard).OrderBy(x => x.Minute).ToList();
-    var redCards = Model.Events.Where(x => x.EventType == MatchEventType.RedCard).OrderBy(x => x.Minute).ToList();
-    var substitutions = Model.Events.Where(x => x.EventType == MatchEventType.Substitution).OrderBy(x => x.Minute).ToList();
+    var isNotStarted = fixture.Status == FixtureStatus.NotStarted;
+    var isLive = fixture.Status == FixtureStatus.Live;
+    var timelineEvents = isNotStarted
+        ? new List<MatchEventItemViewModel>()
+        : Model.Events.OrderBy(x => x.Minute).ToList();
+    var statistics = isNotStarted
+        ? new List<MatchStatisticItemViewModel>()
+        : Model.Statistics.ToList();
+    var goalEvents = timelineEvents.Where(x => x.EventType == MatchEventType.Goal).ToList();
+    var yellowCards = timelineEvents.Where(x => x.EventType == MatchEventType.YellowCard).ToList();
+    var redCards = timelineEvents.Where(x => x.EventType == MatchEventType.RedCard).ToList();
+    var substitutions = timelineEvents.Where(x => x.EventType == MatchEventType.Substitution).ToList();
 
     var homeGoals = goalEvents.Where(x => x.TeamName == fixture.HomeTeamName).ToList();
     var awayGoals = goalEvents.Where(x => x.TeamName == fixture.AwayTeamName).ToList();
@@ -22,9 +30,6 @@
     var fullTimeDisplay = fixture.HomeFullTimeScore.HasValue && fixture.AwayFullTimeScore.HasValue
         ? $"{fixture.HomeFullTimeScore} - {fixture.AwayFullTimeScore}"
         : "-";
-    var isNotStarted = fixture.Status == FixtureStatus.NotStarted;
-    var isLive = fixture.Status == FixtureStatus.Live;
-
     var homeFirstHalf = fixture.HomeHalfTimeScore ?? 0;
     var awayFirstHalf = fixture.AwayHalfTimeScore ?? 0;
     var homeFullTime = fixture.HomeFullTimeScore ?? 0;
@@ -65,11 +70,12 @@
 @section Styles {
     <style>
         .hero {
-            background: linear-gradient(180deg, #0b1830 0%, var(--bg) 100%);
+            background: linear-gradient(180deg, rgba(11,24,48,.72) 0%, rgba(13,10,24,.92) 100%);
             border-bottom: 1px solid var(--border);
             padding: 36px 0 28px;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(3px);
         }
 
         .hero::before {
@@ -627,11 +633,11 @@
             <div class="col-lg-7">
                 <div class="dc">
                     <div class="dc-title"><i class="bi bi-activity me-2" style="color:var(--green)"></i>Maç Olayları</div>
-                    @if (Model.Events.Count == 0)
+                    @if (timelineEvents.Count == 0)
                     {
                         <p style="color:var(--t2)">
                             @(isNotStarted
-                                ? "Mac henuz baslamadi. Asagidaki veriler mac on izlemesi icin hazirlandi."
+                                ? "Mac henuz baslamadi. Olay akisi, goller ve kartlar mac basladiginda olusacak."
                                 : isLive
                                     ? "Bu canli maca ait olay akisi henuz girilmedi."
                                     : "Bu maca ait olay girisi yok.")
@@ -641,7 +647,7 @@
                     {
                         <div class="tl-wrap">
                             <div class="tl-line"></div>
-                            @foreach (var item in Model.Events.OrderBy(x => x.Minute))
+                            @foreach (var item in timelineEvents)
                             {
                                 var isHome = item.TeamName == fixture.HomeTeamName;
                                 var chipClass = item.EventType switch
@@ -833,13 +839,13 @@
                     {
                         <p style="color:var(--t2)">
                             @(isNotStarted
-                                ? "Mac oncesi karsilastirma istatistikleri henuz eklenmedi."
+                                ? "Mac henuz baslamadigi icin istatistik bulunmuyor."
                                 : "Bu maca ait istatistik girisi yok.")
                         </p>
                     }
                     else
                     {
-                        @foreach (var group in Model.Statistics.GroupBy(x => x.Name))
+                        @foreach (var group in statistics.GroupBy(x => x.Name))
                         {
                             var homeValue = group.FirstOrDefault(x => x.TeamName == fixture.HomeTeamName)?.Value ?? "-";
                             var awayValue = group.FirstOrDefault(x => x.TeamName == fixture.AwayTeamName)?.Value ?? "-";

@@ -94,12 +94,13 @@ public class DemoFixtureScenarioService(AppDbContext context) : IDemoFixtureScen
 
     private void AddStatistics(int fixtureId, FixturePlan plan)
     {
-        string[] homeValues = plan.Status == FixtureStatus.NotStarted
-            ? ["52%", "15", "6", "5", "2", "10", "1", "86%", "1.74"]
-            : ["54%", "13", "5", "6", "1", "9", "2", "87%", "1.58"];
-        string[] awayValues = plan.Status == FixtureStatus.NotStarted
-            ? ["48%", "12", "4", "4", "1", "12", "2", "83%", "1.21"]
-            : ["46%", "10", "4", "3", "2", "11", "1", "82%", "1.11"];
+        if (plan.Status == FixtureStatus.NotStarted)
+        {
+            return;
+        }
+
+        string[] homeValues = ["54%", "13", "5", "6", "1", "9", "2", "87%", "1.58"];
+        string[] awayValues = ["46%", "10", "4", "3", "2", "11", "1", "82%", "1.11"];
 
         for (var i = 0; i < DefaultStatisticNames.Length; i++)
         {

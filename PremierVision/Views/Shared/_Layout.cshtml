@@ -1,5 +1,6 @@
 @{
     var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+    var hasBackdrop = !string.Equals(controller, "Admin", StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="tr">
@@ -48,9 +49,26 @@
             background: var(--bg);
             color: var(--t1);
             min-height: 100vh;
+            position: relative;
+            isolation: isolate;
             background-image:
                 radial-gradient(ellipse at 15% 0%, rgba(108,92,231,.14) 0%, transparent 55%),
                 radial-gradient(ellipse at 85% 0%, rgba(155,89,182,.1) 0%, transparent 50%);
+        }
+        body.with-backdrop::before {
+            content: "";
+            position: absolute;
+            top: 86px;
+            left: 0;
+            right: 0;
+            height: min(58vh, 680px);
+            min-height: 460px;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                linear-gradient(180deg, rgba(6,10,18,.08) 0%, rgba(6,10,18,.34) 42%, rgba(13,10,24,.92) 100%),
+                url('/dosyalar/background.jpeg') center 18% / cover no-repeat;
+            opacity: .92;
         }
         a { color: inherit; text-decoration: none; }
         img { display: block; }
@@ -80,8 +98,8 @@
             padding: 14px 0;
         }
         .brand-logo {
-            width: 52px;
-            height: 36px;
+            width: 112px;
+            height: 74px;
             object-fit: contain;
             object-position: center;
             display: block;
@@ -153,11 +171,12 @@
         .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 
         .lg-head {
-            background: linear-gradient(135deg, var(--bg2), var(--card));
-            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, rgba(20,15,36,.76), rgba(26,22,48,.54));
+            border-bottom: 1px solid rgba(49,40,91,.22);
             padding: 32px 0 24px;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(3px);
         }
         .lg-head::before {
             content: "";
@@ -215,11 +234,13 @@
             margin-top: 3px;
         }
         .ftabs-wrap {
-            background: var(--bg2);
-            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, rgba(20,15,36,.66), rgba(26,22,48,.44));
+            border-top: 1px solid rgba(255,255,255,.03);
+            border-bottom: 1px solid rgba(49,40,91,.18);
             position: sticky;
             top: 62px;
             z-index: 99;
+            backdrop-filter: blur(12px);
         }
         .ftabs { display: flex; overflow-x: auto; scrollbar-width: none; }
         .ftabs::-webkit-scrollbar { display: none; }
@@ -460,6 +481,7 @@
             text-align: right;
             flex-shrink: 0;
         }
+        .ts.win { color: var(--green); }
         .ts.dim { font-size: 15px; color: var(--t3); }
         .det-btn {
             flex-shrink: 0;
@@ -532,7 +554,13 @@
         }
 
         @@media (max-width: 600px) {
-            .brand-logo { width: 46px; height: 32px; }
+            body.with-backdrop::before {
+                top: 74px;
+                height: 48vh;
+                min-height: 320px;
+                background-position: center 24%;
+            }
+            .brand-logo { width: 90px; height: 60px; }
             .tn { font-size: 13px; }
             .ts { font-size: 18px; }
             .mc-time { width: 60px; }
@@ -548,7 +576,7 @@
     </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
+<body class="@(hasBackdrop ? "with-backdrop" : string.Empty)">
     <nav class="nb">
         <div class="nb-inner">
             <a asp-controller="Home" asp-action="Index" class="brand">

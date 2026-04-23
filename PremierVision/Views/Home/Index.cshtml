@@ -8,6 +8,12 @@
     var upcomingCount = Model.UpcomingFixtures.Count;
     var totalCount = liveCount + finishedCount + upcomingCount;
     var featured = Model.FeaturedMatch;
+
+    static int GetLiveMinute(DateTime kickoffUtc)
+    {
+        var elapsedMinutes = (int)Math.Floor((DateTime.UtcNow - kickoffUtc).TotalMinutes);
+        return Math.Clamp(elapsedMinutes > 0 ? elapsedMinutes : 1, 1, 90);
+    }
 }
 
 @section Styles {
@@ -92,7 +98,7 @@
             var featuredStatus = featured.Status == FixtureStatus.Completed
                 ? "Mac Bitti"
                 : featured.Status == FixtureStatus.Live
-                    ? "Canli"
+                    ? $"Canli • {GetLiveMinute(featured.KickoffUtc)}'"
                     : "Yaklasan Mac";
 
             <div class="feat-wrap" id="featuredBlock">
@@ -161,11 +167,12 @@
                 var awayInitials = item.AwayTeamName[..Math.Min(3, item.AwayTeamName.Length)].ToUpperInvariant();
                 var homeWon = (item.HomeFullTimeScore ?? 0) > (item.AwayFullTimeScore ?? 0);
                 var awayWon = (item.AwayFullTimeScore ?? 0) > (item.HomeFullTimeScore ?? 0);
+                var liveMinute = GetLiveMinute(item.KickoffUtc);
 
                 <div class="mc-wrap home-section" data-section="live">
                     <a asp-controller="Matches" asp-action="Detail" asp-route-id="@item.Id" class="mc live">
                         <div class="mc-time">
-                            <div class="mc-min lc">CANLI</div>
+                            <div class="mc-min lc">@liveMinute'</div>
                             <div class="sbadge sb-live"><span class="live-dot"></span>CANLI</div>
                         </div>
                         <div class="dvv"></div>
