@@ -17,54 +17,17 @@ public class AdminController(IPremierVisionApiClient apiClient) : Controller
         {
             return View(new AdminPanelViewModel
             {
-                ErrorMessage = $"Admin paneli yuklenirken API baglantisi kurulamadi: {exception.Message}"
+                ErrorMessage = $"Admin paneli yüklenirken API bağlantısı kurulamadı: {exception.Message}"
             });
         }
     }
-
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ImportTeams(CancellationToken cancellationToken)
-    {
-        await apiClient.ImportTeamsAsync(cancellationToken);
-        TempData["AdminMessage"] = "Takimlar import edildi.";
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ImportFixtures(CancellationToken cancellationToken)
-    {
-        await apiClient.ImportFixturesAsync(cancellationToken);
-        TempData["AdminMessage"] = "Fikstur import edildi.";
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ImportLive(CancellationToken cancellationToken)
-    {
-        await apiClient.ImportLiveFixturesAsync(cancellationToken);
-        TempData["AdminMessage"] = "Canli maclar guncellendi.";
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EnsureDemoScenario(CancellationToken cancellationToken)
-    {
-        await apiClient.EnsureDemoScenarioAsync(cancellationToken);
-        TempData["AdminMessage"] = "Demo canli ve gelecek mac senaryosu olusturuldu.";
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddFixture(CreateFixtureInputModel input, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddFixture([Bind(Prefix = nameof(AdminPanelViewModel.Fixture))] CreateFixtureInputModel input, CancellationToken cancellationToken)
     {
         if (input.HomeTeamId == input.AwayTeamId)
         {
-            ModelState.AddModelError(nameof(input.AwayTeamId), "Ayni takim iki kez secilemez.");
+            ModelState.AddModelError($"{nameof(AdminPanelViewModel.Fixture)}.{nameof(input.AwayTeamId)}", "Aynı takım iki kez seçilemez.");
         }
 
         if (!ModelState.IsValid)
@@ -74,13 +37,13 @@ public class AdminController(IPremierVisionApiClient apiClient) : Controller
 
         await apiClient.AddFixtureAsync(input, cancellationToken);
 
-        TempData["AdminMessage"] = "Mac eklendi.";
+        TempData["AdminMessage"] = "Maç eklendi.";
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddEvent(CreateMatchEventInputModel input, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddEvent([Bind(Prefix = nameof(AdminPanelViewModel.Event))] CreateMatchEventInputModel input, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -89,13 +52,13 @@ public class AdminController(IPremierVisionApiClient apiClient) : Controller
 
         await apiClient.AddEventAsync(input, cancellationToken);
 
-        TempData["AdminMessage"] = "Mac olayi eklendi.";
+        TempData["AdminMessage"] = "Maç olayı eklendi.";
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddStatistic(CreateMatchStatisticInputModel input, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddStatistic([Bind(Prefix = nameof(AdminPanelViewModel.Statistic))] CreateMatchStatisticInputModel input, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -104,7 +67,7 @@ public class AdminController(IPremierVisionApiClient apiClient) : Controller
 
         await apiClient.AddStatisticAsync(input, cancellationToken);
 
-        TempData["AdminMessage"] = "Mac istatistigi eklendi.";
+        TempData["AdminMessage"] = "Maç istatistiği eklendi.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -140,7 +103,7 @@ public class AdminController(IPremierVisionApiClient apiClient) : Controller
         {
             return new AdminPanelViewModel
             {
-                ErrorMessage = $"API baglantisi kurulamadi: {exception.Message}",
+                ErrorMessage = $"API bağlantısı kurulamadı: {exception.Message}",
                 Fixture = fixture ?? new CreateFixtureInputModel(),
                 Event = @event ?? new CreateMatchEventInputModel(),
                 Statistic = statistic ?? new CreateMatchStatisticInputModel()

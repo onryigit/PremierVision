@@ -39,6 +39,7 @@
             --tr: all .22s cubic-bezier(.4,0,.2,1);
             --fd: "Barlow Condensed", sans-serif;
             --fb: "Barlow", sans-serif;
+            --hero-panel-bg: rgba(21,16,38,.68);
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -61,13 +62,13 @@
             top: 86px;
             left: 0;
             right: 0;
-            height: min(58vh, 680px);
-            min-height: 460px;
+            height: min(72vh, 860px);
+            min-height: 620px;
             z-index: -1;
             pointer-events: none;
             background:
                 linear-gradient(180deg, rgba(6,10,18,.08) 0%, rgba(6,10,18,.34) 42%, rgba(13,10,24,.92) 100%),
-                url('/dosyalar/background.jpeg') center 18% / cover no-repeat;
+                url('/dosyalar/background.jpeg') center 24% / cover no-repeat;
             opacity: .92;
         }
         a { color: inherit; text-decoration: none; }
@@ -98,8 +99,8 @@
             padding: 14px 0;
         }
         .brand-logo {
-            width: 112px;
-            height: 74px;
+            width: 128px;
+            height: 84px;
             object-fit: contain;
             object-position: center;
             display: block;
@@ -107,7 +108,7 @@
         }
         .brand-txt {
             font-family: var(--fd);
-            font-size: 21px;
+            font-size: 30px;
             font-weight: 800;
             letter-spacing: 1px;
         }
@@ -171,8 +172,8 @@
         .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 
         .lg-head {
-            background: linear-gradient(135deg, rgba(20,15,36,.76), rgba(26,22,48,.54));
-            border-bottom: 1px solid rgba(49,40,91,.22);
+            background: var(--hero-panel-bg);
+            border-bottom: none;
             padding: 32px 0 24px;
             position: relative;
             overflow: hidden;
@@ -214,33 +215,43 @@
         .lg-sub { font-size: 13px; color: var(--t2); margin-top: 6px; }
         .lg-stats {
             display: flex;
-            gap: 24px;
+            gap: 12px;
             align-items: flex-end;
             justify-content: flex-end;
             height: 100%;
         }
+        .lg-stat {
+            min-width: 86px;
+            text-align: center;
+            padding: 12px 14px;
+            background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 14px 28px rgba(0,0,0,.16);
+        }
         .ls-num {
             font-family: var(--fd);
-            font-size: 30px;
+            font-size: 34px;
             font-weight: 800;
             color: var(--green);
             line-height: 1;
+            text-shadow: 0 0 18px rgba(0,230,118,.14);
         }
         .ls-lbl {
             font-size: 10px;
             color: var(--t3);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 3px;
+            letter-spacing: 1.5px;
+            margin-top: 6px;
         }
         .ftabs-wrap {
-            background: linear-gradient(135deg, rgba(20,15,36,.66), rgba(26,22,48,.44));
-            border-top: 1px solid rgba(255,255,255,.03);
+            background: var(--hero-panel-bg);
+            border-top: none;
             border-bottom: 1px solid rgba(49,40,91,.18);
             position: sticky;
             top: 62px;
             z-index: 99;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(3px);
         }
         .ftabs { display: flex; overflow-x: auto; scrollbar-width: none; }
         .ftabs::-webkit-scrollbar { display: none; }
@@ -359,7 +370,7 @@
             font-family: var(--fd);
             font-size: clamp(48px, 8vw, 72px);
             font-weight: 900;
-            letter-spacing: -3px;
+            letter-spacing: 0;
             line-height: 1;
             background: linear-gradient(180deg, #fff 0%, #9ab5e0 100%);
             -webkit-background-clip: text;
@@ -552,6 +563,14 @@
             flex-wrap: wrap;
             gap: 6px;
         }
+        .ft-credit {
+            color: var(--gold);
+            font-family: var(--fd);
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: .4px;
+            text-shadow: 0 0 16px rgba(255,214,0,.18);
+        }
 
         @@media (max-width: 600px) {
             body.with-backdrop::before {
@@ -560,7 +579,8 @@
                 min-height: 320px;
                 background-position: center 24%;
             }
-            .brand-logo { width: 90px; height: 60px; }
+            .brand-logo { width: 104px; height: 68px; }
+            .brand-txt { font-size: 25px; }
             .tn { font-size: 13px; }
             .ts { font-size: 18px; }
             .mc-time { width: 60px; }
@@ -587,7 +607,6 @@
                 <a asp-controller="Home" asp-action="Index" class="nl @(controller == "Home" ? "active" : string.Empty)">Ana Sayfa</a>
                 <a asp-controller="Fixtures" asp-action="Index" class="nl @(controller == "Fixtures" ? "active" : string.Empty)">Fikstür</a>
                 <a asp-controller="Standings" asp-action="Index" class="nl @(controller == "Standings" ? "active" : string.Empty)">Puan Durumu</a>
-                <a asp-controller="Admin" asp-action="Index" class="nl @(controller == "Admin" ? "active" : string.Empty)">Admin</a>
             </div>
             <div class="nb-icons">
                 <button class="tog d-lg-none" id="tog" type="button"><i class="bi bi-list"></i></button>
@@ -598,7 +617,6 @@
                 <a asp-controller="Home" asp-action="Index" class="nl d-block @(controller == "Home" ? "active" : string.Empty)">Ana Sayfa</a>
                 <a asp-controller="Fixtures" asp-action="Index" class="nl d-block @(controller == "Fixtures" ? "active" : string.Empty)">Fikstür</a>
                 <a asp-controller="Standings" asp-action="Index" class="nl d-block @(controller == "Standings" ? "active" : string.Empty)">Puan Durumu</a>
-                <a asp-controller="Admin" asp-action="Index" class="nl d-block @(controller == "Admin" ? "active" : string.Empty)">Admin</a>
             </div>
         </div>
     </nav>
@@ -610,7 +628,7 @@
             <div class="row g-4">
                 <div class="col-lg-4">
                     <div class="ft-brand">Premier<span>Vision</span></div>
-                    <p class="ft-desc">Premier League maçları, puan durumu ve detay sayfaları için proje teması.</p>
+                    <p class="ft-desc">Premier League maçları, istatistikler, puan durumu ve maçların tüm detayları.</p>
                     <div class="si-row">
                         <a href="#" class="si"><i class="bi bi-twitter-x"></i></a>
                         <a href="#" class="si"><i class="bi bi-instagram"></i></a>
@@ -655,8 +673,7 @@
                 </div>
             </div>
             <div class="ft-bot">
-                <span>&copy; 2026 PremierVision. Tüm hakları saklıdır.</span>
-                <span>Premier League verileri demo ve eğitim amaçlıdır.</span>
+                <span>&copy; 2026 PremierVision. <span class="ft-credit">Made By Yiğit Öner.</span> Tüm hakları saklıdır.</span>
             </div>
         </div>
     </footer>

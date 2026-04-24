@@ -29,6 +29,11 @@ app.UseAuthorization();
 app.MapStaticAssets();
 
 app.MapControllerRoute(
+    name: "admin",
+    pattern: "admin",
+    defaults: new { controller = "Admin", action = "Index" });
+
+app.MapControllerRoute(
     name: "match-detail",
     pattern: "match-detail.html/{id?}",
     defaults: new { controller = "Matches", action = "Detail" });

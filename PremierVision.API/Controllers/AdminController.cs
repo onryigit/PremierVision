@@ -3,16 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using PremierVision.Contracts;
 using PremierVision.Data;
 using PremierVision.Models;
-using PremierVision.Services;
 
 namespace PremierVision.API.Controllers;
 
 [ApiController]
 [Route("api/admin")]
 public class AdminController(
-    AppDbContext context,
-    IApiFootballImportService apiFootballImportService,
-    IDemoFixtureScenarioService demoFixtureScenarioService) : ControllerBase
+    AppDbContext context) : ControllerBase
 {
     [HttpGet("options")]
     public async Task<ActionResult<AdminPanelDto>> GetOptions(CancellationToken cancellationToken)
@@ -44,34 +41,6 @@ public class AdminController(
             Teams = teams,
             Fixtures = fixtures
         });
-    }
-
-    [HttpPost("import/teams")]
-    public async Task<ActionResult> ImportTeams(CancellationToken cancellationToken)
-    {
-        var count = await apiFootballImportService.ImportTeamsAsync(cancellationToken);
-        return Ok(new { count });
-    }
-
-    [HttpPost("import/fixtures")]
-    public async Task<ActionResult> ImportFixtures(CancellationToken cancellationToken)
-    {
-        var count = await apiFootballImportService.ImportFixturesAsync(cancellationToken);
-        return Ok(new { count });
-    }
-
-    [HttpPost("import/live")]
-    public async Task<ActionResult> ImportLive(CancellationToken cancellationToken)
-    {
-        var count = await apiFootballImportService.ImportLiveFixturesAsync(cancellationToken);
-        return Ok(new { count });
-    }
-
-    [HttpPost("demo-scenario")]
-    public async Task<ActionResult> EnsureDemoScenario(CancellationToken cancellationToken)
-    {
-        var summary = await demoFixtureScenarioService.EnsureScenarioAsync(cancellationToken);
-        return Ok(summary);
     }
 
     [HttpPost("fixtures")]

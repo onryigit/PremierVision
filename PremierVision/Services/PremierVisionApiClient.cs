@@ -34,20 +34,32 @@ public class PremierVisionApiClient(HttpClient httpClient) : IPremierVisionApiCl
     public Task<AdminPanelViewModel> GetAdminOptionsAsync(CancellationToken cancellationToken = default) =>
         GetAsync<AdminPanelViewModel>("api/admin/options", cancellationToken);
 
-    public Task ImportTeamsAsync(CancellationToken cancellationToken = default) =>
-        PostAsync<object?>("api/admin/import/teams", null, cancellationToken);
+    public Task AddFixtureAsync(CreateFixtureInputModel request, CancellationToken cancellationToken = default)
+    {
+        var kickoffUtc = request.KickoffUtc.Kind switch
+        {
+            DateTimeKind.Utc => request.KickoffUtc,
+            DateTimeKind.Local => request.KickoffUtc.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(request.KickoffUtc, DateTimeKind.Local).ToUniversalTime()
+        };
 
-    public Task ImportFixturesAsync(CancellationToken cancellationToken = default) =>
-        PostAsync<object?>("api/admin/import/fixtures", null, cancellationToken);
+        var payload = new CreateFixtureInputModel
+        {
+            MatchWeek = request.MatchWeek,
+            HomeTeamId = request.HomeTeamId,
+            AwayTeamId = request.AwayTeamId,
+            KickoffUtc = kickoffUtc,
+            VenueName = request.VenueName,
+            ImageUrl = request.ImageUrl,
+            Status = request.Status,
+            HomeHalfTimeScore = request.HomeHalfTimeScore,
+            AwayHalfTimeScore = request.AwayHalfTimeScore,
+            HomeFullTimeScore = request.HomeFullTimeScore,
+            AwayFullTimeScore = request.AwayFullTimeScore
+        };
 
-    public Task ImportLiveFixturesAsync(CancellationToken cancellationToken = default) =>
-        PostAsync<object?>("api/admin/import/live", null, cancellationToken);
-
-    public Task EnsureDemoScenarioAsync(CancellationToken cancellationToken = default) =>
-        PostAsync<object?>("api/admin/demo-scenario", null, cancellationToken);
-
-    public Task AddFixtureAsync(CreateFixtureInputModel request, CancellationToken cancellationToken = default) =>
-        PostAsync("api/admin/fixtures", request, cancellationToken);
+        return PostAsync("api/admin/fixtures", payload, cancellationToken);
+    }
 
     public Task AddEventAsync(CreateMatchEventInputModel request, CancellationToken cancellationToken = default) =>
         PostAsync("api/admin/events", request, cancellationToken);

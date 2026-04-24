@@ -11,6 +11,7 @@ public class FixtureCardViewModel
     public DateTime KickoffUtc { get; init; }
     public string VenueName { get; init; } = string.Empty;
     public FixtureStatus Status { get; init; }
+    public int? CurrentMinute { get; init; }
     public int? HomeHalfTimeScore { get; init; }
     public int? AwayHalfTimeScore { get; init; }
     public int? HomeFullTimeScore { get; init; }

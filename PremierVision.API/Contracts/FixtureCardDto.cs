@@ -11,6 +11,7 @@ public class FixtureCardDto
     public DateTime KickoffUtc { get; set; }
     public string VenueName { get; set; } = string.Empty;
     public FixtureStatus Status { get; set; }
+    public int? CurrentMinute { get; set; }
     public int? HomeHalfTimeScore { get; set; }
     public int? AwayHalfTimeScore { get; set; }
     public int? HomeFullTimeScore { get; set; }

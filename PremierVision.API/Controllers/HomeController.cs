@@ -45,6 +45,7 @@ public class HomeController(AppDbContext context, IStandingsService standingsSer
             .AsNoTracking()
             .Include(x => x.HomeTeam)
             .Include(x => x.AwayTeam)
+            .Include(x => x.Events)
             .Where(x => x.Status == FixtureStatus.Live)
             .OrderBy(x => x.KickoffUtc)
             .Take(5)

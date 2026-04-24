@@ -9,9 +9,14 @@
     var totalCount = liveCount + finishedCount + upcomingCount;
     var featured = Model.FeaturedMatch;
 
-    static int GetLiveMinute(DateTime kickoffUtc)
+    static int GetLiveMinute(FixtureCardViewModel fixture)
     {
-        var elapsedMinutes = (int)Math.Floor((DateTime.UtcNow - kickoffUtc).TotalMinutes);
+        if (fixture.CurrentMinute.HasValue)
+        {
+            return Math.Clamp(fixture.CurrentMinute.Value, 1, 90);
+        }
+
+        var elapsedMinutes = (int)Math.Floor((DateTime.UtcNow - fixture.KickoffUtc).TotalMinutes);
         return Math.Clamp(elapsedMinutes > 0 ? elapsedMinutes : 1, 1, 90);
     }
 }
@@ -61,14 +66,14 @@
         <div class="row align-items-center">
             <div class="col-lg-7">
                 <div class="lg-badge"><i class="bi bi-trophy-fill"></i> Premier League</div>
-                <h1 class="lg-title">Hafta <span style="color:var(--green)">@Model.CurrentWeek</span> Merkezi</h1>
-                <p class="lg-sub">Canli skorlar, son tamamlanan maclar ve yaklasan karsilasmalar tek ekranda</p>
+                <h1 class="lg-title"><span style="color:var(--green)">@Model.CurrentWeek.</span> Hafta Heyecanı</h1>
+                <p class="lg-sub">Canlı skorlar, son tamamlanan maçlar ve yaklaşan karşılaşmalar</p>
             </div>
             <div class="col-lg-5 d-none d-lg-block">
                 <div class="lg-stats">
-                    <div style="text-align:center"><div class="ls-num">@liveCount</div><div class="ls-lbl">Canli</div></div>
-                    <div style="text-align:center"><div class="ls-num">@finishedCount</div><div class="ls-lbl">Biten</div></div>
-                    <div style="text-align:center"><div class="ls-num">@upcomingCount</div><div class="ls-lbl">Yaklasan</div></div>
+                    <div class="lg-stat"><div class="ls-num">@liveCount</div><div class="ls-lbl">Canlı</div></div>
+                    <div class="lg-stat"><div class="ls-num">@finishedCount</div><div class="ls-lbl">Biten</div></div>
+                    <div class="lg-stat"><div class="ls-num">@upcomingCount</div><div class="ls-lbl">Yaklaşan</div></div>
                 </div>
             </div>
         </div>
@@ -78,10 +83,10 @@
 <div class="ftabs-wrap">
     <div class="wrap">
         <div class="ftabs">
-            <button class="ftab active" type="button" data-filter="all">Tum Maclar <span class="bcnt">@totalCount</span></button>
-            <button class="ftab" type="button" data-filter="live"><span class="live-dot"></span>Canli <span class="bcnt">@liveCount</span></button>
+            <button class="ftab active" type="button" data-filter="all">Tüm Maçlar <span class="bcnt">@totalCount</span></button>
+            <button class="ftab" type="button" data-filter="live"><span class="live-dot"></span>Canlı <span class="bcnt">@liveCount</span></button>
             <button class="ftab" type="button" data-filter="finished">Tamamlananlar</button>
-            <button class="ftab" type="button" data-filter="upcoming">Yaklasanlar</button>
+            <button class="ftab" type="button" data-filter="upcoming">Yaklaşanlar</button>
         </div>
     </div>
 </div>
@@ -96,13 +101,13 @@
                 ? "VS"
                 : $"{featured.HomeFullTimeScore ?? 0}-{featured.AwayFullTimeScore ?? 0}";
             var featuredStatus = featured.Status == FixtureStatus.Completed
-                ? "Mac Bitti"
+                ? "Maç Bitti"
                 : featured.Status == FixtureStatus.Live
-                    ? $"Canli • {GetLiveMinute(featured.KickoffUtc)}'"
-                    : "Yaklasan Mac";
+                    ? $"Canlı • {GetLiveMinute(featured)}'"
+                    : "Yaklaşan Maç";
 
             <div class="feat-wrap" id="featuredBlock">
-                <div class="feat-lbl">One Cikan Mac</div>
+                <div class="feat-lbl">Öne Çıkan Maç</div>
                 <a asp-controller="Matches" asp-action="Detail" asp-route-id="@featured.Id" class="feat-card">
                     <div class="row align-items-center g-2">
                         <div class="col-5">
@@ -148,31 +153,32 @@
                     <div class="text-center mt-3" style="font-size:12px;color:var(--t2)">
                         <i class="bi bi-geo-alt"></i> @featured.VenueName
                         &nbsp;·&nbsp;
-                        <span style="color:var(--blue)">Detaylari Gor</span>
+                        <span style="color:var(--blue)">Detayları Gör</span>
                     </div>
                 </a>
             </div>
         }
 
-        <div class="sec-ttl home-section" data-section="live">Canli Maclar</div>
+        <div class="sec-ttl home-section" data-section="live">Canlı Maçlar</div>
         @if (Model.LiveFixtures.Count == 0)
         {
-            <div class="empty-card home-section" data-section="live">Canli mac bulunmuyor.</div>
+            <div class="empty-card home-section" data-section="live">Canlı maç bulunmuyor.</div>
         }
         else
         {
-            @foreach (var item in Model.LiveFixtures)
+            @foreach (var liveEntry in Model.LiveFixtures.Select((item, index) => new { item, index }))
             {
+                var item = liveEntry.item;
                 var homeInitials = item.HomeTeamName[..Math.Min(3, item.HomeTeamName.Length)].ToUpperInvariant();
                 var awayInitials = item.AwayTeamName[..Math.Min(3, item.AwayTeamName.Length)].ToUpperInvariant();
                 var homeWon = (item.HomeFullTimeScore ?? 0) > (item.AwayFullTimeScore ?? 0);
                 var awayWon = (item.AwayFullTimeScore ?? 0) > (item.HomeFullTimeScore ?? 0);
-                var liveMinute = GetLiveMinute(item.KickoffUtc);
+                var displayMinute = GetLiveMinute(item);
 
                 <div class="mc-wrap home-section" data-section="live">
                     <a asp-controller="Matches" asp-action="Detail" asp-route-id="@item.Id" class="mc live">
                         <div class="mc-time">
-                            <div class="mc-min lc">@liveMinute'</div>
+                            <div class="mc-min lc">@displayMinute'</div>
                             <div class="sbadge sb-live"><span class="live-dot"></span>CANLI</div>
                         </div>
                         <div class="dvv"></div>
@@ -208,10 +214,10 @@
             }
         }
 
-        <div class="sec-ttl home-section" data-section="finished">Tamamlanan Maclar</div>
+        <div class="sec-ttl home-section" data-section="finished">Tamamlanan Maçlar</div>
         @if (Model.LatestResults.Count == 0)
         {
-            <div class="empty-card home-section" data-section="finished">Tamamlanmis mac bulunmuyor.</div>
+            <div class="empty-card home-section" data-section="finished">Tamamlanmış maç bulunmuyor.</div>
         }
         else
         {
@@ -261,10 +267,10 @@
             }
         }
 
-        <div class="sec-ttl home-section" data-section="upcoming">Yaklasan Maclar</div>
+        <div class="sec-ttl home-section" data-section="upcoming">Yaklaşan Maçlar</div>
         @if (Model.UpcomingFixtures.Count == 0)
         {
-            <div class="empty-card home-section" data-section="upcoming">Yaklasan mac bulunmuyor.</div>
+            <div class="empty-card home-section" data-section="upcoming">Yaklaşan maç bulunmuyor.</div>
         }
         else
         {

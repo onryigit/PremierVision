@@ -5,170 +5,398 @@
     ViewData["Title"] = "Admin Panel";
 }
 
-<section class="pg-head">
+@section Styles {
+    <style>
+        .admin-head {
+            background: linear-gradient(135deg, rgba(14,10,28,.96), rgba(18,26,46,.7));
+            border-bottom: 1px solid rgba(49,40,91,.55);
+            padding: 42px 0 34px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-head::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 18% 20%, rgba(0,230,118,.08), transparent 46%),
+                radial-gradient(ellipse at 86% 10%, rgba(41,121,255,.1), transparent 42%);
+            pointer-events: none;
+        }
+
+        .admin-head .wrap {
+            position: relative;
+        }
+
+        .admin-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--blue);
+            font-family: var(--fd);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+            margin-bottom: 11px;
+        }
+
+        .admin-kicker i {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--green);
+            background: rgba(0,230,118,.09);
+            border: 1px solid rgba(0,230,118,.24);
+            border-radius: var(--r1);
+            font-size: 16px;
+        }
+
+        .admin-title {
+            margin: 0;
+            font-family: var(--fd);
+            font-size: clamp(32px, 6vw, 54px);
+            font-weight: 900;
+            line-height: .96;
+        }
+
+        .admin-title span {
+            color: var(--green);
+        }
+
+        .admin-sub {
+            color: var(--t2);
+            font-size: 14px;
+            margin: 10px 0 0;
+        }
+
+        .admin-main {
+            padding: 30px 0 60px;
+        }
+
+        .admin-alert {
+            border-radius: var(--r2);
+            border: 1px solid rgba(255,255,255,.08);
+            margin-bottom: 18px;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .admin-panel {
+            background:
+                linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.012)),
+                var(--card);
+            border: 1px solid rgba(255,255,255,.085);
+            border-radius: var(--r2);
+            min-height: 100%;
+            overflow: hidden;
+            box-shadow: 0 18px 42px rgba(0,0,0,.22);
+        }
+
+        .admin-panel-head {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 18px 18px 14px;
+            border-bottom: 1px solid rgba(255,255,255,.065);
+        }
+
+        .admin-panel-icon {
+            width: 42px;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--r2);
+            font-size: 19px;
+            flex: 0 0 auto;
+        }
+
+        .admin-panel-icon.fixture {
+            color: var(--green);
+            background: rgba(0,230,118,.1);
+            border: 1px solid rgba(0,230,118,.22);
+        }
+
+        .admin-panel-icon.event {
+            color: var(--yellow);
+            background: rgba(255,193,7,.1);
+            border: 1px solid rgba(255,193,7,.22);
+        }
+
+        .admin-panel-icon.stat {
+            color: var(--blue);
+            background: rgba(41,121,255,.1);
+            border: 1px solid rgba(41,121,255,.24);
+        }
+
+        .admin-panel-title {
+            margin: 0;
+            font-family: var(--fd);
+            font-size: 22px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .admin-panel-note {
+            color: var(--t3);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .admin-form {
+            display: grid;
+            gap: 14px;
+            padding: 18px;
+        }
+
+        .admin-field label,
+        .admin-score label {
+            color: var(--t2);
+            font-family: var(--fd);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+
+        .admin-form .form-control,
+        .admin-form .form-select {
+            background-color: rgba(9,13,25,.72);
+            border: 1px solid rgba(255,255,255,.09);
+            border-radius: var(--r1);
+            color: var(--t1);
+            min-height: 42px;
+            box-shadow: none;
+        }
+
+        .admin-form .form-control:focus,
+        .admin-form .form-select:focus {
+            background-color: rgba(13,18,34,.9);
+            border-color: rgba(0,230,118,.45);
+            box-shadow: 0 0 0 3px rgba(0,230,118,.1);
+            color: var(--t1);
+        }
+
+        .admin-score-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: var(--r2);
+            background: rgba(0,0,0,.12);
+        }
+
+        .admin-submit {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+            border: 0;
+            border-radius: var(--r1);
+            font-family: var(--fd);
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: var(--tr);
+        }
+
+        .admin-submit.fixture {
+            background: linear-gradient(135deg, #00c853, #00e676);
+            color: #07120d;
+        }
+
+        .admin-submit.event {
+            background: linear-gradient(135deg, #ffb300, #ffd54f);
+            color: #151008;
+        }
+
+        .admin-submit.stat {
+            background: linear-gradient(135deg, #1e6fff, #00b8ff);
+            color: #fff;
+        }
+
+        .admin-submit:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.04);
+        }
+
+        @@media (max-width: 991px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media (max-width: 600px) {
+            .admin-score-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+    </style>
+}
+
+<section class="admin-head">
     <div class="wrap">
-        <div class="pg-badge"><i class="bi bi-shield-lock-fill"></i> Admin Panel</div>
-        <h1 class="pg-title">Sadece <span style="color:var(--green)">Ekleme</span> Islemleri</h1>
-        <p class="pg-sub">Case kapsamina uygun olarak mac, mac olayi ve mac istatistigi ekleme ekranlari</p>
+        <div class="admin-kicker"><i class="bi bi-person-gear"></i> Yönetim Alanı</div>
+        <h1 class="admin-title">Admin Panel <span>Manuel İşlemler</span></h1>
+        <p class="admin-sub">Maç, maç olayı ve maç istatistiği ekleme ekranları</p>
     </div>
 </section>
 
-<main>
-    <div class="wrap" style="padding-top:28px;padding-bottom:56px">
+<main class="admin-main">
+    <div class="wrap">
         @if (TempData["AdminMessage"] is string message)
         {
-            <div class="alert alert-success">@message</div>
+            <div class="alert alert-success admin-alert">@message</div>
         }
 
         @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
         {
-            <div class="alert alert-danger">@Model.ErrorMessage</div>
+            <div class="alert alert-danger admin-alert">@Model.ErrorMessage</div>
         }
 
-        <div class="card border-0 shadow-sm mb-4" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-            <div class="card-body d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h2 class="h4 mb-1">API-Football Import</h2>
-                    <p class="mb-0" style="color:var(--t2)">2025 sezonu, Premier League 2025/2026 sezonunu temsil eder. Import sadece butona bastiginda calisir.</p>
+        <div class="admin-grid">
+            <section class="admin-panel">
+                <div class="admin-panel-head">
+                    <div class="admin-panel-icon fixture"><i class="bi bi-calendar2-plus"></i></div>
+                    <div>
+                        <h2 class="admin-panel-title">Maç Ekle</h2>
+                        <div class="admin-panel-note">Fikstüre yeni maç kaydı oluştur.</div>
+                    </div>
                 </div>
-                <div class="d-flex flex-wrap gap-2">
-                    <form asp-action="EnsureDemoScenario" method="post">
-                        <button class="btn btn-success">Demo Senaryosu Uret</button>
-                    </form>
-                    <form asp-action="ImportTeams" method="post">
-                        <button class="btn btn-outline-light">Takimlari Cek</button>
-                    </form>
-                    <form asp-action="ImportFixtures" method="post">
-                        <button class="btn btn-primary">Fiksturu Cek</button>
-                    </form>
-                    <form asp-action="ImportLive" method="post">
-                        <button class="btn btn-outline-info">Canli Maclari Guncelle</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-lg-4">
-                <div class="card border-0 shadow-sm h-100" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body">
-                        <h2 class="h4 mb-3">Mac Ekle</h2>
-                        <form asp-action="AddFixture" method="post" class="d-grid gap-3">
-                            <div>
+                <form asp-action="AddFixture" method="post" class="admin-form">
+                            <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+                            <div class="admin-field">
                                 <label asp-for="Fixture.MatchWeek" class="form-label"></label>
                                 <input asp-for="Fixture.MatchWeek" class="form-control" />
                                 <span asp-validation-for="Fixture.MatchWeek" class="text-danger small"></span>
                             </div>
-                            <div>
+                            <div class="admin-field">
                                 <label asp-for="Fixture.HomeTeamId" class="form-label">Ev Sahibi</label>
                                 <select asp-for="Fixture.HomeTeamId" class="form-select" asp-items="@(new SelectList(Model.Teams, "Value", "Label"))"></select>
                             </div>
-                            <div>
+                            <div class="admin-field">
                                 <label asp-for="Fixture.AwayTeamId" class="form-label">Deplasman</label>
                                 <select asp-for="Fixture.AwayTeamId" class="form-select" asp-items="@(new SelectList(Model.Teams, "Value", "Label"))"></select>
                                 <span asp-validation-for="Fixture.AwayTeamId" class="text-danger small"></span>
                             </div>
-                            <div>
-                                <label asp-for="Fixture.KickoffUtc" class="form-label">Tarih ve Saat (UTC)</label>
-                                <input asp-for="Fixture.KickoffUtc" class="form-control" type="datetime-local" />
+                            <div class="admin-field">
+                                <label asp-for="Fixture.KickoffUtc" class="form-label">Tarih ve Saat</label>
+                                <input asp-for="Fixture.KickoffUtc" class="form-control" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" step="60" />
                             </div>
-                            <div>
+                            <div class="admin-field">
                                 <label asp-for="Fixture.VenueName" class="form-label">Stadyum</label>
                                 <input asp-for="Fixture.VenueName" class="form-control" />
                             </div>
-                            <div>
+                            <div class="admin-field">
                                 <label asp-for="Fixture.Status" class="form-label">Durum</label>
                                 <select asp-for="Fixture.Status" class="form-select" asp-items="Html.GetEnumSelectList<FixtureStatus>()"></select>
                             </div>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <label asp-for="Fixture.HomeHalfTimeScore" class="form-label">IY Ev</label>
+                            <div class="admin-score-grid">
+                                <div class="admin-score">
+                                    <label asp-for="Fixture.HomeHalfTimeScore" class="form-label">İY Ev</label>
                                     <input asp-for="Fixture.HomeHalfTimeScore" class="form-control" />
                                 </div>
-                                <div class="col-6">
-                                    <label asp-for="Fixture.AwayHalfTimeScore" class="form-label">IY Dep</label>
+                                <div class="admin-score">
+                                    <label asp-for="Fixture.AwayHalfTimeScore" class="form-label">İY Dep</label>
                                     <input asp-for="Fixture.AwayHalfTimeScore" class="form-control" />
                                 </div>
-                                <div class="col-6">
+                                <div class="admin-score">
                                     <label asp-for="Fixture.HomeFullTimeScore" class="form-label">MS Ev</label>
                                     <input asp-for="Fixture.HomeFullTimeScore" class="form-control" />
                                 </div>
-                                <div class="col-6">
+                                <div class="admin-score">
                                     <label asp-for="Fixture.AwayFullTimeScore" class="form-label">MS Dep</label>
                                     <input asp-for="Fixture.AwayFullTimeScore" class="form-control" />
                                 </div>
                             </div>
-                            <button class="btn btn-success">Mac Ekle</button>
-                        </form>
+                            <button class="admin-submit fixture"><i class="bi bi-plus-lg"></i>Maç Ekle</button>
+                </form>
+            </section>
+
+            <section class="admin-panel">
+                <div class="admin-panel-head">
+                    <div class="admin-panel-icon event"><i class="bi bi-lightning-charge"></i></div>
+                    <div>
+                        <h2 class="admin-panel-title">Maç Olayı</h2>
+                        <div class="admin-panel-note">Gol, kart ve değişiklik ekle.</div>
                     </div>
                 </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="card border-0 shadow-sm h-100" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body">
-                        <h2 class="h4 mb-3">Mac Olayi Ekle</h2>
-                        <form asp-action="AddEvent" method="post" class="d-grid gap-3">
-                            <div>
-                                <label asp-for="Event.FixtureId" class="form-label">Mac</label>
+                <form asp-action="AddEvent" method="post" class="admin-form">
+                            <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+                            <div class="admin-field">
+                                <label asp-for="Event.FixtureId" class="form-label">Maç</label>
                                 <select asp-for="Event.FixtureId" class="form-select" asp-items="@(new SelectList(Model.Fixtures, "Value", "Label"))"></select>
                             </div>
-                            <div>
-                                <label asp-for="Event.TeamId" class="form-label">Takim</label>
+                            <div class="admin-field">
+                                <label asp-for="Event.TeamId" class="form-label">Takım</label>
                                 <select asp-for="Event.TeamId" class="form-select" asp-items="@(new SelectList(Model.Teams, "Value", "Label"))">
-                                    <option value="">Seciniz</option>
+                                    <option value="">Seçiniz</option>
                                 </select>
                             </div>
                             <div class="row g-2">
-                                <div class="col-6">
+                                <div class="col-6 admin-field">
                                     <label asp-for="Event.Minute" class="form-label">Dakika</label>
                                     <input asp-for="Event.Minute" class="form-control" />
                                 </div>
-                                <div class="col-6">
+                                <div class="col-6 admin-field">
                                     <label asp-for="Event.EventType" class="form-label">Olay</label>
                                     <select asp-for="Event.EventType" class="form-select" asp-items="Html.GetEnumSelectList<MatchEventType>()"></select>
                                 </div>
                             </div>
-                            <div>
-                                <label asp-for="Event.PlayerName" class="form-label">Oyuncu Ismi</label>
+                            <div class="admin-field">
+                                <label asp-for="Event.PlayerName" class="form-label">Oyuncu İsmi</label>
                                 <input asp-for="Event.PlayerName" class="form-control" />
                             </div>
-                            <div>
-                                <label asp-for="Event.Description" class="form-label">Aciklama</label>
+                            <div class="admin-field">
+                                <label asp-for="Event.Description" class="form-label">Açıklama</label>
                                 <input asp-for="Event.Description" class="form-control" />
                             </div>
-                            <button class="btn btn-warning">Mac Olayi Ekle</button>
-                        </form>
+                            <button class="admin-submit event"><i class="bi bi-plus-lg"></i>Olay Ekle</button>
+                </form>
+            </section>
+
+            <section class="admin-panel">
+                <div class="admin-panel-head">
+                    <div class="admin-panel-icon stat"><i class="bi bi-bar-chart-line"></i></div>
+                    <div>
+                        <h2 class="admin-panel-title">İstatistik</h2>
+                        <div class="admin-panel-note">Maça takım bazlı veri gir.</div>
                     </div>
                 </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="card border-0 shadow-sm h-100" style="background:var(--card);border:1px solid var(--border)!important;color:var(--t1)">
-                    <div class="card-body">
-                        <h2 class="h4 mb-3">Mac Istatistigi Ekle</h2>
-                        <form asp-action="AddStatistic" method="post" class="d-grid gap-3">
-                            <div>
-                                <label asp-for="Statistic.FixtureId" class="form-label">Mac</label>
+                <form asp-action="AddStatistic" method="post" class="admin-form">
+                            <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+                            <div class="admin-field">
+                                <label asp-for="Statistic.FixtureId" class="form-label">Maç</label>
                                 <select asp-for="Statistic.FixtureId" class="form-select" asp-items="@(new SelectList(Model.Fixtures, "Value", "Label"))"></select>
                             </div>
-                            <div>
-                                <label asp-for="Statistic.TeamId" class="form-label">Takim</label>
+                            <div class="admin-field">
+                                <label asp-for="Statistic.TeamId" class="form-label">Takım</label>
                                 <select asp-for="Statistic.TeamId" class="form-select" asp-items="@(new SelectList(Model.Teams, "Value", "Label"))"></select>
                             </div>
-                            <div>
-                                <label asp-for="Statistic.Name" class="form-label">Istatistik Adi</label>
+                            <div class="admin-field">
+                                <label asp-for="Statistic.Name" class="form-label">İstatistik Adı</label>
                                 <input asp-for="Statistic.Name" class="form-control" />
                             </div>
-                            <div>
-                                <label asp-for="Statistic.Value" class="form-label">Deger</label>
+                            <div class="admin-field">
+                                <label asp-for="Statistic.Value" class="form-label">Değer</label>
                                 <input asp-for="Statistic.Value" class="form-control" />
                             </div>
-                            <button class="btn btn-info text-white">Istatistik Ekle</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+                            <button class="admin-submit stat"><i class="bi bi-plus-lg"></i>İstatistik Ekle</button>
+                </form>
+            </section>
         </div>
     </div>
 </main>

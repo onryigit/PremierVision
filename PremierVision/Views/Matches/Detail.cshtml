@@ -36,6 +36,18 @@
     var awayFullTime = fixture.AwayFullTimeScore ?? 0;
     var homeSecondHalf = fixture.HomeFullTimeScore.HasValue && fixture.HomeHalfTimeScore.HasValue ? homeFullTime - homeFirstHalf : 0;
     var awaySecondHalf = fixture.AwayFullTimeScore.HasValue && fixture.AwayHalfTimeScore.HasValue ? awayFullTime - awayFirstHalf : 0;
+    var liveMinute = isLive ? GetLiveMinute(fixture) : 0;
+
+    static int GetLiveMinute(FixtureCardViewModel fixture)
+    {
+        if (fixture.CurrentMinute.HasValue)
+        {
+            return Math.Clamp(fixture.CurrentMinute.Value, 1, 90);
+        }
+
+        var elapsedMinutes = (int)Math.Floor((DateTime.UtcNow - fixture.KickoffUtc).TotalMinutes);
+        return Math.Clamp(elapsedMinutes > 0 ? elapsedMinutes : 1, 1, 90);
+    }
 
     static double ParseComparableValue(string value)
     {
@@ -43,28 +55,76 @@
         return double.TryParse(normalized, NumberStyles.Any, CultureInfo.InvariantCulture, out var result) ? result : 0;
     }
 
-    static string TranslateStatisticName(string name) => name switch
+    static string GetOutgoingPlayerName(string? description)
     {
-        "Shots on Goal" => "İsabetli Şut",
-        "Shots off Goal" => "İsabetsiz Şut",
-        "Total Shots" => "Toplam Şut",
-        "Blocked Shots" => "Engellenen Şut",
-        "Shots insidebox" => "Ceza Sahası İçi Şut",
-        "Shots outsidebox" => "Ceza Sahası Dışı Şut",
-        "Fouls" => "Fauller",
-        "Corner Kicks" => "Korner",
-        "Offsides" => "Ofsayt",
-        "Ball Possession" => "Topa Sahip Olma",
-        "Expected Goals" => "Beklenen Gol",
-        "Goals Prevented" => "Önlenen Gol",
-        "Yellow Cards" => "Sarı Kart",
-        "Red Cards" => "Kırmızı Kart",
-        "Goalkeeper Saves" => "Kaleci Kurtarışı",
-        "Total passes" => "Toplam Pas",
-        "Passes accurate" => "İsabetli Pas",
-        "Passes %" => "Pas İsabeti",
-        _ => name
-    };
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            return "-";
+        }
+
+        var cleaned = description;
+        var pipeIndex = cleaned.LastIndexOf('|');
+        if (pipeIndex >= 0 && pipeIndex < cleaned.Length - 1)
+        {
+            cleaned = cleaned[(pipeIndex + 1)..];
+        }
+
+        cleaned = cleaned
+            .Replace("Assist:", string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Replace("Assist :", string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Replace("Asist:", string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Replace("Asist :", string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Replace("Cikan:", string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Replace("\u00c7\u0131kan:", string.Empty, StringComparison.OrdinalIgnoreCase)
+            .Trim();
+
+        return string.IsNullOrWhiteSpace(cleaned) ? "-" : cleaned;
+    }
+
+    static string GetEventDetailText(MatchEventItemViewModel item)
+    {
+        var description = item.Description?.Trim();
+
+        return item.EventType switch
+        {
+            MatchEventType.Goal => string.IsNullOrWhiteSpace(description)
+                ? "Gol"
+                : description.Replace("Goal", "Gol", StringComparison.OrdinalIgnoreCase)
+                    .Replace("Assist:", "Asist:", StringComparison.OrdinalIgnoreCase)
+                    .Replace("Penalty", "Penaltı", StringComparison.OrdinalIgnoreCase),
+            MatchEventType.YellowCard => "Sar\u0131 Kart",
+            MatchEventType.RedCard => "K\u0131rm\u0131z\u0131 Kart",
+            MatchEventType.Substitution => $"Çıkan: {GetOutgoingPlayerName(description)}",
+            _ => string.IsNullOrWhiteSpace(description) ? item.TeamName : description
+        };
+    }
+
+    static string TranslateStatisticName(string name)
+    {
+        var normalized = name.Replace("_", " ").Trim().ToLowerInvariant();
+        return normalized switch
+        {
+            "shots on goal" => "\u0130sabetli \u015eut",
+            "shots off goal" => "\u0130sabetsiz \u015eut",
+            "total shots" => "Toplam \u015eut",
+            "blocked shots" => "Engellenen \u015eut",
+            "shots insidebox" => "Ceza Sahas\u0131 \u0130\u00e7i \u015eut",
+            "shots outsidebox" => "Ceza Sahas\u0131 D\u0131\u015f\u0131 \u015eut",
+            "fouls" => "Fauller",
+            "corner kicks" => "Korner",
+            "offsides" => "Ofsayt",
+            "ball possession" => "Topa Sahip Olma",
+            "expected goals" => "Beklenen Gol",
+            "goals prevented" => "\u00d6nlenen Gol",
+            "yellow cards" => "Sar\u0131 Kart",
+            "red cards" => "K\u0131rm\u0131z\u0131 Kart",
+            "goalkeeper saves" => "Kaleci Kurtar\u0131\u015f\u0131",
+            "total passes" => "Toplam Pas",
+            "passes accurate" => "\u0130sabetli Pas",
+            "passes %" => "Pas \u0130sabeti",
+            _ => name
+        };
+    }
 }
 
 @section Styles {
@@ -186,6 +246,23 @@
         .h-ht, .h-ft {
             font-family: var(--fd);
             font-size: 12px;
+        }
+
+        .h-live-minute {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--live);
+            background: rgba(255,23,68,.1);
+            border: 1px solid rgba(255,23,68,.24);
+            border-radius: 14px;
+            padding: 5px 14px;
+            font-family: var(--fd);
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 0 18px rgba(255,23,68,.1);
         }
 
         .h-ht {
@@ -563,7 +640,7 @@
 <section class="hero">
     <div class="wrap">
         <div class="hero-badges">
-            <span class="hbadge hb-gold"><i class="bi bi-trophy-fill me-1"></i>Premier League · Hafta @fixture.MatchWeek</span>
+            <span class="hbadge hb-gold"><i class="bi bi-trophy-fill me-1"></i>Premier League • Hafta @fixture.MatchWeek</span>
             <span class="hbadge hb-gray">
                 @if (fixture.Status == FixtureStatus.Completed)
                 {
@@ -598,6 +675,10 @@
                 <div class="h-sc">
                     @fullTimeDisplay
                 </div>
+                @if (isLive)
+                {
+                    <div class="h-live-minute"><span class="live-dot"></span>Dakika @liveMinute'</div>
+                }
                 <div class="h-ht"><i class="bi bi-hourglass-split me-1"></i>İY: @(fixture.HomeHalfTimeScore.HasValue && fixture.AwayHalfTimeScore.HasValue ? $"{fixture.HomeHalfTimeScore} - {fixture.AwayHalfTimeScore}" : "-")</div>
                 <div class="h-ft">
                     @(fixture.Status == FixtureStatus.Completed ? "Maç Bitti" : fixture.Status == FixtureStatus.Live ? "Maç Devam Ediyor" : "Maç Henüz Başlamadı")
@@ -637,10 +718,10 @@
                     {
                         <p style="color:var(--t2)">
                             @(isNotStarted
-                                ? "Mac henuz baslamadi. Olay akisi, goller ve kartlar mac basladiginda olusacak."
+                                ? "Maç henüz başlamadı. Olay akışı, goller ve kartlar maç başladığında oluşacak."
                                 : isLive
-                                    ? "Bu canli maca ait olay akisi henuz girilmedi."
-                                    : "Bu maca ait olay girisi yok.")
+                                    ? "Bu canlı maça ait olay akışı henüz girilmedi."
+                                    : "Bu maça ait olay girişi yok.")
                         </p>
                     }
                     else
@@ -666,21 +747,28 @@
                                 };
                                 var icon = item.EventType switch
                                 {
-                                    MatchEventType.Goal => "bi-circle-fill",
+                                    MatchEventType.Goal => string.Empty,
                                     MatchEventType.YellowCard => "bi-square-fill",
                                     MatchEventType.RedCard => "bi-square-fill",
                                     _ => "bi-arrow-left-right"
                                 };
-                                var detailText = item.EventType == MatchEventType.Substitution
-                                    ? (item.Description ?? string.Empty).Replace("Assist:", "Çıkan:")
-                                    : item.Description;
+                                var detailText = GetEventDetailText(item);
 
                                 <div class="tl-ev">
                                     <div class="tl-home">
                                         @if (isHome)
                                         {
                                             <div class="chip home @chipClass">
-                                                <div class="ev-ico @iconClass"><i class="bi @icon" style="font-size:9px"></i></div>
+                                                <div class="ev-ico @iconClass">
+                                                    @if (item.EventType == MatchEventType.Goal)
+                                                    {
+                                                        @Html.Raw("&#9917;")
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi @icon" style="font-size:9px"></i>
+                                                    }
+                                                </div>
                                                 <div>
                                                     <div class="ev-pl">@item.PlayerName</div>
                                                     <div class="ev-dt">@(!string.IsNullOrWhiteSpace(detailText) ? detailText : item.TeamName)</div>
@@ -693,7 +781,16 @@
                                         @if (!isHome)
                                         {
                                             <div class="chip away @chipClass">
-                                                <div class="ev-ico @iconClass"><i class="bi @icon" style="font-size:9px"></i></div>
+                                                <div class="ev-ico @iconClass">
+                                                    @if (item.EventType == MatchEventType.Goal)
+                                                    {
+                                                        @Html.Raw("&#9917;")
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi @icon" style="font-size:9px"></i>
+                                                    }
+                                                </div>
                                                 <div>
                                                     <div class="ev-pl">@item.PlayerName</div>
                                                     <div class="ev-dt">@(!string.IsNullOrWhiteSpace(detailText) ? detailText : item.TeamName)</div>
@@ -711,30 +808,30 @@
                     <div class="dc-title"><i class="bi bi-circle-fill me-2" style="color:var(--green);font-size:9px"></i>Goller</div>
                     <div class="split2">
                         <div class="box2">
-                            <div class="box2-title">⚽ @fixture.HomeTeamName</div>
+                            <div class="box2-title">&#9917; @fixture.HomeTeamName</div>
                             @if (homeGoals.Count == 0)
                             {
-                                <div class="gl"><div class="gl-pl">@(isNotStarted ? "Mac henuz baslamadi" : "Gol yok")</div></div>
+                                <div class="gl"><div class="gl-pl">@(isNotStarted ? "Maç henüz başlamadı" : "Gol yok")</div></div>
                             }
                             else
                             {
                                 @foreach (var item in homeGoals)
                                 {
-                            <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">@item.PlayerName</div><div class="gl-min">@item.Minute'</div></div>
+                            <div class="gl"><div class="gl-ico">&#9917;</div><div class="gl-pl">@item.PlayerName</div><div class="gl-min">@item.Minute'</div></div>
                                 }
                             }
                         </div>
                         <div class="box2">
-                            <div class="box2-title">⚽ @fixture.AwayTeamName</div>
+                            <div class="box2-title">&#9917; @fixture.AwayTeamName</div>
                             @if (awayGoals.Count == 0)
                             {
-                                <div class="gl"><div class="gl-pl">@(isNotStarted ? "Mac henuz baslamadi" : "Gol yok")</div></div>
+                                <div class="gl"><div class="gl-pl">@(isNotStarted ? "Maç henüz başlamadı" : "Gol yok")</div></div>
                             }
                             else
                             {
                                 @foreach (var item in awayGoals)
                                 {
-                            <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">@item.PlayerName</div><div class="gl-min">@item.Minute'</div></div>
+                            <div class="gl"><div class="gl-ico">&#9917;</div><div class="gl-pl">@item.PlayerName</div><div class="gl-min">@item.Minute'</div></div>
                                 }
                             }
                         </div>
@@ -748,7 +845,7 @@
                             <div class="box2-title">@fixture.HomeTeamName</div>
                             @if (homeCards.Count == 0)
                             {
-                                <div class="gl"><div class="gl-pl">@(isNotStarted ? "Mac henuz baslamadi" : "Kart yok")</div></div>
+                                <div class="gl"><div class="gl-pl">@(isNotStarted ? "Maç henüz başlamadı" : "Kart yok")</div></div>
                             }
                             else
                             {
@@ -766,7 +863,7 @@
                             <div class="box2-title">@fixture.AwayTeamName</div>
                             @if (awayCards.Count == 0)
                             {
-                                <div class="gl"><div class="gl-pl">@(isNotStarted ? "Mac henuz baslamadi" : "Kart yok")</div></div>
+                                <div class="gl"><div class="gl-pl">@(isNotStarted ? "Maç henüz başlamadı" : "Kart yok")</div></div>
                             }
                             else
                             {
@@ -788,7 +885,7 @@
                     <div class="sub-lbl">@fixture.HomeTeamName</div>
                     @if (homeSubs.Count == 0)
                     {
-                        <div class="sub-r"><div class="sub-out">@(isNotStarted ? "Mac henuz baslamadi" : "Degisiklik yok")</div></div>
+                        <div class="sub-r"><div class="sub-out">@(isNotStarted ? "Maç henüz başlamadı" : "Değişiklik yok")</div></div>
                     }
                     else
                     {
@@ -796,9 +893,9 @@
                         {
                             <div class="sub-r">
                                 <div class="sub-min">@item.Minute'</div>
-                                <div class="sub-in">↑ @item.PlayerName</div>
-                                <div class="sub-arr">⇄</div>
-                                <div class="sub-out">↓ @(string.IsNullOrWhiteSpace(item.Description) ? "-" : item.Description.Replace("Assist:", string.Empty).Replace("Cikan:", string.Empty).Replace("Çıkan:", string.Empty).Trim())</div>
+                                <div class="sub-in">&uarr; @item.PlayerName</div>
+                                <div class="sub-arr">&#8646;</div>
+                                <div class="sub-out">&darr; @GetOutgoingPlayerName(item.Description)</div>
                             </div>
                         }
                     }
@@ -806,7 +903,7 @@
                     <div class="sub-lbl">@fixture.AwayTeamName</div>
                     @if (awaySubs.Count == 0)
                     {
-                        <div class="sub-r"><div class="sub-out">@(isNotStarted ? "Mac henuz baslamadi" : "Degisiklik yok")</div></div>
+                        <div class="sub-r"><div class="sub-out">@(isNotStarted ? "Maç henüz başlamadı" : "Değişiklik yok")</div></div>
                     }
                     else
                     {
@@ -814,9 +911,9 @@
                         {
                             <div class="sub-r">
                                 <div class="sub-min">@item.Minute'</div>
-                                <div class="sub-in">↑ @item.PlayerName</div>
-                                <div class="sub-arr">⇄</div>
-                                <div class="sub-out">↓ @(string.IsNullOrWhiteSpace(item.Description) ? "-" : item.Description.Replace("Assist:", string.Empty).Replace("Cikan:", string.Empty).Replace("Çıkan:", string.Empty).Trim())</div>
+                                <div class="sub-in">&uarr; @item.PlayerName</div>
+                                <div class="sub-arr">&#8646;</div>
+                                <div class="sub-out">&darr; @GetOutgoingPlayerName(item.Description)</div>
                             </div>
                         }
                     }
@@ -839,8 +936,8 @@
                     {
                         <p style="color:var(--t2)">
                             @(isNotStarted
-                                ? "Mac henuz baslamadigi icin istatistik bulunmuyor."
-                                : "Bu maca ait istatistik girisi yok.")
+                                ? "Maç henüz başladığı için istatistik bulunmuyor."
+                                : "Bu maça ait istatistik girişi yok.")
                         </p>
                     }
                     else
@@ -883,3 +980,4 @@
         </div>
     </div>
 </div>
+
