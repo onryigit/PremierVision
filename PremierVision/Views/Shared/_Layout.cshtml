@@ -40,6 +40,7 @@
             --fd: "Barlow Condensed", sans-serif;
             --fb: "Barlow", sans-serif;
             --hero-panel-bg: rgba(21,16,38,.68);
+            --brand-purple: #8b4fd8;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -70,6 +71,37 @@
                 linear-gradient(180deg, rgba(6,10,18,.08) 0%, rgba(6,10,18,.34) 42%, rgba(13,10,24,.92) 100%),
                 url('/dosyalar/background.jpeg') center 24% / cover no-repeat;
             opacity: .92;
+        }
+        body.with-backdrop::after {
+            content: "";
+            position: absolute;
+            top: 1100px;
+            left: 24px;
+            width: min(390px, calc((100vw - 1120px) / 2 - 48px));
+            height: min(76vh, 780px);
+            min-height: 560px;
+            z-index: -1;
+            pointer-events: none;
+            background: url('/dosyalar/Cherki.png') left bottom / contain no-repeat;
+            opacity: .88;
+            filter: drop-shadow(0 28px 36px rgba(0,0,0,.42));
+        }
+        .side-player {
+            display: none;
+        }
+        body.with-backdrop .side-player {
+            display: block;
+            position: absolute;
+            top: 1100px;
+            right: 24px;
+            width: min(390px, calc((100vw - 1120px) / 2 - 48px));
+            height: min(76vh, 780px);
+            min-height: 560px;
+            z-index: -1;
+            pointer-events: none;
+            background: url('/dosyalar/Ekitike.png') right bottom / contain no-repeat;
+            opacity: .88;
+            filter: drop-shadow(0 28px 36px rgba(0,0,0,.42));
         }
         a { color: inherit; text-decoration: none; }
         img { display: block; }
@@ -112,7 +144,7 @@
             font-weight: 800;
             letter-spacing: 1px;
         }
-        .brand-txt span { color: var(--green); }
+        .brand-txt span { color: var(--brand-purple); }
         .nav-links { display: flex; }
         .nl {
             font-family: var(--fd);
@@ -593,14 +625,20 @@
             .ft-sc { font-size: 44px; }
             .lg-stats { display: none; }
         }
+
+        @@media (max-width: 1679px) {
+            body.with-backdrop::after { display: none; }
+            body.with-backdrop .side-player { display: none; }
+        }
     </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="@(hasBackdrop ? "with-backdrop" : string.Empty)">
+    <div class="side-player" aria-hidden="true"></div>
     <nav class="nb">
         <div class="nb-inner">
             <a asp-controller="Home" asp-action="Index" class="brand">
-                <img src="~/dosyalar/premierlogo.png" alt="PremierVision logo" class="brand-logo" />
+                <img src="~/dosyalar/logo2.png" alt="PremierVision logo" class="brand-logo" />
                 <span class="brand-txt">Premier<span>Vision</span></span>
             </a>
             <div class="nav-links d-none d-lg-flex">
