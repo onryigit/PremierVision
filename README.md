@@ -107,3 +107,20 @@ Ana sayfalar:
 /standings.html   Puan durumu tablosu
 /match-detail.html/{id}
 /admin            Admin paneli
+
+<img width="1903" height="953" alt="3" src="https://github.com/user-attachments/assets/f9323ebf-d08d-4a40-b7d2-ecc8c4d623fc" />
+<img width="1906" height="948" alt="2" src="https://github.com/user-attachments/assets/ff806f68-d102-4d2a-a9ee-d2d7afa7e90c" />
+<img width="941" height="2962" alt="1" src="https://github.com/user-attachments/assets/1c405d63-eed3-4cb9-8dbe-a22d5eece632" />
+<img width="1904" height="950" alt="4" src="https://github.com/user-attachments/assets/e86d7b50-ffdb-47cd-98d6-25d1cdcc980b" />
+<img width="1906" height="952" alt="5" src="https://github.com/user-attachments/assets/01e568b3-d752-4a24-9b62-228c25cd6ab7" />
+<img width="1904" height="954" alt="33" src="https://github.com/user-attachments/assets/9a573421-ffd7-4bfd-a76a-076669574883" />
+<img width="1906" height="952" alt="6" src="https://github.com/user-attachments/assets/d69571df-15ea-41f7-8798-0289c0f6c0ed" />
+<img width="1901" height="948" alt="7" src="https://github.com/user-attachments/assets/5eb2723f-3b13-46cf-ae37-5ed580157528" />
+<img width="1901" height="948" alt="7" src="https://github.com/user-attachments/assets/952b6a3a-e067-4f4b-9442-5c227180dd93" />
+<img width="1906" height="951" alt="8" src="https://github.com/user-attachments/assets/21794431-4c78-45b8-bc51-c072056063a0" />
+<img width="1907" height="951" alt="9" src="https://github.com/user-attachments/assets/963b5708-e126-424b-963c-13b9c3af5dda" />
+<img width="1907" height="952" alt="11" src="https://github.com/user-attachments/assets/3416c3f7-62c0-4655-aa18-d03b27650ac9" />
+<img width="1905" height="949" alt="10" src="https://github.com/user-attachments/assets/4c4dddc5-9980-48b5-92a7-2b235824c43a" />
+<img width="1045" height="1521" alt="14" src="https://github.com/user-attachments/assets/a71e7212-55e3-45c7-988a-5a114cace06c" />
+<img width="1903" height="950" alt="12" src="https://github.com/user-attachments/assets/c091e85f-41a0-4564-83bc-e884aa1750b2" />
+
