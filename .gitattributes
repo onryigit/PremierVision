@@ -61,3 +61,8 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+wwwroot/** linguist-vendored
+*.cshtml linguist-language=C#
+*.html linguist-vendored
+*.css linguist-vendored
+*.js linguist-vendored
