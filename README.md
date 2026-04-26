@@ -115,8 +115,6 @@ PremierVisionApiClient aracılığıyla API’yi tüketen MVC frontend uygulamas
 
 <img width="1906" height="948" alt="Fixtures Page" src="https://github.com/user-attachments/assets/ff806f68-d102-4d2a-a9ee-d2d7afa7e90c" />
 
-<img width="941" height="2962" alt="Mobile View" src="https://github.com/user-attachments/assets/1c405d63-eed3-4cb9-8dbe-a22d5eece632" />
-
 <img width="1904" height="950" alt="Standings Page" src="https://github.com/user-attachments/assets/e86d7b50-ffdb-47cd-98d6-25d1cdcc980b" />
 
 <img width="1906" height="952" alt="Match Detail Page" src="https://github.com/user-attachments/assets/01e568b3-d752-4a24-9b62-228c25cd6ab7" />
@@ -140,4 +138,5 @@ PremierVisionApiClient aracılığıyla API’yi tüketen MVC frontend uygulamas
 <img width="1045" height="1521" alt="Responsive View" src="https://github.com/user-attachments/assets/a71e7212-55e3-45c7-988a-5a114cace06c" />
 
 <img width="1903" height="950" alt="Final Screenshot" src="https://github.com/user-attachments/assets/c091e85f-41a0-4564-83bc-e884aa1750b2" />
+<img width="941" height="2962" alt="Mobile View" src="https://github.com/user-attachments/assets/1c405d63-eed3-4cb9-8dbe-a22d5eece632" />
 
