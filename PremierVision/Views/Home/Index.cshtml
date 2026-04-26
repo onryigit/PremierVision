@@ -3,11 +3,41 @@
 @{
     ViewData["Title"] = "Ana Sayfa";
 
-    var liveCount = Model.LiveFixtures.Count;
-    var finishedCount = Model.LatestResults.Count;
-    var upcomingCount = Model.UpcomingFixtures.Count;
+    var selectedFixtures = Model.WeeklyFixtures
+        .OrderBy(x => x.KickoffUtc)
+        .ToList();
+    var selectedLiveFixtures = selectedFixtures
+        .Where(x => x.Status == FixtureStatus.Live)
+        .ToList();
+    var selectedFinishedFixtures = selectedFixtures
+        .Where(x => x.Status == FixtureStatus.Completed)
+        .OrderByDescending(x => x.KickoffUtc)
+        .ToList();
+    var selectedUpcomingFixtures = selectedFixtures
+        .Where(x => x.Status == FixtureStatus.NotStarted)
+        .ToList();
+    var liveCount = selectedLiveFixtures.Count;
+    var finishedCount = selectedFinishedFixtures.Count;
+    var upcomingCount = selectedUpcomingFixtures.Count;
     var totalCount = liveCount + finishedCount + upcomingCount;
-    var featured = Model.FeaturedMatch;
+    var featured = selectedLiveFixtures
+        .OrderByDescending(x => x.KickoffUtc)
+        .FirstOrDefault()
+        ?? selectedFinishedFixtures.FirstOrDefault()
+        ?? selectedUpcomingFixtures.FirstOrDefault()
+        ?? selectedFixtures.FirstOrDefault();
+    var prevWeek = Model.CurrentWeek;
+    var nextWeek = Model.CurrentWeek;
+    var nearbyWeeks = Array.Empty<int>();
+    var weekStatusText = totalCount == 0
+        ? "Bu hafta için maç bulunmuyor"
+        : liveCount > 0
+            ? $"{liveCount} maç canlı"
+            : upcomingCount == 0
+                ? "Haftanın tüm maçları tamamlandı"
+                : finishedCount > 0
+                    ? $"{finishedCount} tamamlandı, {upcomingCount} yaklaşan maç"
+                    : $"{upcomingCount} yaklaşan maç";
 
     static int GetLiveMinute(FixtureCardViewModel fixture)
     {
@@ -26,6 +56,7 @@
         .home-main {
             padding-top: 28px;
             padding-bottom: 56px;
+            min-height: 820px;
         }
 
         .sec-ttl[data-section="live"] {
@@ -58,6 +89,166 @@
             padding: 18px;
             color: var(--t2);
         }
+
+        .week-select-card {
+            width: 220px;
+            position: relative;
+            height: 54px;
+            min-height: 54px;
+            padding: 0;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.018)),
+                rgba(9,13,25,.68);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: var(--r2);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 18px 38px rgba(0,0,0,.24);
+            transition: var(--tr);
+            display: flex;
+            align-items: center;
+        }
+
+        .week-select-card::before {
+            content: "\F1F6";
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(-50%);
+            color: var(--green);
+            background: rgba(0,230,118,.1);
+            border: 1px solid rgba(0,230,118,.2);
+            border-radius: var(--r1);
+            font-family: "bootstrap-icons";
+            font-size: 14px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .week-select-card::after {
+            content: "\F282";
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            width: 26px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(-50%);
+            color: var(--t2);
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 7px;
+            font-family: "bootstrap-icons";
+            font-size: 11px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .week-select-card:focus-within {
+            border-color: rgba(0,230,118,.48);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 0 0 3px rgba(0,230,118,.09), 0 18px 38px rgba(0,0,0,.24);
+        }
+
+        .week-select-icon {
+            display: none;
+        }
+
+        .week-arrow,
+        .week-pill,
+        .week-select-caret {
+            display: none;
+        }
+
+        .week-center {
+            display: block;
+            width: 100%;
+            height: 54px;
+        }
+
+        .week-select-wrap {
+            position: relative;
+            width: 100%;
+            height: 54px;
+        }
+
+        .week-select-wrap::before {
+            content: "Hafta Seçimi";
+            position: absolute;
+            top: 6px;
+            left: 52px;
+            color: var(--t3);
+            font-family: var(--fd);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .week-select {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            padding: 21px 40px 0 52px;
+            border: 0;
+            background: transparent;
+            color: var(--t1);
+            font-family: var(--fd);
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            outline: none;
+            z-index: 2;
+            line-height: 1;
+        }
+
+        .week-select option {
+            background: var(--bg2);
+            color: var(--t1);
+            font-family: var(--fb);
+            font-size: 14px;
+        }
+
+        .week-select-label {
+            display: none;
+        }
+
+        .week-select-caret {
+            display: none;
+        }
+
+        .week-state {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 12px;
+            color: var(--t2);
+            font-size: 13px;
+        }
+
+        .week-state i {
+            color: var(--green);
+        }
+
+        @@media (max-width: 991px) {
+            .week-select-card {
+                margin-top: 10px;
+                width: 100%;
+                max-width: 320px;
+            }
+        }
     </style>
 }
 
@@ -68,12 +259,34 @@
                 <div class="lg-badge"><i class="bi bi-trophy-fill"></i> Premier League</div>
                 <h1 class="lg-title"><span style="color:var(--green)">@Model.CurrentWeek.</span> Hafta Heyecanı</h1>
                 <p class="lg-sub">Canlı skorlar, son tamamlanan maçlar ve yaklaşan karşılaşmalar</p>
+                <div class="week-state"><i class="bi bi-activity"></i><span>@weekStatusText</span></div>
             </div>
-            <div class="col-lg-5 d-none d-lg-block">
-                <div class="lg-stats">
-                    <div class="lg-stat"><div class="ls-num">@liveCount</div><div class="ls-lbl">Canlı</div></div>
-                    <div class="lg-stat"><div class="ls-num">@finishedCount</div><div class="ls-lbl">Biten</div></div>
-                    <div class="lg-stat"><div class="ls-num">@upcomingCount</div><div class="ls-lbl">Yaklaşan</div></div>
+            <div class="col-lg-5 mt-3 mt-lg-0">
+                <div class="d-flex flex-column align-items-lg-end gap-3">
+                    <div class="lg-stats d-none d-lg-flex">
+                        <div class="lg-stat"><div class="ls-num">@liveCount</div><div class="ls-lbl">Canlı</div></div>
+                        <div class="lg-stat"><div class="ls-num">@finishedCount</div><div class="ls-lbl">Biten</div></div>
+                        <div class="lg-stat"><div class="ls-num">@upcomingCount</div><div class="ls-lbl">Yaklaşan</div></div>
+                    </div>
+                    <div class="week-select-card" aria-label="Hafta seçimi">
+                        <div class="week-center">
+                            <div class="week-select-wrap">
+                                <select class="week-select" aria-label="Hafta listesi" onchange="if (this.value) window.location.href = this.value;">
+                                    @foreach (var week in Model.AvailableWeeks)
+                                    {
+                                        if (week == Model.CurrentWeek)
+                                        {
+                                            <option value="@Url.Action("Index", "Home", new { week })" selected>Hafta @week</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@Url.Action("Index", "Home", new { week })">Hafta @week</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -160,13 +373,13 @@
         }
 
         <div class="sec-ttl home-section" data-section="live">Canlı Maçlar</div>
-        @if (Model.LiveFixtures.Count == 0)
+        @if (selectedLiveFixtures.Count == 0)
         {
             <div class="empty-card home-section" data-section="live">Canlı maç bulunmuyor.</div>
         }
         else
         {
-            @foreach (var liveEntry in Model.LiveFixtures.Select((item, index) => new { item, index }))
+            @foreach (var liveEntry in selectedLiveFixtures.Select((item, index) => new { item, index }))
             {
                 var item = liveEntry.item;
                 var homeInitials = item.HomeTeamName[..Math.Min(3, item.HomeTeamName.Length)].ToUpperInvariant();
@@ -215,13 +428,13 @@
         }
 
         <div class="sec-ttl home-section" data-section="finished">Tamamlanan Maçlar</div>
-        @if (Model.LatestResults.Count == 0)
+        @if (selectedFinishedFixtures.Count == 0)
         {
             <div class="empty-card home-section" data-section="finished">Tamamlanmış maç bulunmuyor.</div>
         }
         else
         {
-            @foreach (var item in Model.LatestResults)
+            @foreach (var item in selectedFinishedFixtures)
             {
                 var homeInitials = item.HomeTeamName[..Math.Min(3, item.HomeTeamName.Length)].ToUpperInvariant();
                 var awayInitials = item.AwayTeamName[..Math.Min(3, item.AwayTeamName.Length)].ToUpperInvariant();
@@ -268,13 +481,13 @@
         }
 
         <div class="sec-ttl home-section" data-section="upcoming">Yaklaşan Maçlar</div>
-        @if (Model.UpcomingFixtures.Count == 0)
+        @if (selectedUpcomingFixtures.Count == 0)
         {
             <div class="empty-card home-section" data-section="upcoming">Yaklaşan maç bulunmuyor.</div>
         }
         else
         {
-            @foreach (var item in Model.UpcomingFixtures)
+            @foreach (var item in selectedUpcomingFixtures)
             {
                 var homeInitials = item.HomeTeamName[..Math.Min(3, item.HomeTeamName.Length)].ToUpperInvariant();
                 var awayInitials = item.AwayTeamName[..Math.Min(3, item.AwayTeamName.Length)].ToUpperInvariant();
@@ -325,6 +538,22 @@
         const tabs = document.querySelectorAll("[data-filter]");
         const sections = document.querySelectorAll(".home-section");
         const featured = document.getElementById("featuredBlock");
+        const weekSelectCard = document.querySelector(".week-select-card");
+        const weekSelect = document.querySelector(".week-select");
+
+        if (weekSelectCard && weekSelect) {
+            weekSelectCard.addEventListener("click", event => {
+                if (event.target === weekSelect) {
+                    return;
+                }
+
+                weekSelect.focus();
+
+                if (typeof weekSelect.showPicker === "function") {
+                    weekSelect.showPicker();
+                }
+            });
+        }
 
         tabs.forEach(tab => {
             tab.addEventListener("click", () => {

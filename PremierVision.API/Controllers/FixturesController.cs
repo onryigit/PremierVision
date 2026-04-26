@@ -34,6 +34,7 @@ public class FixturesController(AppDbContext context) : ControllerBase
             .AsNoTracking()
             .Include(x => x.HomeTeam)
             .Include(x => x.AwayTeam)
+            .Include(x => x.Events)
             .Where(x => x.MatchWeek == selectedWeek)
             .OrderBy(x => x.KickoffUtc)
             .ToListAsync(cancellationToken))

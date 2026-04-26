@@ -3,6 +3,9 @@ using PremierVision.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 builder.Services.AddControllersWithViews();
 builder.Services.Configure<PremierVisionApiOptions>(
     builder.Configuration.GetSection(PremierVisionApiOptions.SectionName));
