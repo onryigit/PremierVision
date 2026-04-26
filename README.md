@@ -4,6 +4,7 @@ PremierVision, İngiltere Premier Ligi’ne ait maçları, fikstürü, puan duru
 
 Proje kapsamında, ligdeki takımların maç performansları, haftalık fikstürler, canlı ve tamamlanmış karşılaşmalar ile birlikte maçlara ait detaylı olaylar ve istatistikler görüntülenebilmektedir. Ayrıca admin paneli aracılığıyla sistem içerisine manuel veri girişi yapılabilmektedir.
 
+
 ⚙️ Özellikler
 
 Haftalık maç sonuçlarının listelenmesi
