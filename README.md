@@ -5,7 +5,7 @@ PremierVision, İngiltere Premier Ligi’ne ait maçları, fikstürü, puan duru
 Proje kapsamında, ligdeki takımların maç performansları, haftalık fikstürler, canlı ve tamamlanmış karşılaşmalar ile birlikte maçlara ait detaylı olaylar ve istatistikler görüntülenebilmektedir. Ayrıca admin paneli aracılığıyla sistem içerisine manuel veri girişi yapılabilmektedir.
 
 
-⚙️ Özellikler
+###⚙️ Özellikler
 
 Haftalık maç sonuçlarının listelenmesi
 Canlı, tamamlanmış ve yaklaşan maçların ayrı ayrı gösterimi
@@ -23,7 +23,7 @@ Maç olayı ekleme
 Maç istatistiği ekleme
 Responsive (mobil uyumlu) kullanıcı arayüzü
 
-🛠️ Kullanılan Teknolojiler
+###🛠️ Kullanılan Teknolojiler
 
 .NET 10
 ASP.NET Core MVC
@@ -34,7 +34,7 @@ Bootstrap
 Bootstrap Icons
 Razor View Engine
 
-🏗️ Proje Mimarisi
+###🏗️ Proje Mimarisi
 
 Proje, modern web uygulama geliştirme prensiplerine uygun olarak katmanlı bir mimari ile geliştirilmiştir.
 
@@ -46,7 +46,7 @@ Veri erişimi ile arayüz birbirinden ayrılmıştır
 Kodun sürdürülebilirliği ve okunabilirliği artırılmıştır
 Farklı istemcilerin aynı API’yi kullanabilmesi mümkün hale gelmiştir
 
-📊 Veri Yapısı ve İşleyiş
+###📊 Veri Yapısı ve İşleyiş
 
 Uygulamada temel olarak şu veri yapıları kullanılmaktadır:
 Teams (Takımlar)
@@ -67,7 +67,7 @@ Averaj (gol farkı)
 Son maç performansı
 gibi değerler de anlık olarak hesaplanır.
 
-🎯 Kullanım Amacı
+###🎯 Kullanım Amacı
 
 Bu proje:
 
