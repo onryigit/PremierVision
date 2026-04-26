@@ -98,7 +98,8 @@ POST /api/admin/statistics
 
 PremierVisionApiClient aracılığıyla API’yi tüketen MVC frontend uygulamasıdır.
 
-Ana sayfalar:
+```md
+### Ana sayfalar
 
 ```text
 /                 Ana sayfa
