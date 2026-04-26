@@ -1,4 +1,4 @@
-🏆PremierVision
+# 🏆PremierVision
 
 PremierVision, İngiltere Premier Ligi’ne ait maçları, fikstürü, puan durumunu ve maç detaylarını takip etmek amacıyla geliştirilmiş bir web uygulamasıdır. Uygulama, kullanıcıya güncel ve detaylı futbol verilerini anlaşılır ve modern bir arayüz üzerinden sunmayı hedefler.
 
@@ -100,6 +100,7 @@ PremierVisionApiClient aracılığıyla API’yi tüketen MVC frontend uygulamas
 
 Ana sayfalar:
 
+```text
 /                 Ana sayfa
 /index.html       Ana sayfa (alternatif)
 /fixtures.html    Fikstür listesi
