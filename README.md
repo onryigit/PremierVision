@@ -1,46 +1,84 @@
-# PremierVision
+🏆PremierVision
 
-PremierVision is an ASP.NET Core web application for tracking Premier League fixtures, live matches, match details, standings, and admin-managed match data. The solution is split into a backend API and an MVC frontend so the UI consumes structured football data through HTTP endpoints instead of querying the database directly.
+PremierVision, İngiltere Premier Ligi’ne ait maçları, fikstürü, puan durumunu ve maç detaylarını takip etmek amacıyla geliştirilmiş bir web uygulamasıdır. Uygulama, kullanıcıya güncel ve detaylı futbol verilerini anlaşılır ve modern bir arayüz üzerinden sunmayı hedefler.
 
-## Features
+Proje kapsamında, ligdeki takımların maç performansları, haftalık fikstürler, canlı ve tamamlanmış karşılaşmalar ile birlikte maçlara ait detaylı olaylar ve istatistikler görüntülenebilmektedir. Ayrıca admin paneli aracılığıyla sistem içerisine manuel veri girişi yapılabilmektedir.
 
-- Weekly Premier League match overview
-- Live, completed, and upcoming match sections on the home page
-- Featured match card with live minute display
-- Fixture list grouped by match day and match week
-- Match detail page with score, timeline events, goals, cards, substitutions, and statistics
-- Standings table calculated from completed fixtures
-- Admin panel for adding fixtures, match events, and match statistics
-- SQL Server persistence with Entity Framework Core
-- Responsive MVC UI styled with Bootstrap, Bootstrap Icons, and custom CSS
+⚙️ Özellikler
 
-## Tech Stack
+Haftalık maç sonuçlarının listelenmesi
+Canlı, tamamlanmış ve yaklaşan maçların ayrı ayrı gösterimi
+Öne çıkan maç kartı ile canlı dakika takibi
+Maç haftasına göre gruplanmış fikstür yapısı
+Detaylı maç sayfası:
+Skor bilgisi
+Maç içi olaylar (gol, kart, oyuncu değişikliği)
+İstatistikler
+Tamamlanan maçlara göre dinamik olarak hesaplanan puan durumu
+Takımların form durumlarının (son maç performansı) gösterimi
+Admin panel üzerinden:
+Maç ekleme
+Maç olayı ekleme
+Maç istatistiği ekleme
+Responsive (mobil uyumlu) kullanıcı arayüzü
 
-- .NET 10
-- ASP.NET Core MVC
-- ASP.NET Core Web API
-- Entity Framework Core 10
-- SQL Server
-- Bootstrap
-- Bootstrap Icons
+🛠️ Kullanılan Teknolojiler
 
-## Solution Structure
+.NET 10
+ASP.NET Core MVC
+ASP.NET Core Web API
+Entity Framework Core
+SQL Server
+Bootstrap
+Bootstrap Icons
+Razor View Engine
 
-```text
-PremierVision/
-+-- PremierVision.API/        # Backend API, EF Core DbContext, domain models, controllers
-+-- PremierVision/            # MVC frontend application
-+-- PremierVision.slnx        # Solution file
-`-- README.md
-```
+🏗️ Proje Mimarisi
 
-## Projects
+Proje, modern web uygulama geliştirme prensiplerine uygun olarak katmanlı bir mimari ile geliştirilmiştir.
+
+Backend (API) katmanı, veri yönetimi ve iş kurallarından sorumludur
+Frontend (MVC) katmanı, kullanıcı arayüzünü oluşturur ve API üzerinden gelen verileri kullanır
+
+Bu yapı sayesinde:
+Veri erişimi ile arayüz birbirinden ayrılmıştır
+Kodun sürdürülebilirliği ve okunabilirliği artırılmıştır
+Farklı istemcilerin aynı API’yi kullanabilmesi mümkün hale gelmiştir
+
+📊 Veri Yapısı ve İşleyiş
+
+Uygulamada temel olarak şu veri yapıları kullanılmaktadır:
+Teams (Takımlar)
+Fixtures (Maçlar / Fikstür)
+Match Events (Maç Olayları)
+Match Statistics (Maç İstatistikleri)
+
+Puan durumu veritabanında ayrı bir tablo olarak tutulmaz.
+Bunun yerine tamamlanan maç sonuçları üzerinden dinamik olarak hesaplanır:
+
+Galibiyet: 3 puan
+Beraberlik: 1 puan
+Mağlubiyet: 0 puan
+
+Ayrıca:
+Atılan ve yenilen goller
+Averaj (gol farkı)
+Son maç performansı
+gibi değerler de anlık olarak hesaplanır.
+
+🎯 Kullanım Amacı
+
+Bu proje:
+
+Futbol verisi işleme ve görselleştirme
+API ve MVC mimarisini birlikte kullanma
+Entity ve ViewModel ayrımını uygulama
+Gerçek dünya senaryosuna yakın bir sistem geliştirme
+amaçlarıyla geliştirilmiştir.
 
 ### PremierVision.API
 
-Backend service responsible for database access and football data operations.
-
-Main endpoints:
+Ana Endpoint'ler:
 
 ```text
 GET  /api/home
@@ -57,114 +95,13 @@ POST /api/admin/statistics
 
 ### PremierVision.UI
 
-MVC frontend that consumes the API through `PremierVisionApiClient`.
+PremierVisionApiClient aracılığıyla API’yi tüketen MVC frontend uygulamasıdır.
 
-Main pages:
+Ana sayfalar:
 
-```text
-/                 Home page
-/index.html       Home page alias
-/fixtures.html    Fixture list
-/standings.html   Standings table
+/                 Ana sayfa
+/index.html       Ana sayfa (alternatif)
+/fixtures.html    Fikstür listesi
+/standings.html   Puan durumu tablosu
 /match-detail.html/{id}
-/admin
-```
-
-## Prerequisites
-
-- .NET 10 SDK
-- SQL Server
-- Visual Studio, Visual Studio Code, or any .NET-compatible editor
-
-## Configuration
-
-The API connection string is stored in:
-
-```text
-PremierVision.API/appsettings.json
-```
-
-Current example:
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Data Source=YOUR_SQL_SERVER;Initial Catalog=PremierVisionDb;Integrated Security=True;Trust Server Certificate=True;Encrypt=False;MultipleActiveResultSets=True;"
-  }
-}
-```
-
-Update `Data Source` for your local SQL Server instance before running the project on another machine.
-
-The UI points to the API through:
-
-```text
-PremierVision/appsettings.json
-```
-
-```json
-{
-  "PremierVisionApi": {
-    "BaseUrl": "http://localhost:5102/"
-  }
-}
-```
-
-## Running Locally
-
-Restore and build:
-
-```bash
-dotnet restore
-dotnet build PremierVision.API/PremierVision.API.csproj
-dotnet build PremierVision/PremierVision.UI.csproj
-```
-
-Start the API:
-
-```bash
-dotnet run --project PremierVision.API/PremierVision.API.csproj --urls http://localhost:5102
-```
-
-Start the MVC UI in a second terminal:
-
-```bash
-dotnet run --project PremierVision/PremierVision.UI.csproj --urls http://localhost:5059
-```
-
-Open:
-
-```text
-http://localhost:5059
-```
-
-## Database Notes
-
-The application expects an existing SQL Server database named `PremierVisionDb` with these main tables:
-
-- `Teams`
-- `Fixtures`
-- `MatchEvents`
-- `MatchStatistics`
-
-Entity relationships and table mapping are defined in:
-
-```text
-PremierVision.API/Data/AppDbContext.cs
-```
-
-Standings are calculated dynamically from completed fixtures by:
-
-```text
-PremierVision.API/Services/StandingsService.cs
-```
-
-## Development Notes
-
-- Stop running API/UI processes before rebuilding in Visual Studio. Otherwise Windows can lock `PremierVision.API.exe` or `PremierVision.UI.exe` and cause `MSB3021` / `MSB3027` copy errors.
-- The frontend depends on the API being available at the configured `PremierVisionApi:BaseUrl`.
-- Local `.dotnet`, `.dotnet-home`, `bin`, `obj`, `.vs`, and log files should not be committed.
-
-## License
-
-This project is currently provided for portfolio and educational use. Add a license file before publishing it as an open-source project.
+/admin            Admin paneli
